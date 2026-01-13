@@ -1,0 +1,69 @@
+{
+  "name": "Projects",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$path": "src/shared",
+      "Remotes": {
+        "$className": "Folder"
+      }
+    },
+    
+    "ReplicatedFirst": {
+      "$path": "src/replicated_first"
+    },
+
+    "ServerScriptService": {
+      "$path": "src/server"
+    },
+    
+    "ServerStorage": {
+      "$path": "src/server_storage"
+    },
+
+    "StarterGui": {
+      "$path": "src/interface"
+    },
+    
+    "StarterPack": {
+      "$path": "src/starter_pack"
+    },
+
+    "StarterPlayer": {
+      "$properties": {
+        "CameraMode": "Classic"
+      },
+      "StarterPlayerScripts": {
+        "$path": "src/client"
+      },
+      "StarterCharacterScripts": {
+        "$path": "src/character"
+      }
+    },
+
+    "Teams": {
+      "$className": "Teams"
+    },
+
+    "TextChatService": {
+      "$className": "TextChatService",
+      "ChatWindowConfiguration": {
+        "$className": "ChatWindowConfiguration"
+      },
+      "ChatInputBarConfiguration": {
+        "$className": "ChatInputBarConfiguration"
+      }
+    },
+
+    "Workspace": {
+      "$path": "src/workspace"
+    },
+    "Lighting": {
+      "$path": "src/lighting"
+    },
+    "SoundService": {
+      "$path": "src/sound_service"
+    }
+  }
+}
