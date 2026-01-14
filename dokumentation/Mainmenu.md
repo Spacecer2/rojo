@@ -10,12 +10,6 @@ This screen is the **main lobby / Play menu of Call of Duty: Mobile (COD: Mobile
 * Indicates that in-game voice chat is currently muted.
 
 ---
-
-### 🎮 **Game Title**
-
-* **“COD: MOBILE”**
-* Confirms you are on the main menu of Call of Duty: Mobile.
-
 ---
 
 ### 📌 **Main Navigation Tabs**

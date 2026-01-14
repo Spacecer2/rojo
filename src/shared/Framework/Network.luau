@@ -2,7 +2,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Network = {}
-local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local Remotes
+
+if RunService:IsServer() then
+	Remotes = ReplicatedStorage:FindFirstChild("Remotes")
+	if not Remotes then
+		Remotes = Instance.new("Folder")
+		Remotes.Name = "Remotes"
+		Remotes.Parent = ReplicatedStorage
+	end
+else
+	Remotes = ReplicatedStorage:WaitForChild("Remotes")
+end
 
 function Network.GetRemote(name, type)
 	local remote = Remotes:FindFirstChild(name)

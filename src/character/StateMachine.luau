@@ -6,11 +6,14 @@ local States = {
 	Walk = "Walk",
 	Run = "Run",
 	Sprint = "Sprint",
+	TacticalSprint = "TacticalSprint",
 	Crouch = "Crouch",
-	ADS = "ADS", -- Added
+	CrouchWalk = "CrouchWalk", -- Added per documentation
+	ADS = "ADS",
 	Jump = "Jump",
 	Freefall = "Freefall",
-	Land = "Land"
+	Land = "Land",
+	Slide = "Slide"
 }
 
 function StateMachine.new()

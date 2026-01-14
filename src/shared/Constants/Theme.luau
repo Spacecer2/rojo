@@ -14,7 +14,7 @@ local Theme = {
 	
 	Fonts = {
 		Main = Enum.Font.Gotham,
-		Bold = Enum.Font.GothamBold
+		Bold = Enum.Font.GothamBold,
 		Black = Enum.Font.GothamBlack
 	},
 	

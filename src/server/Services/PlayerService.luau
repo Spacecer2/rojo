@@ -18,7 +18,15 @@ function PlayerService.OnPlayerAdded(player)
 	print("Player joined: " .. player.Name)
 	DataService.LoadData(player)
 	
-	-- Here we could trigger character loading or other setup
+	-- Force spawn location "Way Higher" (Y=1000)
+	player.CharacterAdded:Connect(function(character)
+		-- Wait for root part
+		local rootPart = character:WaitForChild("HumanoidRootPart", 5)
+		if rootPart then
+			-- Pivot to high altitude to avoid baseplate clipping
+			character:PivotTo(CFrame.new(0, 1000, 0))
+		end
+	end)
 end
 
 function PlayerService.OnPlayerRemoving(player)

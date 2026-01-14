@@ -57,37 +57,87 @@
 
 ---
 
-## 2. Updated Roadmap
+# Project Roadmap: Warzone MW 2019 Recreation
 
-### Phase 1 – Foundation (Current Status)
-- [x] **Project Setup**: Rojo & Folder Structure (`src/character`).
-- [x] **Input Manager**: `ContextActionService` / `UserInputService` implementation.
-- [x] **State Machine**: Finite State Machine (FSM) with Attribute Sync.
-- [x] **Movement Controller**: Basic Walk/Run/Sprint logic.
-- [x] **Animation Controller**: Basic R15 Animation playback (Idle/Walk/Run/Jump).
-- [x] **Procedural Sway**: Basic Tilt/Sway on `RootJoint` using Springs.
-
-### Phase 2 – Combat & Fluidity
-- [ ] **Transition Smoothing**: Use `TweenService` or Springs for `WalkSpeed` changes (prevent instant snaps).
-- [ ] **Crouch System**: Fully implement Crouch logic (Hitbox reduction, speed dampening).
-- [ ] **Slide Mechanic**:
-    - Impulse force (`VectorForce`).
-    - Friction reduction (`CustomPhysicalProperties`).
-    - Camera FOV Tween.
-- [ ] **Camera System**: Custom `CameraOffset` handling for Crouch/Slide.
-
-### Phase 3 – Polish & Advanced Tech
-- [ ] **Inverse Kinematics (IK)**: Use `IKControl` for foot placement on slopes.
-- [ ] **Motion Matching**: Select start-frames of animations based on velocity (prevent foot sliding).
-- [ ] **Network Replication**: Ensure Attributes replicate correctly to server for anti-cheat validation.
-- [ ] **Sound Integration**: Footstep sounds triggered by `AnimationEvents`.
+This document outlines the complete development lifecycle for the project, aimed at delivering a AAA-grade Warzone experience on Roblox.
 
 ---
 
-## 3. Guiding Principles
-1.  **Server Authoritative, Client Predictive**: Input is immediate on client; Server validates via Attributes/Position checks.
-2.  **Decoupled Systems**: Components communicate via Attributes and Signals, never direct requires where possible.
-3.  **Physics First**: Movement should look good even without animations (via Procedural Tilt/Sway).
+## 🏗️ Phase 1: Foundational Infrastructure (COMPLETED)
+*Goal: Build a scalable, high-performance base.*
+- [x] **Dev Environment**: Rojo, Git, and automated Luau linting.
+- [x] **Networking**: Custom middleware for safe, efficient Remote communication.
+- [x] **Data Architecture**: Secure `DataStore` patterns for player profiles and persistence.
+- [x] **System Hub**: Modular controller/service architecture for decoupled logic.
+
+---
+
+## 🏃 Phase 2: Advanced Movement & Character (IN PROGRESS)
+*Goal: Perfect the "MW 2019 Feel" (Heavy but Fluid).*
+- [x] **State Machine**: Attribute-based sync for Idle, Walk, Sprint, ADS, and Air states.
+- [x] **ADS Mechanics**: Responsive FOV scaling and sensitivity dampening.
+- [x] **Tactical Sprint**: "Weapon-up" high-speed sprint with stamina and "Double-Tap" activation.
+- [ ] **The "Slide" Suite**:
+    - Momentum-based sliding with custom friction.
+    - **Slide Canceling** tech for high-level movement.
+- [x] **Stance Controls**: Fully integrated Crouch and Prone systems (Crouch implemented).
+- [x] **Procedural Juice**: Physics-based head-bob, movement tilt, and weapon sway (Initial pass).
+- [x] **Local Movement Test**: Integrated "TEST MOVEMENT" button for instant bypass of matchmaking.
+
+---
+
+## 🔫 Phase 3: The Arsenal (Combat & Gunplay)
+*Goal: Realistic ballistics and deep customization.*
+- [ ] **Weapon Framework (V3)**:
+    - Hybrid Hitscan/Projectile system (Bullet travel & drop).
+    - Wall penetration and material-based damage falloff.
+- [ ] **Gunsmith System**:
+    - Modular 5-attachment system with visual model swapping.
+    - Real-time stat modification (Mobility, Recoil, Range).
+- [ ] **Visual Recoil**: Spring-driven camera kick and weapon vibration.
+- [ ] **Reload Systems**: Support for Tactical (partial) and Dry (empty) reloads.
+
+---
+
+## 🚁 Phase 4: The Warzone Loop (Battle Royale)
+*Goal: Implement the core mechanics of the BR experience.*
+- [ ] **The Gas**: Circular hazard system with visual distortion and health drain.
+- [ ] **Buy Stations**: Interactive kiosks for Killstreaks, Loadouts, and Revives.
+- [ ] **Armor Plating**: Iconic 3-plate system with manual plating animations.
+- [ ] **The Gulag**: 1v1 arena for eliminated players to earn a redeploy.
+- [ ] **Contracts**: Scavenger, Recon, and Bounty missions for in-match rewards.
+
+---
+
+## 🖥️ Phase 5: UI/UX & Meta-Progression
+*Goal: AAA-standard interface and player retention.*
+- [ ] **Warzone Lobby**: Interactive 3D squad preview with dynamic lighting.
+- [ ] **Loadout Editor**: High-fidelity "Armory Table" for weapon customization.
+- [ ] **Global Progression**: Weapon XP, Player Levels, and Camo Challenges.
+- [ ] **HUD**: Minimap (square/circle toggle), Compass, and dynamic Kill-feed.
+
+---
+
+## 🌍 Phase 6: Environment & Social
+*Goal: Large-scale world-building and community features.*
+- [ ] **Map Development**: Modular "Points of Interest" (POIs) with tactical verticality.
+- [ ] **Audio Occlusion**: Advanced sound propagation through walls and materials.
+- [ ] **Social Systems**: In-game clans, global leaderboards, and party management.
+
+---
+
+## 💎 Phase 7: Final Polish & Tech
+*Goal: Optimization and visual excellence.*
+- [ ] **Parallel Processing**: Moving physics/procedural logic to Actors (Parallel Luau).
+- [ ] **Lighting & VFX**: Leveraging "Future" lighting for realistic metallic reflections.
+- [ ] **Optimization Pass**: Aggressive LOD management for large-scale maps.
+
+---
+
+## 💡 Guiding Principles
+1. **Fidelity Over Speed**: Do it right the first time; use physics over hacks.
+2. **Predictable Gameplay**: The player should never fight the controls.
+3. **Warzone DNA**: Every sound, animation, and UI element must feel authentic to MW 2019.
 
 ---
 *Refined based on Roblox Engine API documentation: 13.01.2026*

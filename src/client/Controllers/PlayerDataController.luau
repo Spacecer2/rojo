@@ -32,6 +32,7 @@ end
 
 function PlayerDataController.Start()
 	print("[PlayerDataController] Started")
+	Network.FireServer("RequestData")
 end
 
 return PlayerDataController

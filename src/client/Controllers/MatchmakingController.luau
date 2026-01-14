@@ -27,4 +27,10 @@ function MatchmakingController.Start()
 	print("[MatchmakingController] Started")
 end
 
+function MatchmakingController.StartMatchmaking(settings)
+	settings = settings or {}
+	print("[MatchmakingController] Requesting matchmaking with settings:", settings)
+	Network.FireServer("MatchmakingRequest", settings)
+end
+
 return MatchmakingController

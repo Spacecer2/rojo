@@ -1,28 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SimpleSignal = {} -- Simple signal implementation for state changes
-SimpleSignal.__index = SimpleSignal
-
-function SimpleSignal.new()
-	local self = setmetatable({}, SimpleSignal)
-	self._listeners = {}
-	return self
-end
-
-function SimpleSignal:Connect(fn)
-	table.insert(self._listeners, fn)
-	return {
-		Disconnect = function()
-			local idx = table.find(self._listeners, fn)
-			if idx then table.remove(self._listeners, idx) end
-		end
-	}
-end
-
-function SimpleSignal:Fire(...)
-	for _, fn in ipairs(self._listeners) do
-		task.spawn(fn, ...)
-	end
-end
+local Utils = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Utils")
+local Signal = require(Utils:WaitForChild("Signal"))
 
 -- The Store
 local Store = {
@@ -33,7 +11,7 @@ local Store = {
 		PlayerProfile = nil
 	},
 	
-	Changed = SimpleSignal.new()
+	Changed = Signal.new()
 }
 
 function Store.Set(key, value)
