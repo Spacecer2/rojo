@@ -26,18 +26,56 @@ Tracking the implementation of the Advanced Movement System and Foundational Inf
     - [x] **Loadout Service**: `LoadoutService.luau` for server-side weapon loadout persistence.
     - [x] **Signal & Spring**: `Signal.luau` and `Spring.luau` in `src/shared/Utils` for scalable communication and physics.
 
-## Phase 2 – Combat & Fluidity
+## Phase 2 – Combat & Fluidity (COMPLETED)
 - [x] **ADS Scaling**: Implemented dynamic FOV zoom and movement speed multipliers with smooth interpolation.
 - [x] **Landing Stun**: Added "heavy land" logic for high falls.
 - [x] **Crouch System**: Basic toggle implemented with CrouchWalk state; animation blending integrated.
 - [x] **Tactical Sprint**: "Weapon-up" sprint logic with double-tap activation and duration timer.
-- [ ] **Slide Mechanic**: In R&D (momentum/friction focus).
+- [x] **Slide Mechanic**: Implemented momentum-based sliding with friction decay and "Slide Canceling" support.
+- [x] **Intelligent Drone Camera**: 3-Layer Hybrid Architecture (Intent → Motion Plan → Physics) for cinematic menu/spectating.
 - [x] **Local Movement Test**: Button to instantly test movement mechanics without matchmaking.
 
-## Phase 3 – Gunsmith & Arsenal
-- [ ] **Weapon Framework**: Foundation for modular attachments.
-- [ ] **Lobby System**: 3D character preview in main menu.
-- [ ] **Loadout Management UI**: Client-side integration with server persistence.
+## Phase 3 – Gunsmith & Arsenal (IN PROGRESS)
+**Goal:** Implement the core weapon customization and leveling systems.
+
+#### Tasks:
+- [ ] **Data Foundations**
+    - [ ] Weapon Data Constants (Base stats, categories)
+    - [ ] Attachment Data Constants (Modifiers, models, categories)
+- [ ] **Weapon Attachment System**
+    - [ ] Backend logic to apply modifiers to base stats
+    - [ ] Real-time model swapping on weapon instances
+- [ ] **Global Progression**
+    - [ ] Weapon Leveling System (XP calculation & ranks)
+    - [ ] Unlockable Content (Mapping level → attachment)
+- [ ] **Loadout Integration**
+    - [ ] Extend `LoadoutService` for attachment persistence
+    - [ ] Save/Load custom weapon builds
+- [ ] **Gunsmith UI**
+    - [ ] Attachment Selection Grid
+    - [ ] Real-time Stat Comparison (Radar/Bar graphs)
+    - [ ] Weapon 3D Preview Camera
+
+#### Dependencies:
+- **Core Systems:** `PlayerDataService` for XP storage.
+- **UI Framework:** `ViewManager` for screen transitions.
+- **Assets:** Weapon and attachment models (using placeholders for now).
+
+#### Success Metrics:
+1. Players can equip an optic and see it visually on the weapon.
+2. Equipping a "Heavy Barrel" increases recoil control but decreases ADS speed.
+3. Weapon XP increases after simulated kills/actions and persists across sessions.
+4. Gunsmith UI correctly displays "Locked" state for items above weapon level.
+
+## Recent Improvements (15.01.2026)
+- ✅ **Drone Camera Refactor**:
+    - Implemented **3-Layer Hybrid Architecture** (Intent / Motion Plan / Physics).
+    - Added **Semantic Framing**: Camera evaluates angles for best visibility.
+    - Added **Predictive Filtering**: Zero-lag velocity extrapolation.
+    - Added `DroneSettingsUI` for real-time parameter tuning.
+- ✅ **Documentation Update**:
+    - Updated `README.md` with high-level architecture overview.
+    - Added `DRONE_TUNING_GUIDE.md` for camera configuration.
 
 ## Recent Improvements (13.01.2026)
 - ✅ **Movement System Enhancements**:
@@ -60,4 +98,4 @@ Tracking the implementation of the Advanced Movement System and Foundational Inf
     - Fixed missing server services (prevented server crashes)
 
 ---
-*Last Updated: 13.01.2026*
+*Last Updated: 15.01.2026*
