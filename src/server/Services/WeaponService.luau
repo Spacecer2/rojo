@@ -9,7 +9,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LoadoutService = require(ServerScriptService.Services.LoadoutService)
-local Network = require(ReplicatedStorage.shared.Framework.Network)
+local Network = require(ReplicatedStorage.Framework.Network)
 
 local WeaponService = {}
 
