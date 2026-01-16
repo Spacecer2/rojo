@@ -69,7 +69,7 @@ local function GetConfig()
 		MaxDistance = GetAttr("DroneMaxDistance", 50),
 		HeightOffset = GetAttr("DroneHeightOffset", 10),
 		LookAheadFactor = GetAttr("DroneLookAheadFactor", 0.2),
-		IdealAlignment = GetAttr("DroneIdealAlignment", -0.8),
+		IdealAlignment = GetAttr("DroneIdealAlignment", 30),
 		
 		-- Intent Layer: Cinematic Behavior
 		OrbitSwayAmplitude = GetAttr("DroneOrbitSwayAmplitude", 0.6), -- Radians
@@ -233,10 +233,9 @@ local function EvaluateFramingQuality(cameraPos, playerPos, playerVel, c)
 		-- Dot product: 1 = camera behind player (chase), -1 = camera in front (face view)
 		local forwardAlignment = horizontalCameraToPlayer:Dot(playerForward)
 		
-		-- User request: prefer looking at player from front (face view)
-		-- Turn 180 degrees from previous (0.5) -> -0.8 (Front bias)
-		local idealAlignment = c.IdealAlignment
-		forwardBias = 1 - math.abs(forwardAlignment - idealAlignment)
+		-- Target alignment based on degrees from front (0 = front, 180 = back)
+		local targetDot = -math.cos(math.rad(c.IdealAlignment))
+		forwardBias = 1 - math.abs(forwardAlignment - targetDot)
 	end
 	
 	-- 4. Height quality (avoid extreme vertical angles)

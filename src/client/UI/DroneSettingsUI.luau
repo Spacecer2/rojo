@@ -35,8 +35,8 @@ local parameters = {
 		 tooltip = "Vertical offset above player"},
 		{name = "DroneLookAheadFactor", label = "Look Ahead Factor", min = 0.0, max = 0.5, default = 0.2, step = 0.05,
 		 tooltip = "How far ahead the camera looks (velocity-based)"},
-		{name = "DroneIdealAlignment", label = "Front/Back Bias", min = -1.0, max = 1.0, default = -0.8, step = 0.1,
-		 tooltip = "Preferred angle: -1.0 is front (face view), 1.0 is behind (chase view)"},
+		{name = "DroneIdealAlignment", label = "Preferred Angle (Deg)", min = 0, max = 180, default = 30, step = 5,
+		 tooltip = "Target angle from the front: 0° is direct front, 180° is direct behind"},
 	}},
 	
 	-- Layer 2: Motion Plan (Control/Smoothing) - How to achieve intent smoothly
@@ -353,7 +353,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 0.8,
 		DroneOrbitSwayFrequency = 0.15,
 		DroneLookAheadFactor = 0.3,
-		DroneIdealAlignment = -0.8,
+		DroneIdealAlignment = 35,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.4,
 		DroneStressSmoothing = 0.008,
@@ -371,7 +371,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 0.4,
 		DroneOrbitSwayFrequency = 0.3,
 		DroneLookAheadFactor = 0.15,
-		DroneIdealAlignment = 0.5,
+		DroneIdealAlignment = 135,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.7,
 		DroneAmbitionScale = 2.0,
@@ -390,7 +390,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 1.0,
 		DroneOrbitSwayFrequency = 0.1,
 		DroneLookAheadFactor = 0.25,
-		DroneIdealAlignment = -0.8,
+		DroneIdealAlignment = 35,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.35,
 		DroneAmbitionScale = 1.5,
