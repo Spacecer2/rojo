@@ -67,7 +67,7 @@ local function GetConfig()
 	return {
 		MinDistance = GetAttr("DroneMinDistance", 10),
 		MaxDistance = GetAttr("DroneMaxDistance", 30),
-		HeightOffset = GetAttr("DroneHeightOffset", 5),
+		HeightOffset = GetAttr("DroneHeightOffset", -3),
 		LookAheadFactor = GetAttr("DroneLookAheadFactor", 0.2),
 		IdealAlignment = GetAttr("DroneIdealAlignment", 0),
 		
