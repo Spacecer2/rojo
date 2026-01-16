@@ -223,6 +223,7 @@ function WeaponsMenu.Create(parent)
 				selectedId = loadout.Id
 				refreshSidebar()
 				refreshEditor(loadout)
+				LoadoutData.Save(loadout)
 			end)
 			
 			-- Delete Button
@@ -268,6 +269,7 @@ function WeaponsMenu.Create(parent)
 		selectedId = newLoadout.Id
 		refreshSidebar()
 		refreshEditor(newLoadout)
+		LoadoutData.Save(newLoadout)
 	end)
 
 	-- Init

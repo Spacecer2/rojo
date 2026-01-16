@@ -1,3 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Network = require(ReplicatedStorage:WaitForChild("shared"):WaitForChild("Framework"):WaitForChild("Network"))
+
 local LoadoutData = {}
 
 local defaultLoadouts = {
@@ -50,6 +53,10 @@ function LoadoutData.Delete(id)
 			break
 		end
 	end
+end
+
+function LoadoutData.Save(loadout)
+	Network.FireServer("UpdateLoadout", loadout)
 end
 
 return LoadoutData
