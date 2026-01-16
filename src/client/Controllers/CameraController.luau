@@ -229,10 +229,12 @@ local function EvaluateFramingQuality(cameraPos, playerPos, playerVel, c)
 		local playerForward = playerVel.Unit
 		local horizontalCameraToPlayer = horizontalDir.Unit
 		
-		-- Dot product: 1 = camera in front, -1 = camera behind
+		-- Dot product: 1 = camera behind player (chase), -1 = camera in front (face view)
 		local forwardAlignment = horizontalCameraToPlayer:Dot(playerForward)
-		-- Prefer slightly forward of perpendicular (0.3 to 0.7 is sweet spot)
-		local idealAlignment = 0.5
+		
+		-- User request: prefer looking at player from front (face view)
+		-- Turn 180 degrees from previous (0.5) -> -0.8 (Front bias)
+		local idealAlignment = -0.8
 		forwardBias = 1 - math.abs(forwardAlignment - idealAlignment)
 	end
 	
