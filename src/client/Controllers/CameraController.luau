@@ -832,13 +832,20 @@ function CameraController.EnableMenuCamera()
 		-- Initialize state
 		if not initialized then
 			local _, y, _ = rootPart.CFrame:ToOrientation()
-			IntentLayer.desiredOrbitAngle = y
-			IntentLayer.impulseGenerator.centralAngle = y
-			IntentLayer.impulseGenerator.targetDist = c.MinDistance + 5
+			local spawnAngle = y + math.pi -- Start in front of player
+			local spawnDist = c.MinDistance + 5
 			
-			PhysicalLayer.p = rootPart.Position + Vector3.new(0, c.HeightOffset, c.MinDistance + 5)
+			IntentLayer.desiredOrbitAngle = spawnAngle
+			IntentLayer.impulseGenerator.centralAngle = spawnAngle
+			IntentLayer.impulseGenerator.targetDist = spawnDist
+			
+			PhysicalLayer.p = rootPart.Position + Vector3.new(
+				math.sin(spawnAngle) * spawnDist,
+				c.HeightOffset,
+				math.cos(spawnAngle) * spawnDist
+			)
 			PhysicalLayer.v = Vector3.zero
-			PhysicalLayer.q = CFrame.fromOrientation(0, y, 0)
+			PhysicalLayer.q = CFrame.lookAt(PhysicalLayer.p, rootPart.Position + Vector3.new(0, 1.5, 0))
 			PhysicalLayer.f = rootPart.Position + Vector3.new(0, 1.5, 0)
 			PhysicalLayer.fv = Vector3.zero
 			
