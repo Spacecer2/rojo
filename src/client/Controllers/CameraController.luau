@@ -69,7 +69,7 @@ local function GetConfig()
 		MaxDistance = GetAttr("DroneMaxDistance", 50),
 		HeightOffset = GetAttr("DroneHeightOffset", 10),
 		LookAheadFactor = GetAttr("DroneLookAheadFactor", 0.2),
-		IdealAlignment = GetAttr("DroneIdealAlignment", 30),
+		IdealAlignment = GetAttr("DroneIdealAlignment", 0),
 		
 		-- Intent Layer: Cinematic Behavior
 		OrbitSwayAmplitude = GetAttr("DroneOrbitSwayAmplitude", 0.6), -- Radians
