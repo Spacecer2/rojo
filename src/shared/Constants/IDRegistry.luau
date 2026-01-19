@@ -28,6 +28,50 @@ IDRegistry.PlaylistList = {
 	"PRACTICE_BOTS"
 }
 
+-- Playlist Metadata for UI Generation
+IDRegistry.PlaylistMetadata = {
+	BR_QUADS = {
+		Name = "Battle Royale Quads",
+		Description = "4-player squad battle royale",
+		Icon = "rbxassetid://0",
+		MaxPlayers = 4,
+		GameMode = "Battle Royale",
+		Ranking = true
+	},
+	BR_SOLOS = {
+		Name = "Battle Royale Solos",
+		Description = "Solo battle royale competition",
+		Icon = "rbxassetid://0",
+		MaxPlayers = 1,
+		GameMode = "Battle Royale",
+		Ranking = true
+	},
+	SCOPES_AND_SCATTER = {
+		Name = "Scopes and Scatter",
+		Description = "Sniper rifle competition",
+		Icon = "rbxassetid://0",
+		MaxPlayers = 2,
+		GameMode = "Limited",
+		Ranking = false
+	},
+	PLUNDER_QUADS = {
+		Name = "Plunder Quads",
+		Description = "Collect cash and survive",
+		Icon = "rbxassetid://0",
+		MaxPlayers = 4,
+		GameMode = "Plunder",
+		Ranking = false
+	},
+	PRACTICE_BOTS = {
+		Name = "Practice vs Bots",
+		Description = "Train against AI opponents",
+		Icon = "rbxassetid://0",
+		MaxPlayers = 4,
+		GameMode = "Practice",
+		Ranking = false
+	}
+}
+
 -- ============================================================================
 -- OPERATOR IDS
 -- ============================================================================
@@ -63,6 +107,140 @@ IDRegistry.OperatorList = {
 	"Mason"
 }
 
+-- Operator Metadata for UI Generation
+IDRegistry.OperatorMetadata = {
+	["T-800"] = {
+		Name = "T-800",
+		Bio = "Cyberdyne Systems Model 101. Coming to Warzone.",
+		Rarity = "Legendary",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "HOOK & SLASH",
+		Nationality = "Cyborg",
+		Category = "Villain"
+	},
+	["Ghost"] = {
+		Name = "Ghost",
+		Bio = "Simon 'Ghost' Riley. Elite British SAS operative.",
+		Rarity = "Epic",
+		Skins = 4,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "SILENT ENTRY",
+		Nationality = "British",
+		Category = "Task Force 141"
+	},
+	["Soap"] = {
+		Name = "Soap",
+		Bio = "Sergeant John 'Soap' MacTavish. Veteran of multiple campaigns.",
+		Rarity = "Rare",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "CLEAN UP",
+		Nationality = "Scottish",
+		Category = "Task Force 141"
+	},
+	["Price"] = {
+		Name = "Price",
+		Bio = "Captain John Price. Leader of Task Force 141.",
+		Rarity = "Epic",
+		Skins = 3,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "BREACH & CLEAR",
+		Nationality = "British",
+		Category = "Task Force 141"
+	},
+	["Gaz"] = {
+		Name = "Gaz",
+		Bio = "Kyle 'Gaz' Garrick. Tactical operator with sharp instincts.",
+		Rarity = "Rare",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "CLASSIFIED",
+		Nationality = "British",
+		Category = "Task Force 141"
+	},
+	["Farah"] = {
+		Name = "Farah",
+		Bio = "Captain Farah Karim. Leader of the Urzikstan Liberation Army.",
+		Rarity = "Epic",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "COUNTER-ATTACK",
+		Nationality = "Urzikstani",
+		Category = "Allies"
+	},
+	["Roze"] = {
+		Name = "Roze",
+		Bio = "Rosa 'Roze' Mendes. Former member of the Armada cartel.",
+		Rarity = "Rare",
+		Skins = 3,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "PRECISION STRIKE",
+		Nationality = "Colombian",
+		Category = "Operators"
+	},
+	["Nikto"] = {
+		Name = "Nikto",
+		Bio = "Nikto. Mysterious operative with a dark past.",
+		Rarity = "Legendary",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "DECISIVE FORCE",
+		Nationality = "Unknown",
+		Category = "Shadow Company"
+	},
+	["Mace"] = {
+		Name = "Mace",
+		Bio = "Mace. Hardened operator with superior tactical skills.",
+		Rarity = "Epic",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "OVERWHELMING FORCE",
+		Nationality = "American",
+		Category = "Shadow Company"
+	},
+	["Velikan"] = {
+		Name = "Velikan",
+		Bio = "Velikan. Imposing force with unmatched combat prowess.",
+		Rarity = "Legendary",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "ABSOLUTE ZERO",
+		Nationality = "Russian",
+		Category = "Shadow Company"
+	},
+	["Lerch"] = {
+		Name = "Lerch",
+		Bio = "Lerch. Veteran of countless operations across the globe.",
+		Rarity = "Rare",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "TACTICAL STRIKE",
+		Nationality = "German",
+		Category = "Operators"
+	},
+	["Woods"] = {
+		Name = "Woods",
+		Bio = "Frank 'Woods' Woods. Seasoned Black Ops veteran.",
+		Rarity = "Epic",
+		Skins = 3,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "TACTICAL NUKE",
+		Nationality = "American",
+		Category = "Black Ops"
+	},
+	["Mason"] = {
+		Name = "Mason",
+		Bio = "Alex Mason. Black Ops operative with specialized training.",
+		Rarity = "Rare",
+		Skins = 2,
+		Portrait = "rbxassetid://13165203306",
+		FinishingMove = "CLASSIFIED OPS",
+		Nationality = "American",
+		Category = "Black Ops"
+	}
+}
+
 -- ============================================================================
 -- CHALLENGE IDS
 -- ============================================================================
@@ -78,6 +256,37 @@ IDRegistry.ChallengeList = {
 	"OPEN_CACHES"
 }
 
+-- Challenge Metadata for UI Generation
+IDRegistry.ChallengeMetadata = {
+	RECON_CONTRACTS = {
+		Name = "Recon Contract",
+		Description = "Gather intelligence at specified locations",
+		Icon = "rbxassetid://0",
+		Reward = 1500,
+		Difficulty = "Medium",
+		Duration = 180,
+		Objectives = 3
+	},
+	AIRPORT_CONTRACTS = {
+		Name = "Airport Security",
+		Description = "Secure the airport perimeter",
+		Icon = "rbxassetid://0",
+		Reward = 2000,
+		Difficulty = "Hard",
+		Duration = 300,
+		Objectives = 2
+	},
+	OPEN_CACHES = {
+		Name = "Cache Retrieval",
+		Description = "Find and open hidden caches",
+		Icon = "rbxassetid://0",
+		Reward = 1200,
+		Difficulty = "Easy",
+		Duration = 120,
+		Objectives = 4
+	}
+}
+
 -- ============================================================================
 -- LOADOUT IDS
 -- ============================================================================
@@ -87,15 +296,50 @@ IDRegistry.Loadouts = {
 	MAX_ID = 999
 }
 
+-- Loadout Metadata for UI Generation
+IDRegistry.LoadoutMetadata = {
+	Default = {
+		Name = "Default Loadout",
+		Description = "Balanced weapon setup",
+		Icon = "rbxassetid://0",
+		Rarity = "Common",
+		PrimaryWeapon = "M4A1",
+		SecondaryWeapon = "M9",
+		Equipment = "Frag Grenade",
+		Tactical = "Stun Grenade"
+	}
+}
+
 -- ============================================================================
 -- LOOKUP & VALIDATION FUNCTIONS
 -- ============================================================================
 
 --[[
-	Validates if a playlist ID exists
-	@param id - The playlist ID to validate
-	@return boolean - True if valid
+	Get metadata for a specific ID
+	@param category - The category (Playlists, Operators, Challenges, Loadouts)
+	@param id - The ID to get metadata for
+	@return table - Metadata table for the ID, or empty table if not found
 ]]
+function IDRegistry.GetMetadata(category, id)
+	local metadataTable = IDRegistry[category .. "Metadata"]
+	if metadataTable and metadataTable[id] then
+		return table.clone(metadataTable[id])
+	end
+	return {}
+end
+
+--[[
+	Get all metadata for a category for enumeration
+	@param category - The category (Playlists, Operators, Challenges, Loadouts)
+	@return table - Table of all metadata for that category
+]]
+function IDRegistry.GetAllMetadata(category)
+	local metadataTable = IDRegistry[category .. "Metadata"]
+	if metadataTable then
+		return table.clone(metadataTable)
+	end
+	return {}
+end
 function IDRegistry.IsValidPlaylist(id)
 	for _, playlistId in ipairs(IDRegistry.PlaylistList) do
 		if playlistId == id then
