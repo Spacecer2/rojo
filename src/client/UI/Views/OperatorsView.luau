@@ -207,7 +207,7 @@ function OperatorsView.Create(parent)
 			opName.Text = op.Name
 			-- Dynamically calculate unlocked skins based on player data
 			local skinCount = op.Skins or 0
-			local unlockedSkins = OperatorRanking.IsOperatorUnlocked(player, op.Id) and skinCount or 0
+			local unlockedSkins = (player and OperatorRanking.IsOperatorUnlocked(player, op.Id)) and skinCount or 0
 			skinLabel.Text = string.format("OPERATOR SKINS\n%d/%d UNLOCKED", unlockedSkins, skinCount)
 			moveLabel.Text = string.format("FINISHING MOVE\n%s", op.FinishingMove or "UNASSIGNED")
 		end))

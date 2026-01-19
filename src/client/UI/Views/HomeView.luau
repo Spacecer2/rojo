@@ -70,6 +70,18 @@ end)
 if not success3 then warn("Failed to load Theme:", theme) end
 if success3 and theme then Theme = theme end
 
+local PlaylistData = {Modes = {}}
+local success4, playlistDataModule = pcall(function()
+	if Constants then
+		local module = Constants:FindFirstChild("PlaylistData")
+		if module then
+			return require(module)
+		end
+	end
+	return nil
+end)
+if success4 and playlistDataModule then PlaylistData = playlistDataModule end
+
 local HomeView = {}
 
 -- Fallback colors if Theme fails to load
@@ -102,7 +114,7 @@ function HomeView.Create(parent)
 	local profile = {
 		Level = 1,
 		Currency = 0,
-		Username = player.Name,
+		Username = player and player.Name or "Player",
 		XP = 0,
 		MaxXP = 1000
 	}
