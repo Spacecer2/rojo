@@ -38,7 +38,7 @@ function LoadingScreen.Create()
 	-- Container
 	container = Instance.new("Frame")
 	container.Name = "Container"
-	container.Size = UDim2.new(0, 600, 0, 200)
+	container.Size = UDim2.fromOffset(600, 200)
 	container.Position = UDim2.fromScale(0.5, 0.5)
 	container.AnchorPoint = Vector2.new(0.5, 0.5)
 	container.BackgroundTransparency = 1

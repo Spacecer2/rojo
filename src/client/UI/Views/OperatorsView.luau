@@ -40,7 +40,7 @@ function OperatorsView.Create(parent)
 	-- 1. Progress Header (Top Left)
 	local header = Instance.new("Frame")
 	header.Name = "Header"
-	header.Size = UDim2.new(0, 400, 0, 50)
+	header.Size = UDim2.fromOffset(400, 50)
 	header.Position = UDim2.fromOffset(40, 20)
 	header.BackgroundTransparency = 1
 	header.Parent = frame
@@ -58,7 +58,7 @@ function OperatorsView.Create(parent)
 	
 	local progressBg = Instance.new("Frame")
 	progressBg.Name = "ProgressBackground"
-	progressBg.Size = UDim2.new(0, 300, 0, 4)
+	progressBg.Size = UDim2.fromOffset(300, 4)
 	progressBg.Position = UDim2.fromOffset(0, 25)
 	progressBg.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
 	progressBg.BorderSizePixel = 0
@@ -80,7 +80,7 @@ function OperatorsView.Create(parent)
 	-- 2. Detail Section (Left Center)
 	local detailPanel = Instance.new("Frame")
 	detailPanel.Name = "DetailPanel"
-	detailPanel.Size = UDim2.new(0, 300, 0, 200)
+	detailPanel.Size = UDim2.fromOffset(300, 200)
 	detailPanel.Position = UDim2.fromOffset(40, 100)
 	detailPanel.BackgroundTransparency = 1
 	detailPanel.Parent = frame
@@ -97,7 +97,7 @@ function OperatorsView.Create(parent)
 	opName.Parent = detailPanel
 	
 	local skinInfo = Instance.new("Frame")
-	skinInfo.Size = UDim2.new(0, 200, 0, 40)
+	skinInfo.Size = UDim2.fromOffset(200, 40)
 	skinInfo.Position = UDim2.fromOffset(0, 65)
 	skinInfo.BackgroundColor3 = Color3.new(0,0,0)
 	skinInfo.BackgroundTransparency = 0.6
@@ -116,7 +116,7 @@ function OperatorsView.Create(parent)
 	skinLabel.Parent = skinInfo
 	
 	local moveInfo = Instance.new("Frame")
-	moveInfo.Size = UDim2.new(0, 200, 0, 40)
+	moveInfo.Size = UDim2.fromOffset(200, 40)
 	moveInfo.Position = UDim2.fromOffset(0, 110)
 	moveInfo.BackgroundColor3 = Color3.new(0,0,0)
 	moveInfo.BackgroundTransparency = 0.6
@@ -166,7 +166,7 @@ function OperatorsView.Create(parent)
 		if not op.Unlocked then
 			local lock = Instance.new("Frame")
 			lock.Size = UDim2.fromOffset(24, 24)
-			lock.Position = UDim2.new(0.5, 0, 0.5, 0)
+		lock.Position = UDim2.fromScale(0.5, 0.5)
 			lock.AnchorPoint = Vector2.new(0.5, 0.5)
 			lock.BackgroundColor3 = Color3.fromRGB(0,0,0)
 			lock.BackgroundTransparency = 0.5
@@ -180,7 +180,7 @@ function OperatorsView.Create(parent)
 		nameTag.TextSize = 10
 		nameTag.TextColor3 = COLORS.TextMain
 		nameTag.Size = UDim2.new(1, 0, 0, 20)
-		nameTag.Position = UDim2.new(0, 0, 1, 0)
+		nameTag.Position = UDim2.fromScale(0, 1)
 		nameTag.AnchorPoint = Vector2.new(0, 1)
 		nameTag.BackgroundColor3 = Color3.new(0,0,0)
 		nameTag.BackgroundTransparency = 0.5
@@ -222,7 +222,7 @@ function OperatorsView.Create(parent)
 	-- 4. Action Buttons (Bottom Bar Right-ish)
 	local actions = Instance.new("Frame")
 	actions.Name = "Actions"
-	actions.Size = UDim2.new(0, 500, 0, 40)
+	actions.Size = UDim2.fromOffset(500, 40)
 	actions.Position = UDim2.new(1, -40, 1, -350)
 	actions.AnchorPoint = Vector2.new(1, 1)
 	actions.BackgroundTransparency = 1

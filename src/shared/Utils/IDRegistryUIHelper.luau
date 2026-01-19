@@ -59,7 +59,7 @@ function IDRegistryUIHelper.CreateIDItemButton(parent, itemName, metadata, onSel
 	nameLabel.Font = Enum.Font.GothamBold
 	nameLabel.TextSize = 14
 	nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	nameLabel.Size = UDim2.new(0.5, 0, 1, 0)
+	nameLabel.Size = UDim2.fromScale(0.5, 1)
 	nameLabel.Position = UDim2.fromOffset(10, 0)
 	nameLabel.BackgroundTransparency = 1
 	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -153,7 +153,7 @@ function IDRegistryUIHelper.CreateIDGridFrame(parent, category, idRegistry, onSe
 		if metadata.Portrait or metadata.Icon then
 			local portrait = Instance.new("ImageLabel")
 			portrait.Image = metadata.Portrait or metadata.Icon
-			portrait.Size = UDim2.new(1, 0, 0.7, 0)
+		portrait.Size = UDim2.fromScale(1, 0.7)
 			portrait.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
 			portrait.BorderSizePixel = 0
 			portrait.Parent = itemFrame
@@ -165,8 +165,8 @@ function IDRegistryUIHelper.CreateIDGridFrame(parent, category, idRegistry, onSe
 		nameLabel.Font = Enum.Font.GothamBold
 		nameLabel.TextSize = 12
 		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		nameLabel.Size = UDim2.new(1, 0, 0.3, 0)
-		nameLabel.Position = UDim2.new(0, 0, 0.7, 0)
+		nameLabel.Size = UDim2.fromScale(1, 0.3)
+		nameLabel.Position = UDim2.fromScale(0, 0.7)
 		nameLabel.BackgroundTransparency = 1
 		nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
 		nameLabel.Parent = itemFrame
@@ -234,7 +234,7 @@ function IDRegistryUIHelper.CreateMetadataPanel(parent, metadata, size)
 			keyLabel.Font = Enum.Font.GothamBold
 			keyLabel.TextSize = 11
 			keyLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
-			keyLabel.Size = UDim2.new(1, 0, 0.4, 0)
+			keyLabel.Size = UDim2.fromScale(1, 0.4)
 			keyLabel.BackgroundTransparency = 1
 			keyLabel.TextXAlignment = Enum.TextXAlignment.Left
 			keyLabel.Parent = fieldFrame
@@ -244,7 +244,7 @@ function IDRegistryUIHelper.CreateMetadataPanel(parent, metadata, size)
 			valueLabel.Font = Enum.Font.Gotham
 			valueLabel.TextSize = 12
 			valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			valueLabel.Size = UDim2.new(1, 0, 0.6, 0)
+			valueLabel.Size = UDim2.fromScale(1, 0.6)
 			valueLabel.Position = UDim2.fromOffset(0, 20)
 			valueLabel.BackgroundTransparency = 1
 			valueLabel.TextXAlignment = Enum.TextXAlignment.Left
