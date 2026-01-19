@@ -1,3 +1,5 @@
+local IDRegistry = require(script.Parent.Constants.IDRegistry)
+
 local PlayerData = {}
 PlayerData.__index = PlayerData
 
@@ -18,9 +20,9 @@ function PlayerData.new(player)
 			Goal = 1
 		},
 		Challenges = {
-			{Id = "RECON_CONTRACTS", Title = "Complete 5 'Recon' Contract(s)", Progress = 0, Goal = 5, XP = 2500},
-			{Id = "AIRPORT_CONTRACTS", Title = "Start 3 Contract(s) at Airport", Progress = 0, Goal = 3, XP = 1500},
-			{Id = "OPEN_CACHES", Title = "Open 10 Caches", Progress = 0, Goal = 10, XP = 1000},
+			{Id = IDRegistry.Challenges.RECON_CONTRACTS, Title = "Complete 5 'Recon' Contract(s)", Progress = 0, Goal = 5, XP = 2500},
+			{Id = IDRegistry.Challenges.AIRPORT_CONTRACTS, Title = "Start 3 Contract(s) at Airport", Progress = 0, Goal = 3, XP = 1500},
+			{Id = IDRegistry.Challenges.OPEN_CACHES, Title = "Open 10 Caches", Progress = 0, Goal = 10, XP = 1000},
 		},
 		Inventory = {},
 		WeaponProgress = {}, -- { ["WeaponName"] = { Level = 1, XP = 0 } }

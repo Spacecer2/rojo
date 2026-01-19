@@ -1,10 +1,12 @@
 --[[
 	ChallengeService - Server-side manager for daily challenges
 	Handles progress tracking, goal completion, and rewards
+	Uses centralized ID management from IDRegistry
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Network = require(ReplicatedStorage.Framework.Network)
+local IDRegistry = require(ReplicatedStorage.Constants.IDRegistry)
 
 local ChallengeService = {}
 
@@ -12,6 +14,12 @@ local ChallengeService = {}
 function ChallengeService.UpdateProgress(player, challengeId, increment)
 	local DataService = require(ServerScriptService.Services.DataService)
 	local pData = DataService.GetPlayerData(player)
+	
+	-- Validate challenge ID before processing
+	if not IDRegistry.IsValidChallenge(challengeId) then
+		warn("[ChallengeService] Invalid challenge ID: " .. tostring(challengeId))
+		return false
+	end
 	
 	if pData and pData.Data.Challenges then
 		for _, challenge in ipairs(pData.Data.Challenges) do

@@ -5,6 +5,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local UI = require(script.Parent.Parent)
 local Controllers = script.Parent.Parent.Parent.Controllers
 
 -- Safe require with fallbacks
@@ -206,6 +207,8 @@ function HomeView.Create(parent)
 		btn.Text = ""
 		btn.Parent = tile
 		
+		UI.ApplyFeedback(btn, {HoverScale = 1.02})
+		
 		btn.MouseButton1Click:Connect(function()
 			currentSelectedMode = data.Title
 			-- Clear others
@@ -257,6 +260,8 @@ function HomeView.Create(parent)
 	fillBtn.BackgroundTransparency = 1
 	fillBtn.Text = ""
 	fillBtn.Parent = squadFill
+	
+	UI.ApplyFeedback(fillBtn, {HoverScale = 1.05})
 	
 	fillBtn.MouseButton1Click:Connect(function()
 		currentSquadFill = not currentSquadFill
@@ -425,6 +430,8 @@ function HomeView.Create(parent)
 	viewLink.BackgroundTransparency = 1
 	viewLink.TextXAlignment = Enum.TextXAlignment.Left
 	viewLink.Parent = rightPanel
+	
+	UI.ApplyFeedback(viewLink, {HoverScale = 1.05})
 
 	-- Cleanup redundant events listener setup
 	if MatchmakingController and MatchmakingController.LobbyChanged then

@@ -61,19 +61,98 @@ We have implemented a **Three-Layer Hybrid Architecture** for the menu/spectator
 - [x] **Intelligent Camera**: The "Stalker Drone" system described above.
 - [x] **Matchmaking**: Scalable lobby system and queue logic.
 
-### Phase 3: Code Health & Polish (RECENT)
+### Phase 3: Code Health & Polish (COMPLETED)
 - [x] **Linting & Standards**: Enforced `Selene` standards across the codebase (deprecated APIs fixed, variable shadowing resolved).
 - [x] **Toolchain**: Integrated `Aftman` for tool management (`Selene`, `Rojo`, `Stylua`).
 - [x] **Stability**: Fixed logical redundancies in UI managers and improved error handling in character controllers.
+- [x] **Documentation System**: 11 README files, 71+ markdown files, comprehensive cross-reference system.
 
-### Phase 4: Gunsmith & Arsenal (IN PROGRESS)
+### Phase 4: Platform Documentation (COMPLETED - Jan 2026)
+- [x] **Roblox Reference Guides**: 9 comprehensive guides covering Luau, Services, Networking, Physics, UI, and Performance
+- [x] **RobloxDocs Organization**: Master index, topic-based navigation, integration with project documentation
+- [x] **Code Examples**: 100+ practical code samples for all major Roblox systems
+- [x] **Warzone-Specific Patterns**: Optimized networking, physics, UI, and performance guidance tailored to the project
+
+### Phase 5: Gunsmith & Arsenal (IN PROGRESS)
 - [ ] **Attachment System**: Modular data structure for weapon modifications.
 - [ ] **Gunsmith UI**: Real-time stat visualization (Radar/Bar graphs).
 - [ ] **Weapon Leveling**: XP progression and unlock tracks.
 
 ---
 
-## 📂 Project Structure
+## � Documentation Organization
+
+All documentation is organized into logical folders for easy navigation:
+**Quick Stats:**
+- 🎮 **71+ markdown files** across 8 organized folders
+- 📖 **40,000+ lines** of documentation and code examples
+- ✅ **11 README files** with consistent naming and structure
+- 🔗 **100+ cross-references** linking features, components, and design docs
+- 🌐 **9 Roblox reference guides** covering development from basics to optimization
+### 🎮 **[Features/](Features/)** - Complete Feature Documentation (MAIN REFERENCE)
+Comprehensive design documentation for all 12 gameplay features:
+- **[Combat/](Features/Combat/)** - Weapon systems & gunplay (WeaponFramework, GunsmithSystem, VisualRecoil)
+- **[BattleRoyale/](Features/BattleRoyale/)** - Core BR mechanics (MatchLifecycle, GasSystem, Gulag, Contracts, Economy, LootingSystem)
+- **[Progression/](Features/Progression/)** - Player retention (BattlePass, RewardSystems)
+- **[Systems/](Features/Systems/)** - UI & settings (SettingsMenu)
+- **[Features/README.md](Features/README.md)** - Start here for feature overview & navigation
+- **[Features/INDEX.md](Features/INDEX.md)** - Cross-references & dependency graph
+
+### 🔧 **[Components/](Components/)** - Individual System Components
+Technical documentation for specific game components:
+- CameraController - Drone camera system architecture
+- StateMachine - Character state management
+- InputManager - Input normalization
+- MovementController - Physics-driven locomotion
+- ProceduralAnimator - Animation & effects
+- MenuController - UI logic
+- Gunsmith - Weapon customization
+
+### 📋 **[Design/](Design/)** - High-Level Design Documents
+System-level design specifications:
+- Contracts - Mission objectives & rewards
+- Economy & Loot - Cash system & item distribution
+- GameLoop - Match flow & state progression
+- Rewards & BattlePass - Seasonal progression
+- Settings - Player customization
+
+### 🎨 **[Assets/](Assets/)** - Game Content & Cosmetics
+Asset inventory and cosmetic documentation:
+- Weapons - All weapons & configurations
+- Operators - Character cosmetics
+- Equipment - Tactical & lethal items
+- Killstreaks - Streak rewards
+- Ranks - Player progression tiers
+- Gamepasses - Cosmetic purchases
+
+### 📖 **[Guides/](Guides/)** - Implementation & Tuning Guides
+Practical guides and troubleshooting:
+- Drone Tuning Guide - Camera system parameter tuning
+- Drone System - System overview
+- Error Handling - Common issues & solutions
+- Armsdealer - Weapon dealer system
+
+### 📦 **[Archive/](Archive/)** - Legacy Documentation
+Superseded and legacy documentation (reference only):
+- Old Feature_*.md files (replaced by Features/)
+- Legacy system designs
+- Deprecated documentation
+
+### 🌐 **[RobloxDocs/](RobloxDocs/)** - Roblox Platform Reference (COMPLETE)
+Comprehensive Roblox development guides and API documentation:
+- **[RobloxDocs/README.md](RobloxDocs/README.md)** - Roblox documentation hub & quick start
+- **[RobloxDocs/INDEX.md](RobloxDocs/INDEX.md)** - Master index with navigation & integration
+- **[Luau_Language.md](RobloxDocs/Luau_Language.md)** - Luau scripting fundamentals & type system
+- **[EngineReference.md](RobloxDocs/EngineReference.md)** - Core Roblox Engine API (638 classes)
+- **[Services_Reference.md](RobloxDocs/Services_Reference.md)** - Built-in services (Players, RunService, DataStore, UI, etc.)
+- **[Networking_Guide.md](RobloxDocs/Networking_Guide.md)** - Client-server communication patterns & optimization
+- **[Physics_Constraints.md](RobloxDocs/Physics_Constraints.md)** - Physics simulation, constraints, raycasting
+- **[UI_Systems.md](RobloxDocs/UI_Systems.md)** - GUI creation, layouts, animations, Warzone HUD patterns
+- **[Performance_Guide.md](RobloxDocs/Performance_Guide.md)** - Optimization techniques & Warzone-specific patterns
+
+---
+
+## 📂 Code Project Structure
 ```text
 src/
 ├── character/        # Movement, FSM, and Procedural Animation

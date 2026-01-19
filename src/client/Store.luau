@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Utils = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Utils")
 local Signal = require(Utils:WaitForChild("Signal"))
+local IDRegistry = require(ReplicatedStorage.Constants.IDRegistry)
 
 -- The Store
 local Store = {
 	State = {
 		CurrentMenu = "PLAY", -- PLAY, WEAPONS, OPERATORS, etc.
-		SelectedLoadoutId = 1,
+		SelectedLoadoutId = IDRegistry.Loadouts.DEFAULT,
 		IsMatchmaking = false,
 		PlayerProfile = nil
 	},
