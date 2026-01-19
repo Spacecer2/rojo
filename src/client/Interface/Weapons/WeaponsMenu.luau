@@ -62,7 +62,8 @@ function WeaponsMenu.Create(parent)
 		slot.BackgroundColor3 = COLORS.Panel
 		slot.BackgroundTransparency = 0.2
 		slot.Parent = parent
-		Instance.new("UICorner", slot)
+		local uic = Instance.new("UICorner")
+		uic.Parent = slot
 		
 		local lbl = Instance.new("TextLabel")
 		lbl.Text = label:upper()
@@ -137,7 +138,9 @@ function WeaponsMenu.Create(parent)
 			p.Size = UDim2.new(0.31, 0, 1, 0)
 			p.BackgroundColor3 = COLORS.Panel
 			p.Parent = perksFrame
-			Instance.new("UICorner", p).CornerRadius = UDim.new(0, 8)
+			local uic = Instance.new("UICorner")
+			uic.CornerRadius = UDim.new(0, 8)
+			uic.Parent = p
 			
 			local l = Instance.new("TextLabel")
 			l.Text = perk:upper()
@@ -160,7 +163,8 @@ function WeaponsMenu.Create(parent)
 			f.Size = UDim2.new(0.48, 0, 1, 0)
 			f.BackgroundColor3 = COLORS.Panel
 			f.Parent = eqFrame
-			Instance.new("UICorner", f)
+			local uic = Instance.new("UICorner")
+			uic.Parent = f
 			
 			local tl = Instance.new("TextLabel")
 			tl.Text = label:upper()
@@ -216,13 +220,17 @@ function WeaponsMenu.Create(parent)
 			btn.TextColor3 = (loadout.Id == selectedId) and COLORS.AccentBlue or COLORS.TextSecondary
 			btn.TextXAlignment = Enum.TextXAlignment.Left
 			btn.Parent = item
-			Instance.new("UICorner", btn)
-			Instance.new("UIPadding", btn).PaddingLeft = UDim.new(0, 15)
+			local uic = Instance.new("UICorner")
+			uic.Parent = btn
+			local uip = Instance.new("UIPadding")
+			uip.PaddingLeft = UDim.new(0, 15)
+			uip.Parent = btn
 			
 			btn.MouseButton1Click:Connect(function()
 				selectedId = loadout.Id
 				refreshSidebar()
 				refreshEditor(loadout)
+				LoadoutData.Save(loadout)
 			end)
 			
 			-- Delete Button
@@ -234,7 +242,9 @@ function WeaponsMenu.Create(parent)
 			del.Font = Enum.Font.GothamBold
 			del.TextColor3 = COLORS.TextMain
 			del.Parent = item
-			Instance.new("UICorner", del).CornerRadius = UDim.new(1, 0)
+			local uic = Instance.new("UICorner")
+			uic.CornerRadius = UDim.new(1, 0)
+			uic.Parent = del
 			
 			del.MouseButton1Click:Connect(function()
 				LoadoutData.Delete(loadout.Id)
@@ -261,13 +271,15 @@ function WeaponsMenu.Create(parent)
 	addBtn.Size = UDim2.new(0, 300, 0, 40)
 	addBtn.Position = UDim2.new(0, 40, 1, -80)
 	addBtn.Parent = container
-	Instance.new("UICorner", addBtn)
+	local uic = Instance.new("UICorner")
+	uic.Parent = addBtn
 	
 	addBtn.MouseButton1Click:Connect(function()
 		local newLoadout = LoadoutData.CreateNew()
 		selectedId = newLoadout.Id
 		refreshSidebar()
 		refreshEditor(newLoadout)
+		LoadoutData.Save(newLoadout)
 	end)
 
 	-- Init

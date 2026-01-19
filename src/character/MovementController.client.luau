@@ -89,6 +89,7 @@ local function updateState()
 		return
 	end
 
+	local currentState = stateMachine:GetState()
 	local moveVector = inputController:GetMoveVector()
 	local isMoving = moveVector.Magnitude > 0
 	local isSprinting = inputController.IsSprinting
@@ -108,7 +109,7 @@ local function updateState()
 	end
 
 	-- Handling Landing transition
-	if stateMachine:GetState() == "Freefall" and isGrounded then
+	if currentState == "Freefall" and isGrounded then
 		stateMachine:SetState("Land")
 		return
 	end
@@ -127,8 +128,8 @@ local function updateState()
 		if isAiming then
 			stateMachine:SetState("ADS")
 			isTacSprinting = false -- ADS cancels tac sprint
-		elseif stateMachine:GetState() == "TacticalSprint" then
-			-- Keep Tax Sprint state
+		elseif currentState == "TacticalSprint" then
+			-- Keep Tac Sprint state (implicit)
 		elseif isSprinting then
 			stateMachine:SetState("Sprint")
 		elseif isCrouching then

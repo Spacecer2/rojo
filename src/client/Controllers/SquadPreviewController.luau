@@ -85,7 +85,12 @@ function SquadPreviewController:UpdateSquad(players)
 					-- Play idle animation if available
 					local humanoid = model:FindFirstChildOfClass("Humanoid")
 					if humanoid then
-						local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+						local animator = humanoid:FindFirstChildOfClass("Animator")
+						if not animator then
+							animator = Instance.new("Animator")
+							animator.Parent = humanoid
+						end
+						
 						-- Hardcoded idle for now, ideally pull from local config
 						local idleAnim = Instance.new("Animation")
 						idleAnim.AnimationId = "rbxassetid://507766666" -- Default R15 Idle

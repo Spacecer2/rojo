@@ -49,7 +49,7 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
 
-local Spring = require(game:GetService("ReplicatedStorage"):WaitForChild("Utils"):WaitForChild("Spring"))
+local FramingUtils = require(game:GetService("ReplicatedStorage"):WaitForChild("Utils"):WaitForChild("FramingUtils"))
 local DroneSettingsUI = require(script.Parent.Parent.UI.DroneSettingsUI)
 
 local CameraController = {}
@@ -65,21 +65,22 @@ end
 
 local function GetConfig()
 	return {
-		MinDistance = GetAttr("DroneMinDistance", 20),
-		MaxDistance = GetAttr("DroneMaxDistance", 50),
-		HeightOffset = GetAttr("DroneHeightOffset", 10),
+		MinDistance = GetAttr("DroneMinDistance", 10),
+		MaxDistance = GetAttr("DroneMaxDistance", 30),
+		HeightOffset = GetAttr("DroneHeightOffset", 0),
 		LookAheadFactor = GetAttr("DroneLookAheadFactor", 0.2),
+		IdealAlignment = GetAttr("DroneIdealAlignment", 0),
 		
 		-- Intent Layer: Cinematic Behavior
-		OrbitSwayAmplitude = GetAttr("DroneOrbitSwayAmplitude", 0.6), -- Radians
-		OrbitSwayFrequency = GetAttr("DroneOrbitSwayFrequency", 0.2), -- Hz
+		OrbitSwayAmplitude = GetAttr("DroneOrbitSwayAmplitude", 0.1), -- Radians
+		OrbitSwayFrequency = GetAttr("DroneOrbitSwayFrequency", 0.1), -- Hz
 		ImpulseIntervalMin = GetAttr("DroneFlankMin", 15),
 		ImpulseIntervalMax = GetAttr("DroneFlankMax", 50),
 		
 		-- Motion Plan Layer: Control & Smoothing
 		ErrorSmoothing = GetAttr("DroneStressSmoothing", 0.012), -- Renamed from StressSmoothing
-		AuthorityScale = GetAttr("DroneAmbitionScale", 1.8), -- Renamed from AmbitionScale
-		AuthorityBase = GetAttr("DroneAmbitionBase", 0.55), -- Renamed from AmbitionBase
+		AuthorityScale = GetAttr("DroneAmbitionScale", 1.0), -- Renamed from AmbitionScale
+		AuthorityBase = GetAttr("DroneAmbitionBase", 0.15), -- Renamed from AmbitionBase
 		PredictionLeadTime = GetAttr("DroneLatencySteps", 15) * 0.016, -- Convert steps to time
 		TopSpeed = GetAttr("DroneTopSpeed", 40),
 		AccelerationLimit = GetAttr("DroneAccelerationLimit", 50),
@@ -166,11 +167,13 @@ local PhysicalLayer = {
 	-- Orientation smoothing
 	filteredDesiredAcc = nil,
 	currentRotSpeed = nil,
+	currentRoll = 0,
 }
 
 -- Connection and initialization
 local connection = nil
-local distSpring = Spring.new(12)
+local physicsAccumulator = 0
+local PHYSICS_STEP = 1/120
 
 -- Obstacle detection cache for efficient raycasting
 local ObstacleCache = {
@@ -182,104 +185,7 @@ local ObstacleCache = {
 	lastPlayerPos = nil,
 }
 
--- ============================================================================
--- FRAMING QUALITY EVALUATION
--- ============================================================================
--- Evaluates the semantic quality of a camera position for framing the player
--- Returns a score from 0 (poor) to 1 (excellent)
--- This provides a unifying objective function that guides intent decisions
-local function EvaluateFramingQuality(cameraPos, playerPos, playerVel, c)
-	local directionToPlayer = playerPos - cameraPos
-	local distance = directionToPlayer.Magnitude
-	
-	if distance < 0.1 then
-		return 0 -- Invalid position
-	end
-	
-	local cameraToPlayer = directionToPlayer.Unit
-	
-	-- 1. Distance quality (optimal range around player)
-	-- Prefer distances in the sweet spot between min and max
-	local optimalDistance = (c.MinDistance + c.MaxDistance * 0.7) * 0.5
-	local distanceError = math.abs(distance - optimalDistance)
-	local distanceQuality = 1 - math.clamp(distanceError / optimalDistance, 0, 1)
-	
-	-- 2. Angle quality (readability)
-	-- Prefer forward-facing angles where player's silhouette is clear
-	-- Bad angles: directly overhead (flattening), directly behind (occlusion)
-	local horizontalDir = cameraToPlayer * Vector3.new(1, 0, 1)
-	local horizontalDist = horizontalDir.Magnitude
-	local verticalAngle = math.asin(math.clamp(cameraToPlayer.Y, -1, 1))
-	
-	-- Penalize overhead angles (too flat)
-	local overheadPenalty = math.max(0, (verticalAngle - math.rad(15)) / math.rad(75))
-	local overheadQuality = 1 - math.min(overheadPenalty, 1)
-	
-	-- Penalize too low angles (looking up at player)
-	local underAnglePenalty = math.max(0, (-verticalAngle) / math.rad(45))
-	local underAngleQuality = 1 - math.min(underAnglePenalty, 0.5)
-	
-	-- Combine angle quality
-	local angleQuality = overheadQuality * (0.6 + underAngleQuality * 0.4)
-	
-	-- 3. Forward-facing bias (camera should prefer to face player's movement direction)
-	-- This makes motion feel more intentional and readable
-	local forwardBias = 0.5 -- Neutral if no movement
-	if playerVel.Magnitude > 0.1 then
-		local playerForward = playerVel.Unit
-		local horizontalCameraToPlayer = horizontalDir.Unit
-		
-		-- Dot product: 1 = camera in front, -1 = camera behind
-		local forwardAlignment = horizontalCameraToPlayer:Dot(playerForward)
-		-- Prefer slightly forward of perpendicular (0.3 to 0.7 is sweet spot)
-		local idealAlignment = 0.5
-		forwardBias = 1 - math.abs(forwardAlignment - idealAlignment)
-	end
-	
-	-- 4. Height quality (avoid extreme vertical angles)
-	-- Prefer angles between 15-45 degrees above horizontal
-	local idealVerticalAngle = math.rad(30)
-	local verticalAngleError = math.abs(verticalAngle - idealVerticalAngle)
-	local heightQuality = 1 - math.clamp(verticalAngleError / math.rad(45), 0, 1)
-	
-	-- Combine all quality metrics with weights
-	local framingScore = 
-		(distanceQuality * 0.25) +
-		(angleQuality * 0.35) +
-		(forwardBias * 0.25) +
-		(heightQuality * 0.15)
-	
-	return math.clamp(framingScore, 0, 1)
-end
 
--- Evaluate multiple orbit angles and return the best one
--- Used by impulse generator to make semantic decisions
-local function FindBestFramingAngle(playerPos, playerVel, currentAngle, distance, height, c, numSamples)
-	numSamples = numSamples or 8
-	
-	local bestAngle = currentAngle
-	local bestScore = 0
-	
-	-- Sample angles around current position
-	for i = 0, numSamples - 1 do
-		local testAngle = currentAngle + (i / numSamples) * math.pi * 2
-		local testOffset = Vector3.new(
-			math.sin(testAngle) * distance,
-			height,
-			math.cos(testAngle) * distance
-		)
-		local testPos = playerPos + testOffset
-		
-		local score = EvaluateFramingQuality(testPos, playerPos, playerVel, c)
-		
-		if score > bestScore then
-			bestScore = score
-			bestAngle = testAngle
-		end
-	end
-	
-	return bestAngle, bestScore
-end
 
 -- ============================================================================
 -- OBSTACLE DETECTION (Efficient Raycasting)
@@ -296,7 +202,7 @@ local function CreateRaycastFilter(character)
 	end
 	return {
 		FilterDescendantsInstances = filter,
-		FilterType = Enum.RaycastFilterType.Blacklist,
+		FilterType = Enum.RaycastFilterType.Exclude,
 	}
 end
 
@@ -336,7 +242,7 @@ local function CheckObstacleBetween(cameraPos, targetPos, rootPart, c)
 	if character then
 		local filterData = CreateRaycastFilter(character)
 		raycastParams.FilterDescendantsInstances = filterData.FilterDescendantsInstances
-		raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+		raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 	end
 	raycastParams.IgnoreWater = true
 	
@@ -377,7 +283,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 			math.cos(IntentLayer.impulseGenerator.centralAngle) * IntentLayer.impulseGenerator.targetDist
 		)
 		local currentCameraPos = playerPos + currentOffset
-		local currentQuality = EvaluateFramingQuality(currentCameraPos, playerPos, charVelocity, c)
+		local currentQuality = FramingUtils.EvaluateFramingQuality(currentCameraPos, playerPos, charVelocity, c).total
 		
 		-- If framing quality is poor, actively seek better angle
 		-- If framing quality is good, make smaller adjustments (cinematic variation)
@@ -386,7 +292,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 		if seekBetterFraming then
 			-- Actively find better framing angle (semantic decision)
 			local targetDist = IntentLayer.impulseGenerator.targetDist > 0 and IntentLayer.impulseGenerator.targetDist or (c.MinDistance + 5)
-			local bestAngle, bestScore = FindBestFramingAngle(
+			local bestAngle, _ = FramingUtils.FindBestFramingAngle(
 				playerPos, 
 				charVelocity, 
 				IntentLayer.impulseGenerator.centralAngle,
@@ -417,7 +323,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 		else
 			-- Current framing is good - make subtle cinematic variations
 			-- Smaller, more intentional shifts (still influenced by framing, but less aggressive)
-			local variationAngle = (math.random() - 0.5) * math.pi * 0.4 -- Reduced from 0.7
+			local variationAngle = (math.random() - 0.5) * math.pi * 0.2 -- Reduced from 0.4
 			
 			-- Bias variation toward better framing
 			local testAngle = (IntentLayer.impulseGenerator.centralAngle + variationAngle) % (math.pi * 2)
@@ -427,7 +333,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 				math.cos(testAngle) * IntentLayer.impulseGenerator.targetDist
 			)
 			local testPos = playerPos + testOffset
-			local testQuality = EvaluateFramingQuality(testPos, playerPos, charVelocity, c)
+			local testQuality = FramingUtils.EvaluateFramingQuality(testPos, playerPos, charVelocity, c).total
 			
 			-- Only accept variation if it doesn't hurt framing too much
 			if testQuality > currentQuality * 0.85 then
@@ -441,7 +347,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 					math.cos(altAngle) * IntentLayer.impulseGenerator.targetDist
 				)
 				local altPos = playerPos + altOffset
-				local altQuality = EvaluateFramingQuality(altPos, playerPos, charVelocity, c)
+				local altQuality = FramingUtils.EvaluateFramingQuality(altPos, playerPos, charVelocity, c).total
 				
 				if altQuality > currentQuality * 0.85 then
 					IntentLayer.impulseGenerator.centralAngle = altAngle
@@ -451,7 +357,7 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 			-- Subtle distance adjustment
 			local prevDist = IntentLayer.impulseGenerator.targetDist > 0 and IntentLayer.impulseGenerator.targetDist or (c.MinDistance + 5)
 			local maxTargetDist = math.max(c.MinDistance, c.MaxDistance * 0.45)
-			local distVariation = (math.random() - 0.5) * 2 -- Reduced from 3
+			local distVariation = (math.random() - 0.5) * 1 -- Reduced from 2
 			IntentLayer.impulseGenerator.targetDist = 
 				math.clamp(prevDist + distVariation, c.MinDistance, maxTargetDist)
 			
@@ -465,14 +371,132 @@ local function UpdateIntentLayer(rootPart, charVelocity, dt, t, c)
 	local sway = math.sin(t * c.OrbitSwayFrequency * 2 * math.pi) * c.OrbitSwayAmplitude
 	IntentLayer.desiredOrbitAngle = IntentLayer.impulseGenerator.centralAngle + sway
 	IntentLayer.desiredDistance = IntentLayer.impulseGenerator.targetDist
-	IntentLayer.desiredHeight = c.HeightOffset + math.sin(t * 0.6) * 1.5 -- Vertical breathing
+	IntentLayer.desiredHeight = c.HeightOffset + math.sin(t * 0.6) * 0.5 -- Reduced vertical breathing from 1.5
 	
 	-- Look-ahead bias based on player velocity
 	IntentLayer.lookAheadBias = charVelocity * c.LookAheadFactor
 	
 	-- Intent to look at the player (with height offset for head/upper body focus)
-	local playerPos = rootPart.Position
 	IntentLayer.desiredFocusTarget = playerPos + Vector3.new(0, 1.5, 0) + IntentLayer.lookAheadBias
+end
+
+-- ============================================================================
+-- LAYER 2 HELPERS: MOTION PLAN (Control/Smoothing)
+-- ============================================================================
+
+-- 1. Manual control arbitration (mode-dependent)
+local function HandleManualControl(predictedTarget, currentPos, dt, c)
+	-- Use drone's current orientation for input reference
+	local droneLookDir = (PhysicalLayer.f - PhysicalLayer.p)
+	if droneLookDir.Magnitude < 0.1 then
+		droneLookDir = PhysicalLayer.q.LookVector
+	else
+		droneLookDir = droneLookDir.Unit
+	end
+	local droneRightDir = PhysicalLayer.q.RightVector
+	
+	local manualInput = Vector3.zero
+	if UserInputService:IsKeyDown(Enum.KeyCode.W) then manualInput = manualInput + droneLookDir end
+	if UserInputService:IsKeyDown(Enum.KeyCode.S) then manualInput = manualInput - droneLookDir end
+	if UserInputService:IsKeyDown(Enum.KeyCode.A) then manualInput = manualInput - droneRightDir end
+	if UserInputService:IsKeyDown(Enum.KeyCode.D) then manualInput = manualInput + droneRightDir end
+	
+	local resultTarget = predictedTarget
+	if manualInput.Magnitude > 0.1 then
+		manualInput = (manualInput * Vector3.new(1, 0, 1)).Unit
+		
+		if c.ManualControlMode == "override" then
+			-- Manual completely overrides AI
+			resultTarget = currentPos + manualInput * c.ManualControlStrength * dt
+		elseif c.ManualControlMode == "bias" then
+			-- Manual nudges intent (modifies desired position)
+			resultTarget = predictedTarget + manualInput * c.ManualControlStrength * dt * 0.1
+		elseif c.ManualControlMode == "assist" then
+			-- Manual sets target, AI smooths
+			resultTarget = predictedTarget:Lerp(currentPos + manualInput * c.ManualControlStrength, 0.3)
+		end
+	end
+	
+	return resultTarget, manualInput
+end
+
+-- 2. Constraint satisfaction (prioritized sequence)
+local function ApplyMotionConstraints(target, playerPos, currentPos, rootPart, c)
+	local result = target
+	local distToPlayer = (playerPos - currentPos).Magnitude
+	
+	-- 1. Leash (Max distance)
+	if distToPlayer > c.MaxDistance * 0.4 then
+		local leashFactor = math.clamp((distToPlayer - (c.MaxDistance * 0.4)) / (c.MaxDistance * 0.8), 0, 1)
+		local directionToPlayer = (playerPos - currentPos)
+		if directionToPlayer.Magnitude > 0.1 then
+			directionToPlayer = directionToPlayer.Unit
+			local safeRadius = c.MaxDistance * 0.7
+			local homePos = playerPos - (directionToPlayer * safeRadius)
+			result = result:Lerp(homePos, leashFactor * 0.9)
+		end
+	end
+	
+	-- 2. Roof avoidance (compositional)
+	local horizontalOffset = (result - playerPos) * Vector3.new(1, 0, 1)
+	local horizontalDist = horizontalOffset.Magnitude
+	local heightAbovePlayer = result.Y - playerPos.Y
+	
+	if heightAbovePlayer > 2 and horizontalDist < c.RoofAvoidanceRadius then
+		local overheadFactor = 1 - (horizontalDist / c.RoofAvoidanceRadius)
+		if horizontalDist > 0.1 then
+			local pushDir = horizontalOffset.Unit
+			local pushDistance = overheadFactor * (c.RoofAvoidanceRadius - horizontalDist)
+			result = result + pushDir * pushDistance
+		else
+			local randomAngle = math.random() * math.pi * 2
+			local randomDir = Vector3.new(math.cos(randomAngle), 0, math.sin(randomAngle))
+			result = playerPos + randomDir * c.RoofAvoidanceRadius + Vector3.new(0, result.Y - playerPos.Y, 0)
+		end
+	end
+	
+	-- 3. Obstacle avoidance (safety)
+	if c.ObstacleAvoidanceEnabled then
+		local playerHeadPos = playerPos + Vector3.new(0, 1.5, 0)
+		local hit, hitDistance, hitPosition = CheckObstacleBetween(currentPos, playerHeadPos, rootPart, c)
+		
+		if hit and hitDistance < distToPlayer * 1.1 then
+			local directionToPlayer = (playerHeadPos - currentPos).Unit
+			local directionToHit = (hitPosition - currentPos).Unit
+			local avoidanceDir = (directionToPlayer - directionToHit * directionToPlayer:Dot(directionToHit))
+			
+			if avoidanceDir.Magnitude > 0.1 then
+				avoidanceDir = avoidanceDir.Unit
+			elseif hit.Normal then
+				avoidanceDir = hit.Normal
+			else
+				avoidanceDir = Vector3.new(1, 0, 0)
+			end
+			
+			local remainingDistance = distToPlayer - hitDistance
+			local pushDistance = math.max(remainingDistance * 0.5, c.ObstacleRaycastRadius * 2)
+			result = result + avoidanceDir * pushDistance * c.ObstacleAvoidanceStrength
+			
+			local pullBack = (currentPos - hitPosition).Unit * (c.ObstacleRaycastRadius + 1)
+			result = result:Lerp(result + pullBack, 0.3)
+		end
+	end
+	
+	-- 4. Min distance (final safety)
+	local finalDistToPlayer = (result - playerPos).Magnitude
+	if finalDistToPlayer < c.MinDistance then
+		local pushDir = (result - playerPos)
+		if pushDir.Magnitude > 0.1 then
+			pushDir = pushDir.Unit
+			result = playerPos + pushDir * c.MinDistance
+		else
+			local randomAngle = math.random() * math.pi * 2
+			local randomDir = Vector3.new(math.cos(randomAngle), 0, math.sin(randomAngle))
+			result = playerPos + randomDir * c.MinDistance
+		end
+	end
+	
+	return result
 end
 
 -- ============================================================================
@@ -490,12 +514,15 @@ local function UpdateMotionPlanLayer(rootPart, charVelocity, dt, c)
 	local targetPos = playerPos + targetOffset
 	
 	-- 2. Predictive filtering (replaces latency buffer)
-	-- Estimate target velocity and acceleration
-	local targetVel = (targetPos - MotionPlanLayer.lastTargetPos) / math.max(dt, 0.001)
-	local targetAcc = (targetVel - MotionPlanLayer.lastTargetVel) / math.max(dt, 0.001)
+	-- Use a stable delta time for prediction to avoid noise from frame rate jitter
+	local stableDt = math.clamp(dt, 0.008, 0.033)
 	
-	-- Smooth velocity and acceleration estimates
-	local velSmoothing = math.clamp(5 * dt, 0, 1)
+	-- Estimate target velocity and acceleration
+	local targetVel = (targetPos - MotionPlanLayer.lastTargetPos) / stableDt
+	local targetAcc = (targetVel - MotionPlanLayer.lastTargetVel) / stableDt
+	
+	-- Smooth estimates to reduce numerical noise
+	local velSmoothing = math.clamp(10 * dt, 0, 1)
 	MotionPlanLayer.lastTargetVel = MotionPlanLayer.lastTargetVel:Lerp(targetVel, velSmoothing)
 	MotionPlanLayer.lastTargetAcc = MotionPlanLayer.lastTargetAcc:Lerp(targetAcc, velSmoothing)
 	MotionPlanLayer.lastTargetPos = targetPos
@@ -506,197 +533,22 @@ local function UpdateMotionPlanLayer(rootPart, charVelocity, dt, c)
 		+ MotionPlanLayer.lastTargetVel * leadTime
 		+ MotionPlanLayer.lastTargetAcc * (leadTime * leadTime * 0.5)
 	
-	-- 3. Constraint satisfaction: Distance leash
-	local distToPlayer = (playerPos - PhysicalLayer.p).Magnitude
-	local leashFactor = math.clamp((distToPlayer - (c.MaxDistance * 0.4)) / (c.MaxDistance * 0.8), 0, 1)
+	-- 3. Manual control arbitration
+	local manualTarget, manualInput = HandleManualControl(predictedTarget, PhysicalLayer.p, dt, c)
 	
-	if distToPlayer > c.MaxDistance * 0.4 then
-		-- Pull back toward safe orbital radius
-		local directionToPlayer = (playerPos - PhysicalLayer.p)
-		if directionToPlayer.Magnitude > 0.1 then
-			directionToPlayer = directionToPlayer.Unit
-			local safeRadius = c.MaxDistance * 0.7
-			local homePos = playerPos - (directionToPlayer * safeRadius)
-			predictedTarget = predictedTarget:Lerp(homePos, leashFactor * 0.9)
-		end
-	end
+	-- 4. Constraint satisfaction (prioritized)
+	local finalTarget = ApplyMotionConstraints(manualTarget, playerPos, PhysicalLayer.p, rootPart, c)
 	
-	-- 4. Constraint satisfaction: Roof avoidance (modifies target position, not forces)
-	local horizontalOffset = (predictedTarget - playerPos) * Vector3.new(1, 0, 1)
-	local horizontalDist = horizontalOffset.Magnitude
-	local heightAbovePlayer = predictedTarget.Y - playerPos.Y
-	
-	if heightAbovePlayer > 2 and horizontalDist < c.RoofAvoidanceRadius then
-		-- Push target outward horizontally to avoid overhead position
-		local overheadFactor = 1 - (horizontalDist / c.RoofAvoidanceRadius)
-		if horizontalDist > 0.1 then
-			local pushDir = horizontalOffset.Unit
-			-- Push target away from center
-			local pushDistance = overheadFactor * (c.RoofAvoidanceRadius - horizontalDist)
-			predictedTarget = predictedTarget + pushDir * pushDistance
-		else
-			-- If exactly overhead, push in random horizontal direction
-			local randomAngle = math.random() * math.pi * 2
-			local randomDir = Vector3.new(math.cos(randomAngle), 0, math.sin(randomAngle))
-			predictedTarget = playerPos + randomDir * c.RoofAvoidanceRadius + Vector3.new(0, predictedTarget.Y - playerPos.Y, 0)
-		end
-	end
-	
-	-- 5. Constraint satisfaction: Min distance (modifies orbit, not forces)
-	if distToPlayer < c.MinDistance then
-		-- Push desired position outward
-		local pushDir = (PhysicalLayer.p - playerPos)
-		if pushDir.Magnitude > 0.1 then
-			pushDir = pushDir.Unit
-			local minDistOffset = pushDir * (c.MinDistance - distToPlayer)
-			predictedTarget = predictedTarget + minDistOffset
-		else
-			-- If exactly at player, push in random direction
-			local randomAngle = math.random() * math.pi * 2
-			local randomDir = Vector3.new(math.cos(randomAngle), 0, math.sin(randomAngle))
-			predictedTarget = playerPos + randomDir * c.MinDistance
-		end
-	end
-	
-	-- 6. Constraint satisfaction: Obstacle avoidance (raycast detection)
-	if c.ObstacleAvoidanceEnabled then
-		local cameraPos = PhysicalLayer.p
-		local playerHeadPos = playerPos + Vector3.new(0, 1.5, 0) -- Focus on player head area
-		
-		local hit, hitDistance, hitPosition = CheckObstacleBetween(cameraPos, playerHeadPos, rootPart, c)
-		
-		if hit and hitDistance < distToPlayer * 1.1 then
-			-- Obstacle detected between camera and player
-			-- Calculate avoidance: move target position away from obstacle
-			local directionToPlayer = (playerHeadPos - cameraPos).Unit
-			local directionToHit = (hitPosition - cameraPos).Unit
-			
-			-- Find perpendicular direction to avoid obstacle
-			local avoidanceDir = (directionToPlayer - directionToHit * directionToPlayer:Dot(directionToHit))
-			if avoidanceDir.Magnitude > 0.1 then
-				avoidanceDir = avoidanceDir.Unit
-			else
-				-- If directions align, push perpendicular to the obstacle normal
-				if hit.Normal then
-					avoidanceDir = hit.Normal
-				else
-					-- Fallback: push horizontally away from obstacle
-					local horizontalDir = (hitPosition - playerPos) * Vector3.new(1, 0, 1)
-					if horizontalDir.Magnitude > 0.1 then
-						avoidanceDir = horizontalDir.Unit
-					else
-						avoidanceDir = Vector3.new(1, 0, 0) -- Default fallback
-					end
-				end
-			end
-			
-			-- Calculate how far we need to push to avoid obstacle
-			local remainingDistance = distToPlayer - hitDistance
-			local pushDistance = math.max(remainingDistance * 0.5, c.ObstacleRaycastRadius * 2)
-			
-			-- Adjust predicted target to avoid obstacle
-			local avoidanceOffset = avoidanceDir * pushDistance * c.ObstacleAvoidanceStrength
-			predictedTarget = predictedTarget + avoidanceOffset
-			
-			-- Also pull back slightly from the obstacle
-			local pullBack = (cameraPos - hitPosition).Unit * (c.ObstacleRaycastRadius + 1)
-			predictedTarget = predictedTarget:Lerp(predictedTarget + pullBack, 0.3)
-		end
-	end
-	
-	-- 7. Manual control (mode-dependent)
-	-- Use drone's current orientation for input reference
-	local droneLookDir = (PhysicalLayer.f - PhysicalLayer.p)
-	if droneLookDir.Magnitude < 0.1 then
-		droneLookDir = PhysicalLayer.q.LookVector
-	else
-		droneLookDir = droneLookDir.Unit
-	end
-	local droneRightDir = PhysicalLayer.q.RightVector
-	
-	local manualInput = Vector3.zero
-	if UserInputService:IsKeyDown(Enum.KeyCode.W) then manualInput += droneLookDir end
-	if UserInputService:IsKeyDown(Enum.KeyCode.S) then manualInput -= droneLookDir end
-	if UserInputService:IsKeyDown(Enum.KeyCode.A) then manualInput -= droneRightDir end
-	if UserInputService:IsKeyDown(Enum.KeyCode.D) then manualInput += droneRightDir end
-	
-	if manualInput.Magnitude > 0.1 then
-		manualInput = (manualInput * Vector3.new(1, 0, 1)).Unit
-		
-		if c.ManualControlMode == "override" then
-			-- Manual completely overrides AI
-			predictedTarget = PhysicalLayer.p + manualInput * c.ManualControlStrength * dt
-		elseif c.ManualControlMode == "bias" then
-			-- Manual nudges intent (modifies desired position)
-			predictedTarget = predictedTarget + manualInput * c.ManualControlStrength * dt * 0.1
-		elseif c.ManualControlMode == "assist" then
-			-- Manual sets target, AI smooths (handled in trajectory planning)
-			predictedTarget = predictedTarget:Lerp(PhysicalLayer.p + manualInput * c.ManualControlStrength, 0.3)
-		end
-	end
-	
-	-- 7.5. Framing quality refinement (after all constraints, refine for quality)
-	-- This addresses constraint shadowing by improving framing without violating hard constraints
-	local currentFramingQuality = EvaluateFramingQuality(predictedTarget, playerPos, charVelocity, c)
-	
-	-- If framing is poor and we're not in an emergency constraint situation, refine
-	local distToPlayer = (playerPos - predictedTarget).Magnitude
-	local inConstraintEmergency = distToPlayer < c.MinDistance * 1.1 or distToPlayer > c.MaxDistance * 0.95
-	
-	if currentFramingQuality < 0.65 and not inConstraintEmergency then
-		-- Try small adjustments that improve framing without violating constraints
-		local horizontalOffset = (predictedTarget - playerPos) * Vector3.new(1, 0, 1)
-		local horizontalDist = horizontalOffset.Magnitude
-		
-		if horizontalDist > 0.1 then
-			local horizontalDir = horizontalOffset.Unit
-			
-			-- Sample small orthogonal adjustments to improve angle quality
-			local bestRefined = predictedTarget
-			local bestRefinedQuality = currentFramingQuality
-			
-			for i = 1, 4 do
-				local testAngle = (i / 4) * math.pi * 2
-				local perpendicular = Vector3.new(-horizontalDir.Z, 0, horizontalDir.X)
-				local testOffset = perpendicular * math.cos(testAngle) + Vector3.new(0, 1, 0) * math.sin(testAngle)
-				
-				-- Small adjustment (don't move too far)
-				local testPos = predictedTarget + testOffset * (horizontalDist * 0.15)
-				
-				-- Verify constraints are still satisfied
-				local testDistToPlayer = (playerPos - testPos).Magnitude
-				if testDistToPlayer >= c.MinDistance and testDistToPlayer <= c.MaxDistance then
-					local testQuality = EvaluateFramingQuality(testPos, playerPos, charVelocity, c)
-					
-					if testQuality > bestRefinedQuality then
-						bestRefinedQuality = testQuality
-						bestRefined = testPos
-					end
-				end
-			end
-			
-			-- Smoothly blend toward better framing (don't snap)
-			if bestRefinedQuality > currentFramingQuality + 0.1 then
-				predictedTarget = predictedTarget:Lerp(bestRefined, 0.2)
-			end
-		end
-	end
-	
-	-- 8. Error magnitude and authority weight (renamed from stress/ambition)
-	local rawError = predictedTarget - PhysicalLayer.p
+	-- 5. Error magnitude and authority weight
+	local rawError = finalTarget - PhysicalLayer.p
 	local distToTarget = rawError.Magnitude
+	local leashFactor = math.clamp(((playerPos - PhysicalLayer.p).Magnitude - (c.MaxDistance * 0.4)) / (c.MaxDistance * 0.8), 0, 1)
 	
-	-- Evaluate final framing quality for error calculation
-	local finalFramingQuality = EvaluateFramingQuality(predictedTarget, playerPos, charVelocity, c)
-	local framingError = 1 - finalFramingQuality -- Invert: poor framing = high error
-	
-	-- Error magnitude = distance error + velocity error + manual input magnitude + framing quality error
-	-- Framing quality is weighted less than hard constraints but influences authority
+	-- Error magnitude = tracking error difficulty
 	local currentError = math.clamp(
 		(distToTarget / 15) + 
 		(PhysicalLayer.v.Magnitude / c.TopSpeed) + 
-		(manualInput.Magnitude * 0.1) +
-		(framingError * 0.15), -- Framing quality contributes to error (15% weight)
+		(manualInput.Magnitude * 0.1),
 		0, 1
 	)
 	MotionPlanLayer.errorMagnitude = math.lerp(MotionPlanLayer.errorMagnitude, currentError, c.ErrorSmoothing)
@@ -707,7 +559,7 @@ local function UpdateMotionPlanLayer(rootPart, charVelocity, dt, c)
 	-- Safety override: ramp up authority near leash limit
 	MotionPlanLayer.authorityWeight = math.lerp(MotionPlanLayer.authorityWeight, 2.5, math.pow(leashFactor, 1.5))
 	
-	-- 9. Generate desired trajectory (position and velocity)
+	-- 6. Generate desired trajectory (position and velocity)
 	-- PID-like control for smooth trajectory
 	local rampedAuthority = math.pow(MotionPlanLayer.authorityWeight, 1.5)
 	local stopFactor = math.clamp(1 - (distToTarget / 10), 0, 1)
@@ -729,19 +581,19 @@ local function UpdateMotionPlanLayer(rootPart, charVelocity, dt, c)
 	end
 	
 	-- Output to physics layer
-	MotionPlanLayer.desiredPosition = predictedTarget
+	MotionPlanLayer.desiredPosition = finalTarget
 	MotionPlanLayer.desiredVelocity = targetVelocity
 end
 
 -- ============================================================================
 -- LAYER 3: PHYSICAL REALIZATION (Drone Body) - How physics executes the plan
 -- ============================================================================
-local function UpdatePhysicalLayer(dt, dtScale, c)
+local function UpdatePhysicalLayer(dt, c)
 	-- 1. Compute desired acceleration from motion plan
 	local posError = MotionPlanLayer.desiredPosition - PhysicalLayer.p
 	local velError = MotionPlanLayer.desiredVelocity - PhysicalLayer.v
 	
-	-- Simple PD controller for thrust
+	-- Simple PD controller for thrust (outputs acceleration)
 	local kP = 0.8
 	local kD = 1.8
 	local desiredAcc = (posError * kP + velError * kD)
@@ -752,6 +604,7 @@ local function UpdatePhysicalLayer(dt, dtScale, c)
 	end
 	
 	-- 2. Orientation control (body tries to align with trajectory)
+	-- This is a kinematic approximation of a high-torque attitude controller
 	local filterPower = 0.05 / MotionPlanLayer.authorityWeight
 	PhysicalLayer.filteredDesiredAcc = PhysicalLayer.filteredDesiredAcc and 
 		PhysicalLayer.filteredDesiredAcc:Lerp(desiredAcc, filterPower) or desiredAcc
@@ -760,23 +613,27 @@ local function UpdatePhysicalLayer(dt, dtScale, c)
 	local desiredThrustDir = thrustMagnitude > 0.1 and PhysicalLayer.filteredDesiredAcc.Unit or Vector3.new(0, 1, 0)
 	local desiredOrientation = CFrame.lookAt(Vector3.zero, -desiredThrustDir, Vector3.new(0, 1, 0))
 	
-	-- Smooth rotation speed
-	local targetRotSpeed = 3.2 * MotionPlanLayer.authorityWeight
+	-- Smooth rotation speed (Dampened from 3.2 to 1.2)
+	local targetRotSpeed = 1.2 * MotionPlanLayer.authorityWeight
 	PhysicalLayer.currentRotSpeed = PhysicalLayer.currentRotSpeed and 
 		math.lerp(PhysicalLayer.currentRotSpeed, targetRotSpeed, 0.05) or targetRotSpeed
 	
 	PhysicalLayer.q = PhysicalLayer.q:Lerp(desiredOrientation, math.clamp(PhysicalLayer.currentRotSpeed * dt, 0, 1))
 	
-	-- 3. Physics integration (pure physics, no decisions)
+	-- Extract and filter roll separately for even more smoothness
+	local _, _, targetRoll = PhysicalLayer.q:ToEulerAnglesYXZ()
+	PhysicalLayer.currentRoll = math.lerp(PhysicalLayer.currentRoll, targetRoll, math.clamp(5 * dt, 0, 1))
+	
+	-- 3. Physics integration (Pure Newton-Euler)
 	local actualThrustDirection = -PhysicalLayer.q.LookVector
-	local appliedThrust = actualThrustDirection * thrustMagnitude
+	local appliedThrustForce = actualThrustDirection * thrustMagnitude * c.MASS
 	
 	-- Forces: thrust, gravity, drag
-	-- Scale forces during frame stalls to maintain stability
-	local netForce = ((appliedThrust * c.MASS) 
-		+ (c.GRAVITY * c.MASS) 
-		+ (-c.DRAG_LINEAR * PhysicalLayer.v)) * dtScale
+	local gravityForce = c.GRAVITY * c.MASS
+	local dragForce = -c.DRAG_LINEAR * PhysicalLayer.v
+	local netForce = appliedThrustForce + gravityForce + dragForce
 	
+	-- Semi-implicit Euler integration
 	PhysicalLayer.v = PhysicalLayer.v + (netForce / c.MASS) * dt
 	PhysicalLayer.p = PhysicalLayer.p + PhysicalLayer.v * dt
 	
@@ -788,6 +645,7 @@ local function UpdatePhysicalLayer(dt, dtScale, c)
 	local currentStiffness = baseStiffness * math.sqrt(MotionPlanLayer.authorityWeight)
 	local currentDamping = baseDamping * math.sqrt(MotionPlanLayer.authorityWeight)
 	
+	-- Centrifugal compensation for focus point
 	local lookDir = (PhysicalLayer.f - PhysicalLayer.p).Unit
 	local lateralVel = PhysicalLayer.v - PhysicalLayer.v:Dot(lookDir) * lookDir
 	local framingForce = lateralVel * c.GIMBAL_CENTRIFUGAL
@@ -808,16 +666,9 @@ function CameraController.EnableMenuCamera()
 	if connection then connection:Disconnect() end
 	
 	local initialized = false
+	physicsAccumulator = 0
 	
 	connection = RunService.RenderStepped:Connect(function(dt)
-		-- Handle frame stalls properly: scale forces instead of lying to integrator
-		-- Clamp dt to reasonable maximum, but track scale factor for force adjustment
-		local dtScale = 1
-		if dt > 0.1 then
-			dtScale = 0.016 / dt -- Scale forces down proportionally
-			dt = 0.016 -- Use stable timestep for integration
-		end
-		
 		local character = player.Character
 		if not character then return end
 		local rootPart = character:FindFirstChild("HumanoidRootPart")
@@ -830,13 +681,20 @@ function CameraController.EnableMenuCamera()
 		-- Initialize state
 		if not initialized then
 			local _, y, _ = rootPart.CFrame:ToOrientation()
-			IntentLayer.desiredOrbitAngle = y
-			IntentLayer.impulseGenerator.centralAngle = y
-			IntentLayer.impulseGenerator.targetDist = c.MinDistance + 5
+			local spawnAngle = y + math.pi -- Start in front of player
+			local spawnDist = c.MinDistance + 5
 			
-			PhysicalLayer.p = rootPart.Position + Vector3.new(0, c.HeightOffset, c.MinDistance + 5)
+			IntentLayer.desiredOrbitAngle = spawnAngle
+			IntentLayer.impulseGenerator.centralAngle = spawnAngle
+			IntentLayer.impulseGenerator.targetDist = spawnDist
+			
+			PhysicalLayer.p = rootPart.Position + Vector3.new(
+				math.sin(spawnAngle) * spawnDist,
+				c.HeightOffset,
+				math.cos(spawnAngle) * spawnDist
+			)
 			PhysicalLayer.v = Vector3.zero
-			PhysicalLayer.q = CFrame.fromOrientation(0, y, 0)
+			PhysicalLayer.q = CFrame.lookAt(PhysicalLayer.p, rootPart.Position + Vector3.new(0, 1.5, 0))
 			PhysicalLayer.f = rootPart.Position + Vector3.new(0, 1.5, 0)
 			PhysicalLayer.fv = Vector3.zero
 			
@@ -844,20 +702,31 @@ function CameraController.EnableMenuCamera()
 			MotionPlanLayer.lastTargetVel = Vector3.zero
 			MotionPlanLayer.lastTargetAcc = Vector3.zero
 			
+			physicsAccumulator = 0
 			initialized = true
 		end
 		
-		-- Execute three-layer architecture (one-way influence)
+		-- Fixed timestep physics accumulator
+		-- This guarantees stable physics behavior regardless of frame rate
+		physicsAccumulator = physicsAccumulator + math.min(dt, 0.1) -- Cap dt to avoid spiral of death
+		
+		-- Execute three-layer architecture
+		-- Layers 1 & 2 run per-frame (decision making)
 		UpdateIntentLayer(rootPart, charVelocity, dt, t, c)      -- Layer 1: Intent
 		UpdateMotionPlanLayer(rootPart, charVelocity, dt, c)     -- Layer 2: Motion Plan
-		UpdatePhysicalLayer(dt, dtScale, c)                      -- Layer 3: Physics (with force scaling)
+		
+		-- Layer 3 (Physics) runs on fixed sub-steps
+		while physicsAccumulator >= PHYSICS_STEP do
+			UpdatePhysicalLayer(PHYSICS_STEP, c)                 -- Layer 3: Physics
+			physicsAccumulator = physicsAccumulator - PHYSICS_STEP
+		end
 		
 		-- Final camera assembly
+		-- Interpolate for smoothness if needed (optional, but good for high refresh rates)
 		local finalCF = CFrame.lookAt(PhysicalLayer.p, PhysicalLayer.f)
-		local _, _, roll = PhysicalLayer.q:ToEulerAnglesYXZ()
 		
 		camera.CameraType = Enum.CameraType.Scriptable
-		camera.CFrame = finalCF * CFrame.Angles(0, 0, roll)
+		camera.CFrame = finalCF * CFrame.Angles(0, 0, PhysicalLayer.currentRoll)
 	end)
 end
 

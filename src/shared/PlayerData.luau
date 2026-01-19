@@ -23,6 +23,7 @@ function PlayerData.new(player)
 			{Id = "OPEN_CACHES", Title = "Open 10 Caches", Progress = 0, Goal = 10, XP = 1000},
 		},
 		Inventory = {},
+		WeaponProgress = {}, -- { ["WeaponName"] = { Level = 1, XP = 0 } }
 		Settings = {
 			FOV = 103,
 			Sensitivity = 1.2

@@ -27,14 +27,16 @@ local parameters = {
 		 tooltip = "How much the camera sways around the orbit (radians)"},
 		{name = "DroneOrbitSwayFrequency", label = "Orbit Sway Frequency", min = 0.05, max = 0.5, default = 0.2, step = 0.05,
 		 tooltip = "Speed of orbital sway motion (Hz)"},
-		{name = "DroneMinDistance", label = "Min Distance", min = 10, max = 30, default = 20, step = 1,
+		{name = "DroneMinDistance", label = "Min Distance", min = 10, max = 30, default = 10, step = 1,
 		 tooltip = "Minimum distance from player"},
-		{name = "DroneMaxDistance", label = "Max Distance", min = 30, max = 80, default = 50, step = 5,
+		{name = "DroneMaxDistance", label = "Max Distance", min = 30, max = 80, default = 30, step = 5,
 		 tooltip = "Maximum distance from player"},
-		{name = "DroneHeightOffset", label = "Height Offset", min = 5, max = 20, default = 10, step = 1,
+		{name = "DroneHeightOffset", label = "Height Offset", min = -10, max = 20, default = 0, step = 1,
 		 tooltip = "Vertical offset above player"},
 		{name = "DroneLookAheadFactor", label = "Look Ahead Factor", min = 0.0, max = 0.5, default = 0.2, step = 0.05,
 		 tooltip = "How far ahead the camera looks (velocity-based)"},
+		{name = "DroneIdealAlignment", label = "Preferred Angle (Deg)", min = 0, max = 180, default = 0, step = 5,
+		 tooltip = "Target angle from the front: 0° is direct front, 180° is direct behind"},
 	}},
 	
 	-- Layer 2: Motion Plan (Control/Smoothing) - How to achieve intent smoothly
@@ -351,6 +353,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 0.8,
 		DroneOrbitSwayFrequency = 0.15,
 		DroneLookAheadFactor = 0.3,
+		DroneIdealAlignment = 0,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.4,
 		DroneStressSmoothing = 0.008,
@@ -368,6 +371,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 0.4,
 		DroneOrbitSwayFrequency = 0.3,
 		DroneLookAheadFactor = 0.15,
+		DroneIdealAlignment = 135,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.7,
 		DroneAmbitionScale = 2.0,
@@ -386,6 +390,7 @@ function DroneSettingsUI.Init()
 		DroneOrbitSwayAmplitude = 1.0,
 		DroneOrbitSwayFrequency = 0.1,
 		DroneLookAheadFactor = 0.25,
+		DroneIdealAlignment = 0,
 		-- Motion Plan Layer
 		DroneAmbitionBase = 0.35,
 		DroneAmbitionScale = 1.5,

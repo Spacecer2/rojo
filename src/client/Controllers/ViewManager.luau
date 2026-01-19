@@ -24,9 +24,7 @@ function ViewManager.SwitchTo(viewName)
 	
 	-- Hide current view
 	if currentView then
-		if type(currentView) == "table" and currentView.Destroy then
-			currentView:Destroy()
-		elseif typeof(currentView) == "Instance" then
+		if typeof(currentView) == "Instance" or (type(currentView) == "table" and currentView.Destroy) then
 			currentView:Destroy()
 		end
 		currentView = nil
