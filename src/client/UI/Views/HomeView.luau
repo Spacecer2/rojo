@@ -72,8 +72,8 @@ if success3 and theme then Theme = theme end
 
 local PlaylistData = {Modes = {}}
 local success4, playlistDataModule = pcall(function()
-	if Constants then
-		local module = Constants:FindFirstChild("PlaylistData")
+	if constants then
+		local module = constants:FindFirstChild("PlaylistData")
 		if module then
 			return require(module)
 		end
@@ -250,7 +250,7 @@ function HomeView.Create(parent)
 	-- Squad Fill Toggle
 	local squadFill = Instance.new("Frame")
 	squadFill.Name = "SquadFill"
-	squadFill.Size = UDim2.new(0, 350, 0, 40)
+	squadFill.Size = UDim2.fromOffset(350, 40)
 	squadFill.Position = UDim2.new(0, 40, 1, -40)
 	squadFill.AnchorPoint = Vector2.new(0, 1)
 	squadFill.BackgroundTransparency = 1
@@ -283,7 +283,7 @@ if UI and UI.ApplyFeedback then UI.ApplyFeedback(fillBtn, {HoverScale = 1.05}) e
 	-- XP Boost Indicator (Center Bottom)
 	local xpBoost = Instance.new("Frame")
 	xpBoost.Name = "XPBoost"
-	xpBoost.Size = UDim2.new(0, 120, 0, 30)
+	xpBoost.Size = UDim2.fromOffset(120, 30)
 	xpBoost.Position = UDim2.new(0.5, -50, 1, -40)
 	xpBoost.AnchorPoint = Vector2.new(0.5, 1)
 	xpBoost.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
@@ -419,7 +419,7 @@ if UI and UI.ApplyFeedback then UI.ApplyFeedback(fillBtn, {HoverScale = 1.05}) e
 			xpReward.Font = Enum.Font.GothamBold
 			xpReward.TextSize = 8
 			xpReward.TextColor3 = COLORS.AccentBlue
-			xpReward.Size = UDim2.new(0, 50, 0, 15)
+			xpReward.Size = UDim2.fromOffset(50, 15)
 			xpReward.Position = UDim2.new(1, -50, 0, 0)
 			xpReward.BackgroundTransparency = 1
 			xpReward.TextXAlignment = Enum.TextXAlignment.Right
