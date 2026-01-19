@@ -2,9 +2,12 @@
 	LoadoutService - Scalable loadout persistence system
 	Handles server-side storage and retrieval of player weapon loadouts
 	Designed for integration with DataService for persistence
+	Uses centralized ID management from IDRegistry
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DataService = require(ServerScriptService.Services.DataService)
+local IDRegistry = require(ReplicatedStorage.Constants.IDRegistry)
 
 local LoadoutService = {}
 
@@ -14,7 +17,7 @@ local playerLoadouts = {}
 -- Default loadout structure (abstracted for scalability)
 local function createDefaultLoadout()
 	return {
-		Id = 1,
+		Id = IDRegistry.Loadouts.DEFAULT,
 		Name = "Default Loadout",
 		Primary = {
 			Name = "M4",
@@ -49,6 +52,12 @@ end
 
 -- Save loadout for player
 function LoadoutService.SaveLoadout(player, loadoutData)
+	-- Validate loadout ID
+	if not IDRegistry.IsValidLoadout(loadoutData.Id) then
+		warn("[LoadoutService] Invalid loadout ID: " .. tostring(loadoutData.Id))
+		return false
+	end
+	
 	if not playerLoadouts[player.UserId] then
 		playerLoadouts[player.UserId] = {}
 	end

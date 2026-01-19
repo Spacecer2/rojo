@@ -1,27 +1,74 @@
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Theme = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Constants"):WaitForChild("Theme"))
+local SoundService = game:GetService("SoundService")
+local Theme = require(ReplicatedStorage:WaitForChild("Constants"):WaitForChild("Theme"))
 
 local UI = {}
 
--- Utility: Apply Hover Effect
-function UI.ApplyHover(button, targetScale)
-	local originalSize = button.Size
-	targetScale = targetScale or 1.05
+-- Utility: Play UI Sound
+function UI.PlaySound(soundId, volume)
+	if not soundId or soundId == "" then return end
 	
+	local sound = Instance.new("Sound")
+	sound.SoundId = soundId
+	sound.Volume = volume or 0.5
+	sound.PlayOnRemove = true
+	sound.Parent = SoundService
+	sound:Destroy() -- Triggers PlayOnRemove
+end
+
+-- Utility: Apply Visual/Audio Feedback
+function UI.ApplyFeedback(button, options)
+	options = options or {}
+	local originalSize = button.Size
+	local hoverScale = options.HoverScale or 1.05
+	local pressScale = options.PressScale or 0.95
+	
+	-- Hover
 	button.MouseEnter:Connect(function()
-		TweenService:Create(button, Theme.Transitions.Default, {
+		if options.HoverSound ~= false then
+			UI.PlaySound(Theme.Sounds.Hover, 0.3)
+		end
+		
+		TweenService:Create(button, Theme.Transitions.Quick, {
 			Size = UDim2.new(
-				originalSize.X.Scale * targetScale, 
-				originalSize.X.Offset * targetScale, 
-				originalSize.Y.Scale * targetScale, 
-				originalSize.Y.Offset * targetScale
+				originalSize.X.Scale * hoverScale, 
+				originalSize.X.Offset * hoverScale, 
+				originalSize.Y.Scale * hoverScale, 
+				originalSize.Y.Offset * hoverScale
 			)
 		}):Play()
 	end)
 	
 	button.MouseLeave:Connect(function()
 		TweenService:Create(button, Theme.Transitions.Default, {Size = originalSize}):Play()
+	end)
+	
+	-- Press
+	button.MouseButton1Down:Connect(function()
+		if options.ClickSound ~= false then
+			UI.PlaySound(Theme.Sounds.Click, 0.5)
+		end
+		
+		TweenService:Create(button, Theme.Transitions.Quick, {
+			Size = UDim2.new(
+				originalSize.X.Scale * pressScale, 
+				originalSize.X.Offset * pressScale, 
+				originalSize.Y.Scale * pressScale, 
+				originalSize.Y.Offset * pressScale
+			)
+		}):Play()
+	end)
+	
+	button.MouseButton1Up:Connect(function()
+		TweenService:Create(button, Theme.Transitions.Quick, {
+			Size = UDim2.new(
+				originalSize.X.Scale * hoverScale, 
+				originalSize.X.Offset * hoverScale, 
+				originalSize.Y.Scale * hoverScale, 
+				originalSize.Y.Offset * hoverScale
+			)
+		}):Play()
 	end)
 end
 
@@ -38,6 +85,7 @@ function UI.Button(props)
 	btn.Position = props.Position or UDim2.fromScale(0, 0)
 	btn.AnchorPoint = props.AnchorPoint or Vector2.new(0, 0)
 	btn.BackgroundTransparency = props.BackgroundTransparency or 0
+	btn.AutoButtonColor = false -- Disable default dark/bright effect
 	
 	if props.Corner then
 		local corner = Instance.new("UICorner")
@@ -45,8 +93,13 @@ function UI.Button(props)
 		corner.Parent = btn
 	end
 	
-	if props.Hover ~= false then
-		UI.ApplyHover(btn, props.HoverScale)
+	if props.Feedback ~= false then
+		UI.ApplyFeedback(btn, {
+			HoverScale = props.HoverScale,
+			PressScale = props.PressScale,
+			HoverSound = props.HoverSound,
+			ClickSound = props.ClickSound
+		})
 	end
 	
 	btn.Parent = props.Parent

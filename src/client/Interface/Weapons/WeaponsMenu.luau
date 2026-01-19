@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
+local UI = require(script.Parent.Parent.Parent.UI)
 local LoadoutData = require(script.Parent.LoadoutData)
 
 local WeaponsMenu = {}
@@ -226,6 +227,8 @@ function WeaponsMenu.Create(parent)
 			uip.PaddingLeft = UDim.new(0, 15)
 			uip.Parent = btn
 			
+			UI.ApplyFeedback(btn, {HoverScale = 1.02})
+			
 			btn.MouseButton1Click:Connect(function()
 				selectedId = loadout.Id
 				refreshSidebar()
@@ -245,6 +248,8 @@ function WeaponsMenu.Create(parent)
 			local uic = Instance.new("UICorner")
 			uic.CornerRadius = UDim.new(1, 0)
 			uic.Parent = del
+			
+			UI.ApplyFeedback(del, {HoverScale = 1.1, PressScale = 0.9})
 			
 			del.MouseButton1Click:Connect(function()
 				LoadoutData.Delete(loadout.Id)
@@ -273,6 +278,8 @@ function WeaponsMenu.Create(parent)
 	addBtn.Parent = container
 	local uic = Instance.new("UICorner")
 	uic.Parent = addBtn
+	
+	UI.ApplyFeedback(addBtn, {HoverScale = 1.05})
 	
 	addBtn.MouseButton1Click:Connect(function()
 		local newLoadout = LoadoutData.CreateNew()
