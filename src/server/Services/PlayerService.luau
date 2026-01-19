@@ -1,8 +1,13 @@
 local Players = game:GetService("Players")
+local BadgeService = game:GetService("BadgeService")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local DataService = require(ServerScriptService.Services.DataService)
+local MarketplaceService = require(ServerScriptService.Services.MarketplaceService)
 
 local PlayerService = {}
+
+local BETA_TESTER_BADGE_ID = 4197950939233224
 
 function PlayerService.Init()
 	Players.PlayerAdded:Connect(function(player)
@@ -17,14 +22,48 @@ end
 function PlayerService.OnPlayerAdded(player)
 	print("Player joined: " .. player.Name)
 	DataService.LoadData(player)
+
+	-- Award Beta Tester Badge
+	task.spawn(function()
+		if RunService:IsStudio() then
+			print("[BadgeService] Skipping badge award in Studio for " .. player.Name)
+			return
+		end
+
+		local success, result = pcall(function()
+			return BadgeService:AwardBadge(player.UserId, BETA_TESTER_BADGE_ID)
+		end)
+		
+		if success then
+			if result then
+				print("Successfully awarded Beta Tester badge to " .. player.Name)
+			end
+		else
+			warn("Failed to award badge to " .. player.Name .. ": " .. tostring(result))
+		end
+	end)
+
+	-- Check for Special Pass ownership
+	task.spawn(function()
+		local passId = MarketplaceService.Passes.SPECIAL_PASS
+		if MarketplaceService.UserOwnsPass(player.UserId, passId) then
+			print("[Marketplace] Player " .. player.Name .. " owns the Special Pass!")
+		end
+	end)
 	
-	-- Force spawn location "Way Higher" (Y=1000)
+	-- Force spawn location at SpawnLocation center during load
 	player.CharacterAdded:Connect(function(character)
 		-- Wait for root part
 		local rootPart = character:WaitForChild("HumanoidRootPart", 5)
 		if rootPart then
-			-- Pivot to high altitude to avoid baseplate clipping
-			character:PivotTo(CFrame.new(0, 1000, 0))
+			local spawnLocation = workspace:FindFirstChildOfClass("SpawnLocation")
+			if spawnLocation then
+				-- Pivot to the exact center of the SpawnLocation, slightly above the surface
+				character:PivotTo(spawnLocation.CFrame * CFrame.new(0, spawnLocation.Size.Y/2 + 3.5, 0))
+			else
+				-- Fallback if no SpawnLocation is found
+				character:PivotTo(CFrame.new(0, 1000, 0))
+			end
 		end
 	end)
 end

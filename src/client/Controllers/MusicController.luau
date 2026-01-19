@@ -10,7 +10,7 @@ local Players = game:GetService("Players")
 local MusicController = {}
 
 -- Configuration
-local MUSIC_ID = "rbxassetid://1839843632" -- Replace with your desired audio ID
+local MUSIC_ID = "rbxassetid://128656968698835" -- Replace with your desired audio ID
 local DEFAULT_VOLUME = 0.5
 local FADE_TIME = 2.0
 
