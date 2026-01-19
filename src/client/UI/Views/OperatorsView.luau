@@ -5,10 +5,14 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
 
 local Constants = ReplicatedStorage:WaitForChild("Constants")
 local Theme = require(Constants:WaitForChild("Theme"))
 local OperatorData = require(Constants:WaitForChild("OperatorData"))
+
+local Utils = ReplicatedStorage:WaitForChild("Utils")
+local OperatorRanking = require(Utils:WaitForChild("OperatorRanking"))
 
 local OperatorsView = {}
 
@@ -23,6 +27,7 @@ local COLORS = (Theme and Theme.Colors) or {
 
 function OperatorsView.Create(parent)
 	local connections = {}
+	local player = Players.LocalPlayer
 	local frame = Instance.new("Frame")
 	frame.Name = "OperatorsView"
 	frame.Size = UDim2.fromScale(1, 1)
@@ -38,7 +43,8 @@ function OperatorsView.Create(parent)
 	header.Parent = frame
 	
 	local unlockedLabel = Instance.new("TextLabel")
-	unlockedLabel.Text = "43/45 OPERATORS UNLOCKED"
+	unlockedLabel.Name = "UnlockedLabel"
+	unlockedLabel.Text = "0/0 OPERATORS UNLOCKED"
 	unlockedLabel.Font = Enum.Font.GothamBold
 	unlockedLabel.TextSize = 14
 	unlockedLabel.TextColor3 = COLORS.TextSecondary
@@ -48,6 +54,7 @@ function OperatorsView.Create(parent)
 	unlockedLabel.Parent = header
 	
 	local progressBg = Instance.new("Frame")
+	progressBg.Name = "ProgressBackground"
 	progressBg.Size = UDim2.new(0, 300, 0, 4)
 	progressBg.Position = UDim2.fromOffset(0, 25)
 	progressBg.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
@@ -55,10 +62,17 @@ function OperatorsView.Create(parent)
 	progressBg.Parent = header
 	
 	local progressFill = Instance.new("Frame")
-	progressFill.Size = UDim2.fromScale(43/45, 1)
+	progressFill.Name = "Fill"
+	progressFill.Size = UDim2.fromScale(0, 1)
 	progressFill.BackgroundColor3 = COLORS.AccentBlue
 	progressFill.BorderSizePixel = 0
 	progressFill.Parent = progressBg
+
+	-- Bind ranking UI to update dynamically
+	if player then
+		table.insert(connections, OperatorRanking.BindToLabel(unlockedLabel, player))
+		table.insert(connections, OperatorRanking.BindToProgressBar(progressBg, player))
+	end
 
 	-- 2. Detail Section (Left Center)
 	local detailPanel = Instance.new("Frame")
@@ -87,7 +101,8 @@ function OperatorsView.Create(parent)
 	skinInfo.Parent = detailPanel
 	
 	local skinLabel = Instance.new("TextLabel")
-	skinLabel.Text = "OPERATOR SKINS\n2/2 UNLOCKED"
+	skinLabel.Name = "SkinLabel"
+	skinLabel.Text = "OPERATOR SKINS\nLOADING..."
 	skinLabel.Font = Enum.Font.GothamBold
 	skinLabel.TextSize = 10
 	skinLabel.TextColor3 = COLORS.AccentBlue
@@ -187,7 +202,10 @@ function OperatorsView.Create(parent)
 		
 		table.insert(connections, btn.MouseButton1Click:Connect(function()
 			opName.Text = op.Name
-			skinLabel.Text = string.format("OPERATOR SKINS\n%d/%d UNLOCKED", op.Skins or 0, op.Skins or 0)
+			-- Dynamically calculate unlocked skins based on player data
+			local skinCount = op.Skins or 0
+			local unlockedSkins = OperatorRanking.IsOperatorUnlocked(player, op.Id) and skinCount or 0
+			skinLabel.Text = string.format("OPERATOR SKINS\n%d/%d UNLOCKED", unlockedSkins, skinCount)
 			moveLabel.Text = string.format("FINISHING MOVE\n%s", op.FinishingMove or "UNASSIGNED")
 		end))
 		
