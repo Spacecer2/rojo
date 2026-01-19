@@ -9,7 +9,10 @@ local Players = game:GetService("Players")
 
 local Constants = ReplicatedStorage:WaitForChild("Constants")
 local Theme = require(Constants:WaitForChild("Theme"))
-local OperatorData = require(Constants:WaitForChild("OperatorData"))
+
+local OperatorData = {Operators = {}}
+local success, operatorDataModule = pcall(function() return require(Constants:WaitForChild("OperatorData")) end)
+if success and operatorDataModule then OperatorData = operatorDataModule end
 
 local Utils = ReplicatedStorage:WaitForChild("Utils")
 local OperatorRanking = require(Utils:WaitForChild("OperatorRanking"))

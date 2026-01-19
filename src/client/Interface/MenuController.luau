@@ -105,7 +105,7 @@ function MenuController.Start()
 		branding.Font = Enum.Font.GothamBlack
 		branding.TextSize = 28
 		branding.TextColor3 = Color3.new(1, 1, 1)
-		branding.Size = UDim2.new(0, 200, 0, 40)
+		branding.Size = UDim2.fromOffset(200, 40)
 		branding.Position = UDim2.fromOffset(40, 10)
 		branding.BackgroundTransparency = 1
 		branding.TextXAlignment = Enum.TextXAlignment.Left
@@ -114,7 +114,7 @@ function MenuController.Start()
 		-- Resource Bar (Top Right)
 		local resources = Instance.new("Frame")
 		resources.Name = "ResourceBar"
-		resources.Size = UDim2.new(0, 400, 0, 40)
+		resources.Size = UDim2.fromOffset(400, 40)
 		resources.Position = UDim2.new(1, -40, 0, 10)
 		resources.AnchorPoint = Vector2.new(1, 0)
 		resources.BackgroundTransparency = 1
@@ -190,7 +190,7 @@ function MenuController.Start()
 		local footer = Instance.new("Frame")
 		footer.Name = "Footer"
 		footer.Size = UDim2.new(1, 0, 0, 40)
-		footer.Position = UDim2.new(0, 0, 1, 0)
+		footer.Position = UDim2.fromScale(0, 1)
 		footer.AnchorPoint = Vector2.new(0, 1)
 		footer.BackgroundColor3 = Color3.new(0,0,0)
 		footer.BackgroundTransparency = 0.6

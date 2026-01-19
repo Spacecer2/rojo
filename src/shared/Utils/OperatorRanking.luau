@@ -4,7 +4,6 @@
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
 
 local Constants = ReplicatedStorage:WaitForChild("Constants")
 local IDRegistry = require(Constants:WaitForChild("IDRegistry"))

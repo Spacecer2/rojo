@@ -207,7 +207,7 @@ function HomeView.Create(parent)
 		btn.Text = ""
 		btn.Parent = tile
 		
-		UI.ApplyFeedback(btn, {HoverScale = 1.02})
+		if UI and UI.ApplyFeedback then UI.ApplyFeedback(btn, {HoverScale = 1.02}) end
 		
 		btn.MouseButton1Click:Connect(function()
 			currentSelectedMode = data.Title
@@ -261,7 +261,7 @@ function HomeView.Create(parent)
 	fillBtn.Text = ""
 	fillBtn.Parent = squadFill
 	
-	UI.ApplyFeedback(fillBtn, {HoverScale = 1.05})
+if UI and UI.ApplyFeedback then UI.ApplyFeedback(fillBtn, {HoverScale = 1.05}) end
 	
 	fillBtn.MouseButton1Click:Connect(function()
 		currentSquadFill = not currentSquadFill
