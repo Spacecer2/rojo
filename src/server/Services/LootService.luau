@@ -15,6 +15,62 @@ local LootService = {
 	ActiveBoxes = {}, -- [BoxId] = Data
 }
 
+function LootService.SpawnLoot(position, itemId)
+	local itemData = LootData.Items[itemId]
+	if not itemData then warn("[LootService] Invalid loot item:", itemId) return end
+
+	local lootId = game:GetService("HttpService"):GenerateGUID(false)
+	
+	-- Create Visuals
+	local part = Instance.new("Part")
+	part.Name = "Loot_" .. itemId
+	part.Size = Vector3.new(1, 1, 1)
+	part.Position = position + Vector3.new(0, 1, 0)
+	part.Anchored = false
+	part.CanCollide = true
+	part.Parent = workspace
+	part:SetAttribute("LootId", lootId)
+	
+	-- Visuals
+	if itemData.Rarity then
+		local rarityInfo = LootData.Rarities[itemData.Rarity]
+		if rarityInfo then part.Color = rarityInfo.Color end
+	else
+		part.Color = Color3.fromRGB(200, 200, 200)
+	end
+	
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.fromScale(4, 1)
+	bb.StudsOffset = Vector3.new(0, 2, 0)
+	bb.AlwaysOnTop = true
+	bb.Parent = part
+	
+	local txt = Instance.new("TextLabel")
+	txt.Text = itemData.Name
+	txt.Size = UDim2.fromScale(1, 1)
+	txt.BackgroundTransparency = 1
+	txt.TextColor3 = Color3.new(1,1,1)
+	txt.TextScaled = true
+	txt.Parent = bb
+	
+	-- Interaction
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = "Pick Up"
+	prompt.ObjectText = itemData.Name
+	prompt.RequiresLineOfSight = false
+	prompt.HoldDuration = 0.5
+	prompt.Parent = part
+	
+	prompt.Triggered:Connect(function(player)
+		LootService.ProcessInteraction(player, lootId)
+	end)
+
+	LootService.ActiveLoot[lootId] = {
+		Part = part,
+		Data = itemData
+	}
+end
+
 function LootService.Init()
 	PlayerDataService = require(script.Parent.PlayerDataService)
 	

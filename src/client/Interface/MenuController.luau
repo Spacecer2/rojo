@@ -32,6 +32,8 @@ if success_pdc then PlayerDataController = pdc end
 
 local MenuController = {}
 
+local menuConnection = nil -- Track connection to clean up
+
 -- Theme Colors
 local COLORS = {
 	Background = Color3.fromRGB(15, 15, 15),
@@ -69,6 +71,15 @@ function MenuController.Start()
 	local success, err = pcall(function()
 		local player = Players.LocalPlayer
 		local playerGui = player:WaitForChild("PlayerGui")
+
+		-- Cleanup previous session
+		if menuConnection then
+			menuConnection:Disconnect()
+			menuConnection = nil
+		end
+		
+		local existing = playerGui:FindFirstChild("WarzoneMenu")
+		if existing then existing:Destroy() end
 
 		-- Global State
 		player:SetAttribute("InMenu", true)
@@ -160,7 +171,7 @@ function MenuController.Start()
 		end
 
 		if PlayerDataController and PlayerDataController.ProfileChanged then
-			PlayerDataController.ProfileChanged.Event:Connect(updateTopBar)
+			menuConnection = PlayerDataController.ProfileChanged.Event:Connect(updateTopBar)
 		end
 		updateTopBar()
 
