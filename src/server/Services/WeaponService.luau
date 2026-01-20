@@ -43,6 +43,22 @@ local function findWeaponTool(weaponName)
 	return weaponCache[weaponName]
 end
 
+-- Equip a specific weapon by name (used by LootService)
+function WeaponService.EquipWeapon(player, weaponName)
+	local tool = findWeaponTool(weaponName)
+	if tool then
+		-- Clone to backpack
+		local newTool = tool:Clone()
+		newTool.Parent = player:WaitForChild("Backpack")
+		
+		-- Optionally equip immediately (humanoid:EquipTool) if desired, 
+		-- but usually just adding to backpack is enough for "picking up".
+		print(string.format("[WeaponService] Equipping %s for %s", weaponName, player.Name))
+	else
+		warn("[WeaponService] Could not find weapon to equip: " .. tostring(weaponName))
+	end
+end
+
 -- Give loadout weapons to a player
 function WeaponService.GiveLoadoutWeapons(player)
 	local character = player.Character

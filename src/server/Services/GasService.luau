@@ -30,11 +30,6 @@ function GasService.Init()
 	GasService.CurrentRadius = GasConfig.PHASES[1].Radius * 2
 	GasService.TargetRadius = GasConfig.PHASES[1].Radius * 2
 	
-	task.spawn(function()
-		task.wait(GasConfig.START_DELAY)
-		GasService.StartNextPhase()
-	end)
-	
 	-- Damage Loop
 	task.spawn(function()
 		while true do
@@ -46,6 +41,14 @@ function GasService.Init()
 	-- Sync Loop
 	RunService.Heartbeat:Connect(function(dt)
 		GasService.Update(dt)
+	end)
+end
+
+function GasService.StartMatch()
+	print("[GasService] Starting Gas Sequence...")
+	task.spawn(function()
+		task.wait(GasConfig.START_DELAY)
+		GasService.StartNextPhase()
 	end)
 end
 

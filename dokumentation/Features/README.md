@@ -81,15 +81,9 @@ Long-term engagement and cosmetic reward structures.
   - Duplicate conversion to cosmetic currency
   - Optional premium passes and bundle cosmetics
 
-### ⚙️ **Systems/** - UI & Settings
-Meta-systems affecting all gameplay.
-
-- **[SettingsMenu.md](Systems/SettingsMenu.md)** - Player customization
-  - **Input**: Sensitivity, control schemes, keybinding, deadzone
-  - **Audio**: Master volume, device selection, voice chat, equalizer
-  - **Graphics**: Resolution, FPS, draw distance, quality presets, colorblind modes
-  - **Accessibility**: Motor, hearing, visual adaptations
-  - Cloud sync & profile management
+### 🖥️ Systems & UI
+- [SettingsMenu](Systems/SettingsMenu.md) - Input, Audio, and Graphics configuration.
+- [PlayerHUD](Systems/PlayerHUD.md) - Real-time gameplay interface and feedback.
 
 ---
 

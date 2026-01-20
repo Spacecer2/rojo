@@ -47,10 +47,8 @@ Layer 1: Intent (Cinematic/AI)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local UserInputService = game:GetService("UserInputService")
 
 local FramingUtils = require(game:GetService("ReplicatedStorage"):WaitForChild("Utils"):WaitForChild("FramingUtils"))
-local DroneSettingsUI = require(script.Parent.Parent.UI.DroneSettingsUI)
 
 local CameraController = {}
 
@@ -778,9 +776,6 @@ local initialized = false
 function CameraController.Init()
 	if initialized then return end
 	initialized = true
-	
-	-- Initialize settings UI
-	DroneSettingsUI.Init()
 	
 	player:GetAttributeChangedSignal("InMenu"):Connect(function()
 		local inMenu = player:GetAttribute("InMenu")

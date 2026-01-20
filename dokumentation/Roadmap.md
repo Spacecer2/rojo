@@ -24,7 +24,7 @@ This document outlines the complete development lifecycle for the project, aimed
 
 ---
 
-## 💎 Phase 3: Code Health & Architecture (COMPLETED - NEW)
+## 💎 Phase 3: Code Health & Architecture (COMPLETED)
 *Goal: Ensure long-term maintainability and stability.*
 - [x] **Toolchain Integration**: Aftman (Rojo, Selene, Stylua) for standardized dev tools.
 - [x] **Static Analysis**: Enforced strict linting (Selene) to remove shadowing, deprecated APIs, and global pollution.
@@ -54,40 +54,65 @@ This document outlines the complete development lifecycle for the project, aimed
 
 ---
 
-## 🚁 Phase 5: The Warzone Loop (Battle Royale) (IN PROGRESS)
-*Goal: Implement the core mechanics of the BR experience.*
-- [ ] **Match Lifecycle**: Pre-game warmup -> Infiltration (Plane) -> Victory.
+## 🚁 Phase 5: The Playable Loop & World (IN PROGRESS)
+*Goal: Create a functioning, winnable Battle Royale match loop.*
+
+- [x] **Match Lifecycle**:
+    - [x] Service Coordinator (`MatchService`) for Warmup -> Infil -> Match -> End.
+    - [x] Warmup & Infiltration logic (Teleportation).
+    - [x] Win Condition checks (Last Team Standing).
 - [x] **The Gas**: Circular hazard system with visual distortion and health drain.
-- [ ] **Economy**:
+- [x] **Economy & Loot**:
     - [x] Cash spawning and looting.
-    - [x] **Buy Stations**: UI and logic for purchasing Killstreaks/Revives.
-- [x] **Looting**:
-    - [x] Ground loot system (Weapons, Cash).
+    - [x] Buy Stations (UI/Logic).
     - [x] Supply Boxes (Blue/Orange) and Rarity tiers.
-- [x] **The Gulag**: 1v1 arena with "Capture Flag" overtime mechanic.
-- [ ] **Contracts**: Bounty, Recon, and Scavenger mission logic.
+- [~] **The Gulag**:
+    - [x] 1v1 Arena Management & Matchmaking.
+    - [x] Win/Loss Logic & Respawn.
+    - [ ] "Capture Flag" Overtime Mechanic.
+    - [ ] **Integration**: Hook into MatchService death flow (Currently TODO).
+- [ ] **Map Development**:
+    - [ ] Greybox Layout (POIs, Cover).
+    - [ ] Verticality & Traversal testing.
 
 ---
 
-## 🖥️ Phase 6: UI/UX & Meta-Progression (IN PROGRESS)
-*Goal: AAA-standard interface and player retention.*
-- [ ] **Settings Menu**: High-fidelity options for Input, Audio, and Graphics (FOV, Blur).
-- [ ] **Battle Pass**: 100-Tier "Sector Map" progression system.
-- [ ] **Reward Systems**: "Supply Drop" lottery with pity mechanics.
-- [ ] **Global Progression**: Weapon XP, Player Levels, and Camo Challenges.
-- [x] **HUD Foundations**: Basic state indicators (Ammo, Health).
-- [x] **UI Polish & Feedback**:
-    - [x] **Centralized UI Audio**: Implementation of `Theme.Sounds` for Hover, Click, and Navigation.
-    - [x] **Interaction Animations**: Spring-based scaling for button presses/releases.
-    - [x] **Global Utility**: Update `UI.luau` to automatically inject feedback into all framework-level buttons.
+## 🖥️ Phase 6: Core User Experience (IN PROGRESS)
+*Goal: AAA-standard interface, settings, and feedback.*
 
----
-
-## 🌍 Phase 7: Environment & Social
-*Goal: Large-scale world-building and community features.*
-- [ ] **Map Development**: Modular "Points of Interest" (POIs) with tactical verticality.
+- [x] **Player HUD**:
+    - [x] Architecture (Three-Layer System).
+    - [x] Basic implementation (Ammo, Health, State).
+    - [ ] **Advanced Features**: Compass Tape, Hitmarkers, Minimap.
+- [x] **Settings System**:
+    - [x] Backend Data Structure (`SettingsData`).
+    - [x] Client Controller (`SettingsController`) for application.
+    - [x] **Settings Menu UI**: Tabbed interface (General, Graphics, Audio).
 - [ ] **Audio Occlusion**: Advanced sound propagation through walls and materials.
+
+---
+
+## 📦 Phase 7: Meta & Content (PENDING)
+*Goal: Player retention, progression, and variety.*
+
+- [ ] **Contracts**:
+    - [ ] Bounty (Kill Target).
+    - [ ] Recon (Secure Area).
+    - [ ] Scavenger (Loot Crates).
+- [ ] **Battle Pass**: 100-Tier "Sector Map" progression system.
+- [ ] **Global Progression**: Weapon XP, Player Levels, and Camo Challenges.
+- [ ] **Reward Systems**: "Supply Drop" lottery with pity mechanics.
+
+---
+
+## 🌍 Phase 8: Social & Optimization (PENDING)
+*Goal: Scale to 100+ players and community features.*
+
 - [ ] **Social Systems**: In-game clans, global leaderboards, and party management.
+- [ ] **Optimization**:
+    - [ ] LOD / Streaming Enabled.
+    - [ ] Network Replication Budgeting.
+    - [ ] Memory Management.
 
 ---
 
@@ -97,4 +122,4 @@ This document outlines the complete development lifecycle for the project, aimed
 3. **Warzone DNA**: Every sound, animation, and UI element must feel authentic to MW 2019.
 
 ---
-*Updated: 19.01.2026*
+*Updated: 20.01.2026*

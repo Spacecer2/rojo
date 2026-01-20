@@ -28,7 +28,16 @@ function LootService.SpawnLoot(position, itemId)
 	part.Position = position + Vector3.new(0, 1, 0)
 	part.Anchored = false
 	part.CanCollide = true
-	part.Parent = workspace
+	
+	-- Organization
+	local lootFolder = workspace:FindFirstChild("Loot")
+	if not lootFolder then
+		lootFolder = Instance.new("Folder")
+		lootFolder.Name = "Loot"
+		lootFolder.Parent = workspace
+	end
+	part.Parent = lootFolder
+	
 	part:SetAttribute("LootId", lootId)
 	
 	-- Visuals
@@ -178,7 +187,11 @@ function LootService.ProcessInteraction(player, lootId)
 	elseif itemData.Type == "Weapon" then
 		-- Logic to give weapon (e.g., call WeaponService)
 		local WeaponService = require(script.Parent.WeaponService)
-		WeaponService.EquipWeapon(player, itemData.WeaponName)
+		if WeaponService.EquipWeapon then
+			WeaponService.EquipWeapon(player, itemData.WeaponName)
+		else
+			warn("[LootService] WeaponService.EquipWeapon is missing! Ensure WeaponService is updated.")
+		end
 	end
 	
 	-- Cleanup
