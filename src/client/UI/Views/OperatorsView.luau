@@ -4,7 +4,6 @@
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 
 local Constants = ReplicatedStorage:WaitForChild("Constants")
@@ -259,7 +258,13 @@ function OperatorsView.Create(parent)
 	return {
 		Instance = frame,
 		Destroy = function()
-			for _, c in ipairs(connections) do c:Disconnect() end
+			for _, c in ipairs(connections) do
+				if type(c) == "function" then
+					c()
+				elseif typeof(c) == "RBXScriptConnection" then
+					c:Disconnect()
+				end
+			end
 			frame:Destroy()
 		end
 	}

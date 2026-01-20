@@ -6,7 +6,7 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DataService = require(ServerScriptService.Services.DataService)
+local _DataService = require(ServerScriptService.Services.DataService)
 local IDRegistry = require(ReplicatedStorage.Constants.IDRegistry)
 
 local LoadoutService = {}
@@ -82,6 +82,7 @@ function LoadoutService.SaveLoadout(player, loadoutData)
 	-- DataService.UpdatePlayerLoadouts(player, loadouts)
 	
 	print("[LoadoutService] Loadout saved for " .. player.Name)
+	return true
 end
 
 -- Delete loadout

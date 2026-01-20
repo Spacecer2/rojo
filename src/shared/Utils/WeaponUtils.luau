@@ -3,8 +3,7 @@
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage:WaitForChild("shared")
-local Constants = Shared:WaitForChild("Constants")
+local Constants = ReplicatedStorage:WaitForChild("Constants")
 
 local WeaponData = require(Constants:WaitForChild("WeaponData"))
 local AttachmentData = require(Constants:WaitForChild("AttachmentData"))
@@ -102,6 +101,55 @@ function WeaponUtils.GetUINormalizedStats(stats)
 		Mobility = math.clamp(stats.Mobility.MovementSpeed / 1.2, 0, 1),
 		Control = math.clamp(stats.AimingStability / 2, 0, 1),
 	}
+end
+
+-- Visually assemble attachments onto a weapon model
+function WeaponUtils.AssembleWeapon(weaponModel, equippedAttachments)
+	local assets = ReplicatedStorage:WaitForChild("Assets")
+	local attachmentsFolder = assets:FindFirstChild("Attachments")
+	if not attachmentsFolder then return end
+
+	for _, attachmentName in pairs(equippedAttachments) do
+		local data = AttachmentData.Attachments[attachmentName]
+		if not data or not data.ModelName then continue end
+
+		local modelTemplate = attachmentsFolder:FindFirstChild(data.ModelName)
+		if not modelTemplate then continue end
+
+		-- Find point on weapon
+		local targetPoint = weaponModel:FindFirstChild(data.AttachmentPoint, true)
+		if not targetPoint or not targetPoint:IsA("Attachment") then 
+			-- Fallback: Check for part with same name
+			targetPoint = weaponModel:FindFirstChild(data.AttachmentPoint, true)
+			if not targetPoint then continue end
+		end
+
+		local attachmentModel = modelTemplate:Clone()
+		attachmentModel.Parent = weaponModel
+
+		-- Weld using RigidConstraint for perfect alignment if it's an Attachment
+		-- Otherwise use Motor6D
+		if targetPoint:IsA("Attachment") then
+			local modelPoint = attachmentModel:FindFirstChild("ReceiverPoint", true) 
+				or attachmentModel:FindFirstChildWhichIsA("Attachment", true)
+			
+			if modelPoint then
+				local constraint = Instance.new("RigidConstraint")
+				constraint.Attachment0 = targetPoint
+				constraint.Attachment1 = modelPoint
+				constraint.Parent = attachmentModel
+			else
+				attachmentModel:PivotTo(targetPoint.WorldCFrame)
+			end
+		else
+			-- Simple weld if no attachment points found
+			local weld = Instance.new("WeldConstraint")
+			weld.Part0 = targetPoint
+			weld.Part1 = attachmentModel.PrimaryPart or attachmentModel:FindFirstChildWhichIsA("BasePart")
+			attachmentModel:PivotTo(targetPoint.CFrame)
+			weld.Parent = attachmentModel
+		end
+	end
 end
 
 return WeaponUtils

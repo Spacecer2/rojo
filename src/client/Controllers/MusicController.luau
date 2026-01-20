@@ -5,7 +5,6 @@
 
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
 
 local MusicController = {}
 

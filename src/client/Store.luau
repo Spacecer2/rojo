@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Utils = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Utils")
+local Utils = ReplicatedStorage:WaitForChild("Utils")
 local Signal = require(Utils:WaitForChild("Signal"))
 local IDRegistry = require(ReplicatedStorage.Constants.IDRegistry)
 

@@ -17,12 +17,16 @@ InputController.CrouchToggled = Instance.new("BindableEvent")
 InputController.SlideRequest = Instance.new("BindableEvent") -- New event for Slide
 InputController.JumpPressed = Instance.new("BindableEvent")
 InputController.ADSToggled = Instance.new("BindableEvent")
+InputController.FireToggled = Instance.new("BindableEvent")
+InputController.ReloadRequest = Instance.new("BindableEvent")
 
 -- Action names for ContextActionService (scalable pattern)
 local ACTION_SPRINT = "Sprint"
 local ACTION_CROUCH = "Crouch"
 local ACTION_JUMP = "Jump"
 local ACTION_ADS = "AimDownSights"
+local ACTION_FIRE = "Fire"
+local ACTION_RELOAD = "Reload"
 
 local DOUBLE_TAP_THRESHOLD = 0.3 -- Max time between taps
 
@@ -33,6 +37,7 @@ function InputController.new()
 	self.IsSprinting = false
 	self.IsCrouching = false
 	self.IsAiming = false
+	self.IsFiring = false
 	self._boundActions = {}
 	self._lastSprintPress = 0
 	
@@ -108,6 +113,32 @@ function InputController:Setup()
 		false,
 		Enum.UserInputType.MouseButton2
 	)
+
+	-- Fire (Hold) - MouseButton1
+	self._boundActions[ACTION_FIRE] = ContextActionService:BindAction(
+		ACTION_FIRE,
+		function(_, state, inputObject)
+			local isPressed = state == Enum.UserInputState.Begin
+			self.IsFiring = isPressed
+			self.FireToggled:Fire(isPressed)
+			return Enum.ContextActionResult.Sink
+		end,
+		false,
+		Enum.UserInputType.MouseButton1
+	)
+
+	-- Reload (Press) - R
+	self._boundActions[ACTION_RELOAD] = ContextActionService:BindAction(
+		ACTION_RELOAD,
+		function(_, state, inputObject)
+			if state == Enum.UserInputState.Begin then
+				self.ReloadRequest:Fire()
+			end
+			return Enum.ContextActionResult.Sink
+		end,
+		false,
+		Enum.KeyCode.R
+	)
 	
 	-- MoveVector is computed on-demand via GetMoveVector() (called by MovementController)
 	-- No background polling needed - MovementController calls GetMoveVector() directly for efficiency
@@ -115,11 +146,11 @@ end
 
 function InputController:GetMoveVector()
 	-- Basic WASD vector construction (normalized)
-	local vector = Vector3.zero
-	if UserInputService:IsKeyDown(Enum.KeyCode.W) then vector += Vector3.new(0, 0, -1) end
-	if UserInputService:IsKeyDown(Enum.KeyCode.S) then vector += Vector3.new(0, 0, 1) end
-	if UserInputService:IsKeyDown(Enum.KeyCode.A) then vector += Vector3.new(-1, 0, 0) end
-	if UserInputService:IsKeyDown(Enum.KeyCode.D) then vector += Vector3.new(1, 0, 0) end
+	local vector = Vector3.new(0, 0, 0)
+	if UserInputService:IsKeyDown(Enum.KeyCode.W) then vector = vector + Vector3.new(0, 0, -1) end
+	if UserInputService:IsKeyDown(Enum.KeyCode.S) then vector = vector + Vector3.new(0, 0, 1) end
+	if UserInputService:IsKeyDown(Enum.KeyCode.A) then vector = vector + Vector3.new(-1, 0, 0) end
+	if UserInputService:IsKeyDown(Enum.KeyCode.D) then vector = vector + Vector3.new(1, 0, 0) end
 	
 	-- Normalize if length > 0
 	if vector.Magnitude > 0 then

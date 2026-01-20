@@ -2,10 +2,6 @@
 	BarracksView - Player statistics, missions, and customization
 	Matches the Warzone "BARRACKS" reference image
 ]]
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
-
 local Controllers = script.Parent.Parent.Parent.Controllers
 local PlayerDataController = nil
 
@@ -117,7 +113,7 @@ function BarracksView.Create(parent)
 
 	local function createPanel(titleText, timeText)
 		local panel = Instance.new("Frame")
-		panel.Size = UDim2.new(0.45, 0, 1, 0)
+		panel.Size = UDim2.fromScale(0.45, 1)
 		panel.BackgroundColor3 = COLORS.Panel
 		panel.BackgroundTransparency = 0.4
 		panel.BorderSizePixel = 0
@@ -142,7 +138,7 @@ function BarracksView.Create(parent)
 			t.Font = Enum.Font.Gotham
 			t.TextSize = 12
 			t.TextColor3 = COLORS.AccentBlue
-			t.Size = UDim2.new(0, 100, 0, 40)
+			t.Size = UDim2.fromOffset(100, 40)
 			t.Position = UDim2.new(1, -110, 0, 10)
 			t.TextXAlignment = Enum.TextXAlignment.Right
 			t.BackgroundTransparency = 1
@@ -184,8 +180,8 @@ function BarracksView.Create(parent)
 	progressText.Font = Enum.Font.Gotham
 	progressText.TextSize = 10
 	progressText.TextColor3 = COLORS.TextSecondary
-	progressText.Size = UDim2.new(0, 40, 0, 20)
-	progressText.Position = UDim2.new(0, 0, 1, 0)
+	progressText.Size = UDim2.fromOffset(40, 20)
+	progressText.Position = UDim2.fromScale(0, 1)
 	progressText.TextXAlignment = Enum.TextXAlignment.Left
 	progressText.BackgroundTransparency = 1
 	progressText.Parent = progressBg
@@ -203,7 +199,7 @@ function BarracksView.Create(parent)
 
 	local function createRewardCard(name, value, isLoot)
 		local card = Instance.new("Frame")
-		card.Size = UDim2.new(0, 110, 0, 130)
+		card.Size = UDim2.fromOffset(110, 130)
 		card.BackgroundColor3 = Color3.new(0,0,0)
 		card.BackgroundTransparency = 0.5
 		card.BorderSizePixel = 1
@@ -220,7 +216,7 @@ function BarracksView.Create(parent)
 		header.Parent = card
 
 		local icon = Instance.new("Frame")
-		icon.Size = UDim2.new(0, 60, 0, 60)
+		icon.Size = UDim2.fromOffset(60, 60)
 		icon.Position = UDim2.new(0.5, -30, 0, 25)
 		icon.BackgroundColor3 = isLoot and COLORS.AccentBlue or COLORS.TextSecondary
 		icon.BackgroundTransparency = 0.9

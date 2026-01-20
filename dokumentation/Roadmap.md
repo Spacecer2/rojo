@@ -33,30 +33,38 @@ This document outlines the complete development lifecycle for the project, aimed
 
 ---
 
-## 🔫 Phase 4: The Arsenal (Combat & Gunplay) (IN PROGRESS)
+## 🔫 Phase 4: The Arsenal (Combat & Gunplay) (COMPLETED)
 *Goal: Realistic ballistics and deep customization.*
-- [ ] **Weapon Framework (V3)**:
-    - Hybrid Hitscan/Projectile system (Bullet travel & drop).
-    - Wall penetration and material-based damage falloff.
-- [ ] **Gunsmith Backend**:
+- [x] **Weapon Framework (V3)**:
+    - [x] Hybrid Hitscan/Projectile system (Bullet travel & drop).
+    - [x] Wall penetration and material-based damage falloff.
+    - [x] Real-time projectile visualization (Tracers).
+- [x] **Gunsmith Backend**:
     - [x] Attachment Data Structure (Muzzle, Barrel, Optic, etc.).
-    - [ ] Real-time stat modification logic (Mobility, Recoil, Range).
+    - [x] Real-time stat modification logic (Mobility, Recoil, Range).
+    - [x] Weapon attachment welding and visual assembly logic.
 - [x] **Loadout UI**:
-    - "WeaponsMenu" with slot selection and stats visualization.
-    - "Squad Preview" in 3D Lobby.
-- [ ] **Visual Recoil**: Spring-driven camera kick and weapon vibration.
+    - [x] "WeaponsMenu" with slot selection and stats visualization.
+    - [x] "Gunsmith UI" for visual attachment customization.
+    - [x] "Squad Preview" in 3D Lobby.
+- [x] **Visual Recoil**:
+    - [x] Spring-driven camera kick and weapon vibration.
+    - [x] Viewmodel sway and bobbing integration.
+    - [x] Dynamic weapon model swapping and viewmodel support.
 
 ---
 
-## 🚁 Phase 5: The Warzone Loop (Battle Royale) (DESIGNED)
+## 🚁 Phase 5: The Warzone Loop (Battle Royale) (IN PROGRESS)
 *Goal: Implement the core mechanics of the BR experience.*
 - [ ] **Match Lifecycle**: Pre-game warmup -> Infiltration (Plane) -> Victory.
-- [ ] **The Gas**: Circular hazard system with visual distortion and health drain.
+- [x] **The Gas**: Circular hazard system with visual distortion and health drain.
 - [ ] **Economy**:
-    - Cash spawning and looting.
-    - **Buy Stations**: UI and logic for purchasing Killstreaks/Revives.
-- [ ] **Looting**: Ground loot, Supply Boxes (Blue/Orange), and Rarity tiers.
-- [ ] **The Gulag**: 1v1 arena with "Capture Flag" overtime mechanic.
+    - [x] Cash spawning and looting.
+    - [x] **Buy Stations**: UI and logic for purchasing Killstreaks/Revives.
+- [x] **Looting**:
+    - [x] Ground loot system (Weapons, Cash).
+    - [x] Supply Boxes (Blue/Orange) and Rarity tiers.
+- [x] **The Gulag**: 1v1 arena with "Capture Flag" overtime mechanic.
 - [ ] **Contracts**: Bounty, Recon, and Scavenger mission logic.
 
 ---

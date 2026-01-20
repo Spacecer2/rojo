@@ -21,6 +21,7 @@ end
 
 function PlayerService.OnPlayerAdded(player)
 	print("Player joined: " .. player.Name)
+	player:SetAttribute("EquippedWeapon", "M4")
 	DataService.LoadData(player)
 
 	-- Award Beta Tester Badge
@@ -53,6 +54,18 @@ function PlayerService.OnPlayerAdded(player)
 	
 	-- Force spawn location at SpawnLocation center during load
 	player.CharacterAdded:Connect(function(character)
+		-- Listen for death for Gulag redirection
+		local humanoid = character:WaitForChild("Humanoid")
+		humanoid.Died:Connect(function()
+			if not player:GetAttribute("HasBeenToGulag") then
+				player:SetAttribute("HasBeenToGulag", true)
+				local GulagService = require(ServerScriptService.Services.GulagService)
+				task.delay(2, function()
+					GulagService.QueuePlayer(player)
+				end)
+			end
+		end)
+
 		-- Wait for root part
 		local rootPart = character:WaitForChild("HumanoidRootPart", 5)
 		if rootPart then

@@ -9,6 +9,8 @@ local WeaponData = {
 			Name = "M4",
 			Category = "Assault Rifle",
 			Description = "A versatile, reliable assault rifle with a high rate of fire.",
+			BallisticType = "Projectile",
+			ProjectileStats = { Velocity = 2800, GravityMultiplier = 1.0 },
 			BaseStats = {
 				Damage = { Head = 35, Chest = 28, Stomach = 28, Limbs = 24 },
 				FireRate = 800, -- RPM
@@ -34,6 +36,8 @@ local WeaponData = {
 			Name = "Lachmann Sub",
 			Category = "Submachine Gun",
 			Description = "A compact SMG with excellent mobility and close-quarters dominance.",
+			BallisticType = "Projectile",
+			ProjectileStats = { Velocity = 2200, GravityMultiplier = 1.0 },
 			BaseStats = {
 				Damage = { Head = 40, Chest = 25, Stomach = 25, Limbs = 20 },
 				FireRate = 850,
@@ -59,6 +63,8 @@ local WeaponData = {
 			Name = "P890",
 			Category = "Handgun",
 			Description = "A semi-automatic pistol chambered in .45 Auto, offering stopping power and reliability.",
+			BallisticType = "Projectile",
+			ProjectileStats = { Velocity = 1200, GravityMultiplier = 1.5 },
 			BaseStats = {
 				Damage = { Head = 50, Chest = 34, Stomach = 34, Limbs = 30 },
 				FireRate = 350,
@@ -81,6 +87,8 @@ local WeaponData = {
 			Name = "M13B",
 			Category = "Assault Rifle",
 			Description = "Featuring a short-stroke piston system that allows for a high rate of fire and low recoil.",
+			BallisticType = "Projectile",
+			ProjectileStats = { Velocity = 3000, GravityMultiplier = 0.8 },
 			BaseStats = {
 				Damage = { Head = 30, Chest = 24, Stomach = 24, Limbs = 20 },
 				FireRate = 900,
@@ -98,6 +106,8 @@ local WeaponData = {
 			Name = "X12",
 			Category = "Handgun",
 			Description = "A lightweight semi-auto 9mm pistol with specialized trigger for fast firing.",
+			BallisticType = "Projectile",
+			ProjectileStats = { Velocity = 1300, GravityMultiplier = 1.5 },
 			BaseStats = {
 				Damage = { Head = 40, Chest = 28, Stomach = 28, Limbs = 24 },
 				FireRate = 450,
@@ -115,6 +125,7 @@ local WeaponData = {
 			Name = "Knife",
 			Category = "Melee",
 			Description = "Tactical combat knife for quick and silent eliminations.",
+			BallisticType = "Hitscan",
 			BaseStats = {
 				Damage = { Head = 135, Chest = 135, Stomach = 135, Limbs = 135 },
 				FireRate = 120,

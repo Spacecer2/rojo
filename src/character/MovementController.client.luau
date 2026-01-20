@@ -34,13 +34,18 @@ local camera = Workspace.CurrentCamera
 local stateMachine = StateMachine.new()
 local inputController = InputManager.new()
 
--- Tac Sprint State
-local lastTacSprintTime = 0
-local isTacSprinting = false
-local tacSprintTimer = nil
+-- Use SharedState to expose InputController idiomatically
+local SharedState = require(player.PlayerScripts:WaitForChild("SharedState"))
+SharedState.Set("InputController", inputController)
 
--- Slide State
+-- Movement State Variables
+local isTacSprinting = false
+local lastTacSprintTime = 0
+local tacSprintTimer = nil
 local lastSlideTime = 0
+local currentSpeed = 0
+
+-- Slide Physics State
 local slideVelocity = nil -- LinearVelocity instance
 local slideAttachment = nil
 local slideDirection = Vector3.zero
@@ -82,7 +87,7 @@ stateMachine.StateChanged.Event:Connect(function(newState, oldState)
 	end
 end)
 
--- Logic
+-- Core Logic Functions
 local function updateState()
 	if player:GetAttribute("InMenu") then
 		stateMachine:SetState("Idle")
@@ -126,18 +131,19 @@ local function updateState()
 
 	if isMoving then
 		if isAiming then
-			stateMachine:SetState("ADS")
 			isTacSprinting = false -- ADS cancels tac sprint
-		elseif currentState == "TacticalSprint" then
-			-- Keep Tac Sprint state (implicit)
+			stateMachine:SetState("ADS")
+		elseif isTacSprinting then
+			stateMachine:SetState("TacticalSprint")
 		elseif isSprinting then
 			stateMachine:SetState("Sprint")
 		elseif isCrouching then
-			stateMachine:SetState("CrouchWalk") -- Use CrouchWalk when moving while crouched
+			stateMachine:SetState("CrouchWalk")
 		else
 			stateMachine:SetState("Run")
 		end
 	else
+		isTacSprinting = false -- Reset tac sprint if we stop moving
 		if isAiming then
 			stateMachine:SetState("ADS")
 		elseif isCrouching then
@@ -148,10 +154,7 @@ local function updateState()
 	end
 end
 
--- Speed interpolation state
-local currentSpeed = Config.WalkSpeed
-
-	local function applyMovement(dt)
+local function applyMovement(dt)
 	local inMenu = player:GetAttribute("InMenu")
 	if inMenu then
 		humanoid.WalkSpeed = 0
@@ -167,25 +170,22 @@ local currentSpeed = Config.WalkSpeed
 	
 	-- Handle Slide Physics separately
 	if currentState == "Slide" then
-		-- Smoothly decay slide velocity
 		local currentVel = slideVelocity.VectorVelocity
 		local decay = 1 - (Config.SlideFriction * dt)
 		local newVel = currentVel * math.clamp(decay, 0, 1)
 		
 		slideVelocity.VectorVelocity = newVel
 		
-		-- Termination checks
 		local speed = newVel.Magnitude
 		if speed < Config.RunSpeed * 0.8 then
 			stateMachine:SetState(inputController.IsCrouching and "Crouch" or "Idle")
 		end
 		
-		-- FOV for slide
 		local targetFOV = Config.DefaultFOV + 5
 		local fovLerpFactor = math.min(1, (dt * 60) * Config.FOVTransitionSpeed)
 		camera.FieldOfView = camera.FieldOfView + (targetFOV - camera.FieldOfView) * fovLerpFactor
 		
-		return -- Skip normal movement logic
+		return
 	end
 	
 	if currentState == "Run" then
@@ -202,51 +202,44 @@ local currentSpeed = Config.WalkSpeed
 		targetSpeed = (currentState == "Land") and (Config.WalkSpeed * 0.5) or 0
 	end
 	
-	-- Smooth speed interpolation (per documentation - smooth transitions)
-	local lerpFactor = math.min(1, (dt * 60) / Config.AccelerationTime) -- Normalize to 60fps
+	local lerpFactor = math.min(1, (dt * 60) / Config.AccelerationTime)
 	currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * lerpFactor
 	humanoid.WalkSpeed = currentSpeed
 	
-	-- FOV Change
 	local targetFOV = Config.DefaultFOV
 	if inputController.IsAiming then
 		targetFOV = Config.ADSFOV
 	elseif currentState == "TacticalSprint" then
-		targetFOV = Config.DefaultFOV + 10 -- Dynamic FOV boost
+		targetFOV = Config.DefaultFOV + 10
 	end
 	
 	local fovLerpFactor = math.min(1, (dt * 60) * Config.FOVTransitionSpeed)
 	camera.FieldOfView = camera.FieldOfView + (targetFOV - camera.FieldOfView) * fovLerpFactor
 end
 
--- Function to start Tactical Sprint
 local function startTacticalSprint()
 	local now = tick()
 	if (now - lastTacSprintTime) < Config.TacticalSprintCooldown then return end
 	
 	local currentState = stateMachine:GetState()
-	-- Can only enter from moving forward states
 	if currentState == "Sprint" or currentState == "Run" then
-		stateMachine:SetState("TacticalSprint")
 		isTacSprinting = true
+		stateMachine:SetState("TacticalSprint")
 		
-		-- Duration Timer
 		if tacSprintTimer then task.cancel(tacSprintTimer) end
 		tacSprintTimer = task.delay(Config.TacticalSprintDuration, function()
 			if stateMachine:GetState() == "TacticalSprint" then
-				stateMachine:SetState("Sprint") -- Downgrade to normal sprint
 				isTacSprinting = false
+				stateMachine:SetState("Sprint")
 				lastTacSprintTime = tick()
 			end
 		end)
 	end
 end
 
--- Function to start Sliding
 local function startSlide()
 	local currentState = stateMachine:GetState()
 	
-	-- Slide Cancellation (Slide Cancel)
 	if currentState == "Slide" then
 		stateMachine:SetState("Crouch")
 		return
@@ -255,14 +248,11 @@ local function startSlide()
 	local now = tick()
 	if (now - lastSlideTime) < Config.SlideCooldown then return end
 	
-	-- Check if we are grounded and moving fast enough
 	local isGrounded = humanoid.FloorMaterial ~= Enum.Material.Air
 	if not isGrounded then return end
 	
-	local moveVector = inputController:GetMoveVector()
 	if currentSpeed < Config.MinSlideSpeed then return end
 
-	-- Calculate slide direction (based on current velocity or move vector)
 	local velocity = rootPart.AssemblyLinearVelocity
 	if velocity.Magnitude > 1 then
 		slideDirection = velocity.Unit
@@ -270,16 +260,13 @@ local function startSlide()
 		slideDirection = rootPart.CFrame.LookVector
 	end
 	
+	isTacSprinting = false
 	stateMachine:SetState("Slide")
 	lastSlideTime = now
 	
-	-- Apply Initial Physics
-	slideVelocity.MaxForce = 100000 -- Strong push
+	slideVelocity.MaxForce = 100000
 	slideVelocity.VectorVelocity = slideDirection * Config.SlideSpeed
-	humanoid.AutoRotate = false -- Lock rotation during slide
-	
-	-- Cancel other sprinting states
-	isTacSprinting = false
+	humanoid.AutoRotate = false
 end
 
 -- Bind Input Signals
@@ -287,16 +274,15 @@ inputController.TacticalSprintRequest.Event:Connect(startTacticalSprint)
 inputController.SlideRequest.Event:Connect(startSlide)
 inputController.JumpPressed.Event:Connect(function()
 	if stateMachine:GetState() == "Slide" then
-		stateMachine:SetState("Idle") -- Standard "Slide Cancel into Jump"
+		stateMachine:SetState("Idle")
 	end
 	
-	-- Grounded check for jump
 	if humanoid.FloorMaterial ~= Enum.Material.Air then
 		humanoid.Jump = true
 	end
 end)
 
--- Loop - Using PreSimulation for physics updates (per documentation recommendations)
+-- Loop
 RunService.PreSimulation:Connect(function(dt)
 	updateState()
 	applyMovement(dt)

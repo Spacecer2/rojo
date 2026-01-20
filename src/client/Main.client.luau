@@ -100,6 +100,25 @@ local function Start()
 		warn("[Client] Failed to load MenuController: " .. tostring(MenuController))
 		updateProgress("Menu Failed")
 	end
+
+	-- Step 5: Initialize Developer Console
+	task.spawn(function()
+		local devConsoleModule = script.Parent:WaitForChild("DeveloperConsole")
+		local devConsoleUIModule = devConsoleModule:WaitForChild("DeveloperConsoleUI")
+		
+		local success_dc, DeveloperConsoleUI = pcall(require, devConsoleUIModule)
+		if success_dc then
+			local UserInputService = game:GetService("UserInputService")
+			UserInputService.InputBegan:Connect(function(input, gameProcessed)
+				if not gameProcessed and input.KeyCode == Enum.KeyCode.I then
+					DeveloperConsoleUI.Toggle()
+				end
+			end)
+			print("[Client] Developer Console initialized (Keybind: I)")
+		else
+			warn("[Client] Failed to load DeveloperConsoleUI: " .. tostring(DeveloperConsoleUI))
+		end
+	end)
 	
 	-- Complete (95-100%)
 	LoadingScreen.SetProgress(100, "Ready!")
