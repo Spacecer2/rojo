@@ -60,13 +60,9 @@ function SettingsController.UpdateSetting(key, value)
 	SettingsController.CurrentSettings[key] = value
 	SettingsController.ApplySetting(key, value)
 	SettingsController.SettingsChanged:Fire(key, value)
-end
-
-function SettingsController.SaveAll()
-	for k, v in pairs(SettingsController.CurrentSettings) do
-		Network.FireServer("UpdateSettings", k, v)
-	end
-	print("[SettingsController] All settings saved.")
+	
+	-- Save to server
+	Network.FireServer("UpdateSettings", key, value)
 end
 
 function SettingsController.ApplyAll()
@@ -76,10 +72,7 @@ function SettingsController.ApplyAll()
 end
 
 function SettingsController.ApplySetting(key, value)
-	if string.sub(key, 1, 5) == "Drone" then
-		game:GetService("Players").LocalPlayer:SetAttribute(key, value)
-		
-	elseif key == "FOV" then
+	if key == "FOV" then
 		local cam = workspace.CurrentCamera
 		if cam then cam.FieldOfView = value end
 		

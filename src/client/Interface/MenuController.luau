@@ -109,8 +109,18 @@ function MenuController.Start()
 		topBar.BackgroundTransparency = 0.4
 		topBar.Parent = mainFrame
 		
-		-- WARZONE Branding (Removed per user request)
-		-- local branding = Instance.new("TextLabel") ...
+		-- WARZONE Branding
+		local branding = Instance.new("TextLabel")
+		branding.Name = "Branding"
+		branding.Text = "WARZONE"
+		branding.Font = Enum.Font.GothamBlack
+		branding.TextSize = 28
+		branding.TextColor3 = Color3.new(1, 1, 1)
+		branding.Size = UDim2.fromOffset(200, 40)
+		branding.Position = UDim2.fromOffset(40, 10)
+		branding.BackgroundTransparency = 1
+		branding.TextXAlignment = Enum.TextXAlignment.Left
+		branding.Parent = topBar
 
 		-- Resource Bar (Top Right)
 		local resources = Instance.new("Frame")
@@ -169,15 +179,13 @@ function MenuController.Start()
 		-- Tab Navigation
 		local tabContainer = Instance.new("Frame")
 		tabContainer.Name = "TabContainer"
-		tabContainer.Size = UDim2.new(1, 0, 0, 40)
-		tabContainer.Position = UDim2.fromOffset(0, 50)
+		tabContainer.Size = UDim2.new(1, -80, 0, 40)
+		tabContainer.Position = UDim2.fromOffset(40, 50)
 		tabContainer.BackgroundTransparency = 1
 		tabContainer.Parent = topBar
 		
 		local tabLayout = Instance.new("UIListLayout")
 		tabLayout.FillDirection = Enum.FillDirection.Horizontal
-		tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-		tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 		tabLayout.Padding = UDim.new(0, 20)
 		tabLayout.Parent = tabContainer
 

@@ -200,24 +200,13 @@ function SettingsView.Create(parent)
 			createSlider("MasterVolume", "Master Volume", SettingsData.Constraints.MasterVolume, 1).Parent = optionsScroll
 			createSlider("MusicVolume", "Music Volume", SettingsData.Constraints.MusicVolume, 2).Parent = optionsScroll
 			createSlider("EffectsVolume", "Effects Volume", SettingsData.Constraints.EffectsVolume, 3).Parent = optionsScroll
-		elseif cat == "Drone" then
-			createSlider("DroneOrbitSwayAmplitude", "Orbit Sway", SettingsData.Constraints.DroneOrbitSwayAmplitude, 1).Parent = optionsScroll
-			createSlider("DroneOrbitSwayFrequency", "Sway Speed", SettingsData.Constraints.DroneOrbitSwayFrequency, 2).Parent = optionsScroll
-			createSlider("DroneMinDistance", "Min Distance", SettingsData.Constraints.DroneMinDistance, 3).Parent = optionsScroll
-			createSlider("DroneMaxDistance", "Max Distance", SettingsData.Constraints.DroneMaxDistance, 4).Parent = optionsScroll
-			createSlider("DroneHeightOffset", "Height Offset", SettingsData.Constraints.DroneHeightOffset, 5).Parent = optionsScroll
-			createSlider("DroneLookAheadFactor", "Look Ahead", SettingsData.Constraints.DroneLookAheadFactor, 6).Parent = optionsScroll
-			createSlider("DroneTopSpeed", "Top Speed", SettingsData.Constraints.DroneTopSpeed, 7).Parent = optionsScroll
-			createSlider("DroneAccelerationLimit", "Accel Limit", SettingsData.Constraints.DroneAccelerationLimit, 8).Parent = optionsScroll
-			createSlider("DroneFocusSpringSpeed", "Focus Speed", SettingsData.Constraints.DroneFocusSpringSpeed, 9).Parent = optionsScroll
-			createSlider("DroneFocusSpringDamper", "Focus Damper", SettingsData.Constraints.DroneFocusSpringDamper, 10).Parent = optionsScroll
 		end
 		
 		optionsScroll.CanvasSize = UDim2.fromOffset(0, optLayout.AbsoluteContentSize.Y + 20)
 	end
 
 	-- Category Buttons
-	local categories = {"General", "Graphics", "Audio", "Drone"}
+	local categories = {"General", "Graphics", "Audio"}
 	for _, cat in ipairs(categories) do
 		local btn = Instance.new("TextButton")
 		btn.Text = cat
@@ -253,28 +242,6 @@ function SettingsView.Create(parent)
 	
 	backBtn.MouseButton1Click:Connect(function()
 		ViewManager.SwitchTo("Home")
-	end)
-
-	-- Save Button
-	local saveBtn = Instance.new("TextButton")
-	saveBtn.Text = "SAVE SETTINGS"
-	saveBtn.Font = Enum.Font.GothamBold
-	saveBtn.TextSize = 14
-	saveBtn.TextColor3 = Color3.new(0, 0, 0)
-	saveBtn.BackgroundColor3 = COLORS.AccentBlue
-	saveBtn.Size = UDim2.fromOffset(150, 40)
-	saveBtn.Position = UDim2.new(0, 150, 1, -50)
-	saveBtn.Parent = frame
-	Instance.new("UICorner", saveBtn).CornerRadius = UDim.new(0, 4)
-	
-	saveBtn.MouseButton1Click:Connect(function()
-		SettingsController.SaveAll()
-		saveBtn.Text = "SAVED!"
-		saveBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
-		task.delay(1, function()
-			saveBtn.Text = "SAVE SETTINGS"
-			saveBtn.BackgroundColor3 = COLORS.AccentBlue
-		end)
 	end)
 
 	-- Default Load
