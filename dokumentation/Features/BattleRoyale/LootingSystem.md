@@ -1,7 +1,16 @@
 # Looting System: Ground Loot, Supply Boxes, & Rarity Tiers
 
 ## Overview
-A comprehensive loot distribution system where items are scattered across the map in various containers and as ground spawns. Loot quality increases through rarity tiers, with rare items in high-risk areas, incentivizing exploration and risk-taking.
+The looting system is the foundation of the battle royale experience. It's designed to encourage exploration, create dynamic risk-reward scenarios, and provide a clear sense of progression within a single match.
+
+## System Design & Vision
+
+The looting system is built on a set of core principles that are essential to the Warzone experience:
+
+- **Exploration and Discovery:** The map is littered with loot of varying rarity, encouraging players to explore their surroundings and venture into new areas. The placement of high-tier loot in contested "hot zones" creates a natural flow to the match, as players are drawn to these high-risk, high-reward locations.
+- **Scarcity and Progression:** The early game is a frantic scramble for basic resources. As the match progresses, players will find better gear, creating a clear sense of progression and power. The rarity system, with its distinct color-coding, provides immediate and satisfying feedback on the value of a found item.
+- **Risk vs. Reward:** The best loot is often found in the most dangerous places. This creates a constant tension between the desire for better gear and the risk of encountering other players. Supply drops, in particular, are designed to be major points of conflict, as they offer the most valuable loot in the game.
+- **A Balanced and Fair Experience:** The loot distribution algorithm is designed to be random enough to make each match feel unique, but also balanced enough to prevent any one player from getting an insurmountable advantage in the early game. The system is designed to reward smart play and strategic decision-making, not just blind luck.
 
 ## Loot Containers
 

@@ -1,6 +1,13 @@
 # System Design: Contracts
 
-Contracts are optional, objective-based missions found within the Battle Royale map. They provide Cash, Weapon XP, and Loot incentives to force player movement.
+## System Design & Vision
+
+Contracts are a core gameplay mechanic designed to create dynamic, player-driven scenarios and objectives within a single match. They are not simply side-quests, but a fundamental part of the strategic layer of the game. The design is guided by the following principles:
+
+- **Player-Driven Narrative:** Contracts generate micro-narratives within each match. A "Bounty" contract creates a tense hunter-hunted scenario, while a "Recon" contract tells a story of tactical positioning and foresight. This makes each match feel unique and less predictable.
+- **Risk vs. Reward:** Each contract type is designed with a clear risk-reward profile. Bounties are high-risk, high-reward, pushing squads into direct conflict. Recons are lower risk, offering a strategic advantage. This allows squads to choose their level of engagement.
+- **Economic & Strategic Integration:** Contracts are deeply integrated with the in-game economy. They are a primary source of cash, which can then be used at Buy Stations to gain a significant advantage. This creates a feedback loop where completing contracts directly translates to increased power.
+- **A Tool for Pacing and Flow:** Contracts are used to influence the pacing and flow of the match. For example, Recon contracts can be used to encourage players to move to new areas of the map, while Most Wanted contracts can create a "king of the hill" scenario in the mid-game.
 
 ## 📜 Contract Types
 

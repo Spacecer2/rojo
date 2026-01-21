@@ -1,320 +1,409 @@
-# Roblox Networking Guide
+# Roblox Networking Guide: Engineering the Warzone Multiplayer Experience
 
-Client-server communication patterns for multiplayer games.
+## Introduction & Philosophy
+
+Networking is the backbone of any real-time multiplayer game, and for our Warzone recreation on Roblox, it is absolutely critical. This guide outlines our architectural philosophy and best practices for client-server communication, aiming to deliver a seamless, fair, and responsive "Warzone Feel." We confront the unique challenges of Roblox's networking model head-on, committing to:
+
+-   **Server Authority**: The server is the single source of truth for all critical game logic, preventing client-side exploits and ensuring fair gameplay.
+-   **Client-Side Prediction**: We leverage client-side prediction to maintain a fluid and responsive player experience, even under network latency, by immediately reflecting player actions locally.
+-   **Optimized Bandwidth**: Meticulous attention is paid to minimizing network traffic through efficient data serialization, batching, and throttling, ensuring smooth performance for all players.
+-   **Robust Error Handling**: Network interactions are designed with resilience in mind, anticipating and gracefully handling latency, packet loss, and desynchronization.
+
+This document serves as our technical blueprint for building a competitive and immersive multiplayer environment.
 
 ## Architecture Overview
 
-Roblox uses a **client-server model**:
-- **Server** authorizes actions, maintains game state
-- **Client** displays visuals, handles local input
-- **Replication** syncs game state automatically
+Roblox fundamentally operates on a **client-server model**:
+-   **Server**: The authoritative core that maintains the global game state, processes critical game logic, validates player actions, and handles data persistence.
+-   **Client**: Responsible for rendering the game world, processing local player input, and providing immediate visual feedback.
+-   **Replication**: Roblox's built-in mechanism for automatically synchronizing the game state between the server and connected clients for designated instances.
 
-Security Rule: **Never trust the client**
+**The Golden Rule**: **Never trust the client.** All player actions and crucial game state changes initiated by the client *must* be validated and authorized by the server.
 
-## RemoteEvent vs RemoteFunction
+---
 
-| Feature | RemoteEvent | RemoteFunction |
-|---------|-------------|-----------------|
-| Direction | One-way | Two-way |
-| Response | No | Yes (waits) |
-| Performance | Better | Slower (blocking) |
-| Use Case | Fire-and-forget | Requests answers |
+## RemoteEvent vs RemoteFunction: Strategic Communication Choices
 
-## Client to Server Communication
+The choice between `RemoteEvent` and `RemoteFunction` is a fundamental architectural decision based on the nature of the communication required.
 
-### RemoteEvent (Fire & Forget)
+| Feature | RemoteEvent (One-Way) | RemoteFunction (Two-Way) | Strategic Use Cases |
+|---------|-----------------------|--------------------------|----------------------|
+| **Direction** | Client → Server or Server → Client/All | Client ↔ Server |
+| **Response** | No immediate response (fire-and-forget) | Synchronous, waits for a return value |
+| **Performance** | Generally better for high-frequency, non-critical updates | Slower due to blocking nature, should be used sparingly |
+| **Use Case** | Player movement input, visual effects, non-critical status updates | Requesting data from server (e.g., player stats), server validation for critical actions (e.g., weapon fire, purchases) |
+
+---
+
+## Client to Server Communication: Authoritative Action Requests
+
+### RemoteEvent (Fire & Forget): Asynchronous Action Notification
+Used for transmitting player input or non-critical actions to the server without requiring an immediate, blocking response. Server-side validation is still paramount.
+
 ```lua
--- Setup: ReplicatedStorage.Events.PlayerAttack
+-- Setup: Create a RemoteEvent named 'PlayerAttack' in ReplicatedStorage/Events
+-- Purpose: Notifies the server that a player intends to attack.
 
--- SERVER CODE
+-- SERVER CODE (Module: PlayerCombatService)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local attackEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerAttack")
 
-attackEvent.OnServerEvent:Connect(function(player, targetId)
-    print(player.Name .. " attacked target " .. targetId)
-    -- Validate, process, update game state
+attackEvent.OnServerEvent:Connect(function(player, targetInstance)
+    -- *** CRITICAL: Server-side validation is ALWAYS required here ***
+    if not PlayerService.isPlayerAlive(player) then return end
+    if not CombatService.isValidTarget(targetInstance) then return end
+    if not CombatService.isTargetInRange(player, targetInstance) then return end
+    
+    CombatService.processAttack(player, targetInstance) -- Only process after validation
 end)
 
--- CLIENT CODE
+-- CLIENT CODE (Module: InputManager or WeaponController)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local attackEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerAttack")
 
--- Send attack to server
-attackEvent:FireServer(targetCharacter.Id)
+-- When player clicks to attack
+Mouse.Button1Down:Connect(function()
+    local target = getTargetFromRaycast() -- Client-side prediction of target
+    if target then
+        attackEvent:FireServer(target) -- Request server to process attack
+    end
+end)
 ```
 
-### RemoteFunction (Request Response)
-```lua
--- Setup: ReplicatedStorage.Remotes.GetPlayerStats
+### RemoteFunction (Request-Response): Synchronous Data & Validation
+Used when the client needs to explicitly ask the server for data or to perform a critical action that requires server validation and a return value. Blocks the client until the server responds.
 
--- SERVER CODE
+```lua
+-- Setup: Create a RemoteFunction named 'GetPlayerStats' in ReplicatedStorage/Remotes
+-- Purpose: Client requests player's current health stat from the server.
+
+-- SERVER CODE (Module: PlayerDataService)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local getStatsRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("GetPlayerStats")
 
-getStatsRemote.OnServerInvoke = function(player, statName)
-    -- Look up player's data
-    local stats = {health = 100, mana = 50}
-    return stats[statName] or 0
+getStatsRemote.OnServerInvoke = function(player, statName: string)
+    -- CRITICAL: Validate statName to prevent arbitrary data access
+    if statName == "health" then
+        return PlayerDataService.getPlayerHealth(player)
+    elseif statName == "mana" then
+        return PlayerDataService.getPlayerMana(player)
+    end
+    return nil -- Or throw an error for invalid requests
 end
 
--- CLIENT CODE
+-- CLIENT CODE (Module: HUDController)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local getStatsRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("GetPlayerStats")
 
--- Request data (blocks until response)
-local health = getStatsRemote:InvokeServer("health")
-print("Player health:", health)
+-- Request data (This call will yield until the server responds)
+local currentHealth = getStatsRemote:InvokeServer("health")
+print("Player health received:", currentHealth)
 ```
 
-## Server to Client Communication
+---
 
-### Sending Data to Specific Client
+## Server to Client Communication: Distributing Game State
+
+### Sending Data to a Specific Client: Targeted Updates
 ```lua
--- SERVER: Send to one client
-local attackEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerHit")
-attackEvent:FireClient(player, damageAmount, hitPosition)
+-- SERVER: Notifies a specific player they have been hit.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local playerHitEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerHit")
 
--- CLIENT: Receive
-attackEvent.OnClientEvent:Connect(function(damageAmount, hitPosition)
+-- In CombatService.processAttack() after damage calculation
+playerHitEvent:FireClient(targetPlayer, damageAmount, hitPosition, attackerPlayerId)
+
+-- CLIENT: Receives notification of being hit.
+playerHitEvent.OnClientEvent:Connect(function(damageAmount: number, hitPosition: Vector3, attackerId: number)
+    HUDController.displayDamageIndicator(damageAmount)
+    VFXController.spawnHitEffect(hitPosition)
+    AudioController.playDamageSound()
     print("Hit for " .. damageAmount .. " damage!")
 end)
 ```
 
-### Broadcasting to All Clients
+### Broadcasting to All Clients: Global State Updates
 ```lua
--- SERVER: Send to all clients
-attackEvent:FireAllClients(bulletId, position, velocity)
+-- SERVER: Notifies all clients a bullet impact occurred for visual feedback.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local bulletHitVisualEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("BulletHitVisual")
 
--- CLIENT: Receive
-attackEvent.OnClientEvent:Connect(function(bulletId, position, velocity)
-    createBulletVisuals(bulletId, position, velocity)
+-- In CombatService.processProjectileHit()
+bulletHitVisualEvent:FireAllClients(impactPosition, surfaceNormal, material)
+
+-- CLIENT: Receives global bullet hit for visual consistency.
+bulletHitVisualEvent.OnClientEvent:Connect(function(impactPosition: Vector3, surfaceNormal: Vector3, material: Enum.Material)
+    VFXController.spawnBulletImpactEffect(impactPosition, surfaceNormal, material)
+    AudioController.playImpactSound(material)
 end)
 ```
-
-## Optimized Networking Patterns
-
-### Throttled Updates
-```lua
--- SERVER: Limit updates to prevent spam
-local lastUpdateTime = {}
-local UPDATE_INTERVAL = 0.1  -- 100ms
-
-local function sendPlayerUpdate(player, data)
-    local currentTime = tick()
-    if not lastUpdateTime[player] then
-        lastUpdateTime[player] = currentTime
-    end
-    
-    if currentTime - lastUpdateTime[player] >= UPDATE_INTERVAL then
-        playerUpdateEvent:FireClient(player, data)
-        lastUpdateTime[player] = currentTime
-    end
-end
-```
-
-### Batched Updates
-```lua
--- SERVER: Send multiple updates at once
-local pendingUpdates = {}
-local BATCH_INTERVAL = 0.05
-
-local function queueUpdate(player, updateData)
-    if not pendingUpdates[player] then
-        pendingUpdates[player] = {}
-    end
-    table.insert(pendingUpdates[player], updateData)
-end
-
--- Send batches periodically
-game:GetService("RunService").Heartbeat:Connect(function()
-    for player, updates in pairs(pendingUpdates) do
-        if #updates > 0 then
-            batchUpdateEvent:FireClient(player, updates)
-            pendingUpdates[player] = {}
-        end
-    end
-end)
-```
-
-### Unreliable High-Frequency Updates
-```lua
--- CLIENT: Send input only when it changes
-local lastInput = nil
-
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    local currentInput = {
-        forward = input.KeyCode == Enum.KeyCode.W,
-        backward = input.KeyCode == Enum.KeyCode.S,
-        left = input.KeyCode == Enum.KeyCode.A,
-        right = input.KeyCode == Enum.KeyCode.D
-    }
-    
-    if currentInput ~= lastInput then
-        moveEvent:FireServer(currentInput)
-        lastInput = currentInput
-    end
-end)
-```
-
-## Error Handling & Safety
-
-### Server-side Validation
-```lua
--- ALWAYS validate client input
-attackEvent.OnServerEvent:Connect(function(player, targetId)
-    -- Validate player is alive
-    if not isPlayerAlive(player) then
-        return
-    end
-    
-    -- Validate target exists and is in range
-    local target = workspace:FindFirstChild(targetId)
-    if not target then return end
-    
-    local distance = (player.Character.HumanoidRootPart.Position - target.Position).Magnitude
-    if distance > 100 then  -- Max attack range
-        return
-    end
-    
-    -- Only now process the attack
-    processAttack(player, target)
-end)
-```
-
-### Debouncing
-```lua
-local debounce = {}
-
-attackEvent.OnServerEvent:Connect(function(player, targetId)
-    -- Prevent spam
-    if debounce[player.UserId] then
-        return
-    end
-    
-    debounce[player.UserId] = true
-    
-    -- Process attack
-    processAttack(player, targetId)
-    
-    -- Cooldown
-    task.wait(0.5)
-    debounce[player.UserId] = nil
-end)
-```
-
-## Data Serialization
-
-### Complex Data Types
-```lua
--- Objects don't serialize well, so convert to simple types
-
--- SERVER: Send player data
-local playerData = {
-    id = player.UserId,
-    name = player.Name,
-    position = {x = char.HRP.Position.X, y = char.HRP.Position.Y, z = char.HRP.Position.Z},
-    health = humanoid.Health,
-    weapons = {weapon1_id, weapon2_id},
-    inventory = {item1 = 5, item2 = 10}
-}
-
-playerUpdateEvent:FireClient(player, playerData)
-
--- CLIENT: Reconstruct
-local function deserializePlayer(data)
-    return {
-        id = data.id,
-        name = data.name,
-        position = Vector3.new(data.position.x, data.position.y, data.position.z),
-        health = data.health
-    }
-end
-```
-
-## For Warzone-Style Games
-
-### Movement Replication
-```lua
--- CLIENT: Send movement input frequently
-local MovementInput = game:GetService("UserInputService")
-local moveEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerMove")
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    local direction = Vector3.new(0, 0, 0)
-    if MovementInput:IsKeyDown(Enum.KeyCode.W) then direction = direction + workspace.CurrentCamera.CFrame.LookVector end
-    if MovementInput:IsKeyDown(Enum.KeyCode.S) then direction = direction - workspace.CurrentCamera.CFrame.LookVector end
-    if MovementInput:IsKeyDown(Enum.KeyCode.A) then direction = direction - workspace.CurrentCamera.CFrame.RightVector end
-    if MovementInput:IsKeyDown(Enum.KeyCode.D) then direction = direction + workspace.CurrentCamera.CFrame.RightVector end
-    
-    moveEvent:FireServer(direction.Unit)
-end)
-
--- SERVER: Process movement and replicate to other clients
-moveEvent.OnServerEvent:Connect(function(player, direction)
-    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        humanoidRootPart.Velocity = direction * PLAYER_SPEED
-        -- Replicate to other players
-        playerMoveReplicateEvent:FireAllClients(player.UserId, humanoidRootPart.Position, direction)
-    end
-end)
-```
-
-### Weapon Firing
-```lua
--- CLIENT: Request to fire weapon
-local fireEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("FireWeapon")
-
-Mouse.Button1Down:Connect(function()
-    local rayStart = Mouse.Hit.Position
-    local rayDirection = (Mouse.Hit.Position - workspace.CurrentCamera.CFrame.Position).Unit
-    fireEvent:FireServer(rayStart, rayDirection)
-end)
-
--- SERVER: Validate and apply damage
-fireEvent.OnServerEvent:Connect(function(player, rayStart, rayDirection)
-    -- Validate player is alive and armed
-    if not isPlayerAlive(player) then return end
-    
-    -- Server-side raycast for accuracy
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = {player.Character}
-    
-    local result = workspace:Raycast(rayStart, rayDirection * 300, raycastParams)
-    
-    if result then
-        local hitCharacter = result.Instance.Parent
-        if hitCharacter:FindFirstChild("Humanoid") then
-            hitCharacter.Humanoid:TakeDamage(50)
-            -- Notify all clients about the hit
-            bulletHitEvent:FireAllClients(result.Position, hitCharacter.Name)
-        end
-    end
-end)
-
--- CLIENT: Show visual feedback
-bulletHitEvent.OnClientEvent:Connect(function(hitPosition, targetName)
-    -- Create particle effect at hit position
-    createExplosion(hitPosition)
-end)
-```
-
-## Performance Tips
-
-1. **Minimize network calls** - Batch updates when possible
-2. **Use events for fire-and-forget** - Avoid blocking RemoteFunctions in tight loops
-3. **Replicate efficiently** - Only send changed data
-4. **Server-authoritative** - Trust server calculations for important logic
-5. **Client-side prediction** - Show local changes immediately, sync with server
-6. **Compression** - Use short names, combine related data
-7. **Cooldowns** - Prevent spam with debouncing
 
 ---
 
-**For more information:**
-- [Network Replication](https://create.roblox.com/docs/tutorials/scripting/networking)
-- [Remote Events](https://create.roblox.com/docs/reference/engine/classes/RemoteEvent)
-- [Remote Functions](https://create.roblox.com/docs/reference/engine/classes/RemoteFunction)
+## Optimized Networking Patterns: Bandwidth Efficiency & Responsiveness
+
+### Throttled Updates: Reducing Redundancy
+Limits the rate at which updates are sent, preventing network spam from rapidly changing client data (e.g., constant character position updates when the character is not moving significantly).
+
+```lua
+-- SERVER (Module: PlayerMovementService): Limit update frequency to clients
+local lastUpdateTimestamp = {}
+local UPDATE_INTERVAL = 0.1 -- 100ms interval for movement updates
+
+local function sendPlayerMovementUpdate(player: Player, position: Vector3, velocity: Vector3)
+    local currentTime = tick()
+    if not lastUpdateTimestamp[player] or (currentTime - lastUpdateTimestamp[player] >= UPDATE_INTERVAL) then
+        -- Only fire client if enough time has passed
+        PlayerMovementReplicationEvent:FireClient(player, position, velocity)
+        lastUpdateTimestamp[player] = currentTime
+    end
+end
+```
+
+### Batched Updates: Grouping for Efficiency
+Groups multiple small updates into a single network transmission, significantly reducing network overhead, especially for numerous small state changes.
+
+```lua
+-- SERVER (Module: GlobalStateManager): Collect and send updates periodically
+local pendingGlobalUpdates: {any} = {}
+local BATCH_INTERVAL = 0.05 -- Send updates every 50ms
+
+local function queueGlobalUpdate(updateData: any)
+    table.insert(pendingGlobalUpdates, updateData)
+end
+
+-- Periodically send batches of updates to all clients
+game:GetService("RunService").Heartbeat:Connect(function()
+    if #pendingGlobalUpdates > 0 then
+        GlobalUpdateEvent:FireAllClients(pendingGlobalUpdates)
+        pendingGlobalUpdates = {} -- Clear batch after sending
+    end
+end)
+```
+
+### Unreliable High-Frequency Updates: Client-Side Input Prioritization
+For input like movement, clients send updates only when input *changes*, leveraging client-side prediction for smooth local experience, and server reconciliation for authority.
+
+```lua
+-- CLIENT (Module: InputManager): Send input only when it changes or on a fixed interval if active.
+local lastInputState: { [string]: boolean } = {}
+local inputChangedEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerInputChanged")
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local currentInputState = InputService.getMovementInputState() -- Custom function to get current WASD state
+    if not table.equal(currentInputState, lastInputState) then -- Compare with previous state
+        inputChangedEvent:FireServer(currentInputState)
+        lastInputState = currentInputState
+    end
+end)
+```
+
+---
+
+## Error Handling & Safety: Building Resilient Network Interactions
+
+### Server-Side Validation: The First Line of Defense
+All client-initiated actions and data must undergo rigorous validation on the server before being processed. This is non-negotiable for security and game integrity.
+
+```lua
+-- SERVER (Module: CombatService): ALWAYS validate client input for weapon fire.
+local fireWeaponEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("FireWeapon")
+
+fireWeaponEvent.OnServerEvent:Connect(function(player, rayOrigin: Vector3, rayDirection: Vector3)
+    -- 1. Validate Player State: Is the player alive? In a valid combat state?
+    if not PlayerService.isPlayerAlive(player) or not PlayerService.isPlayerInCombatState(player) then
+        return CombatService.sendRejectionMessage(player, "Invalid player state for firing.")
+    end
+
+    -- 2. Validate Weapon State: Is the player holding a weapon? Is it loaded? Is it on cooldown?
+    local currentWeapon = WeaponService.getEquippedWeapon(player)
+    if not currentWeapon or not WeaponService.canFireWeapon(player, currentWeapon) then
+        return CombatService.sendRejectionMessage(player, "Cannot fire weapon.")
+    end
+
+    -- 3. Validate Input Parameters: Are rayOrigin/rayDirection plausible?
+    if (rayOrigin - player.Character.HumanoidRootPart.Position).Magnitude > MAX_CLIENT_RAY_DISTANCE then
+        return CombatService.sendRejectionMessage(player, "Suspicious ray origin.")
+    end
+
+    -- 4. Re-calculate Server-Side: Perform an authoritative raycast on the server.
+    local serverRaycastResult = CombatService.performServerRaycast(player, rayOrigin, rayDirection)
+    if serverRaycastResult then
+        CombatService.applyDamage(player, currentWeapon, serverRaycastResult)
+        -- Inform other clients about the authoritative hit (not the client's prediction)
+    else
+        CombatService.sendRejectionMessage(player, "Server raycast missed.")
+    end
+end)
+```
+
+### Debouncing (Server-Side): Preventing Spam
+Used on the server to prevent clients from spamming events, ensuring actions have a minimum cooldown.
+
+```lua
+-- SERVER (Module: PlayerActionLimiter): Prevent rapid button presses/actions
+local lastActionTimestamp: { [number]: number } = {}
+local ACTION_COOLDOWN = 0.5 -- 500ms cooldown per player for a specific action
+
+local playerActionRequest = ReplicatedStorage:WaitForChild("Events"):WaitForChild("RequestAction")
+
+playerActionRequest.OnServerEvent:Connect(function(player, actionType: string)
+    local playerId = player.UserId
+    if lastActionTimestamp[playerId] and (tick() - lastActionTimestamp[playerId] < ACTION_COOLDOWN) then
+        return PlayerService.sendFeedback(player, "Action on cooldown.")
+    end
+
+    lastActionTimestamp[playerId] = tick()
+    PlayerActionService.processAction(player, actionType)
+end)
+```
+
+---
+
+## Data Serialization: Efficient Transmission of Complex Data
+
+### Handling Complex Data Types: Structuring for Network Transit
+Roblox's `RemoteEvent`s and `RemoteFunction`s can transmit various Luau types, but complex objects (like `Instance` references directly) can be problematic or inefficient. It's often best practice to serialize complex data into simple, network-friendly types (numbers, strings, booleans, tables of these) before transmission, and then deserialize them on the receiving end.
+
+```lua
+-- SERVER: Sending detailed player data to a client.
+type PlayerNetworkData = {
+    playerId: number,
+    username: string,
+    pos: {x: number, y: number, z: number},
+    health: number,
+    equippedWeaponId: string,
+    activeEffects: {[string]: number}, -- EffectName -> DurationRemaining
+}
+
+local playerUpdateEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerStatusUpdate")
+
+local function sendPlayerStatus(player: Player, networkData: PlayerNetworkData)
+    playerUpdateEvent:FireClient(player, networkData)
+end
+
+-- CLIENT: Receiving and reconstructing player data.
+playerUpdateEvent.OnClientEvent:Connect(function(networkData: PlayerNetworkData)
+    -- Reconstruct Vector3 from table
+    networkData.pos = Vector3.new(networkData.pos.x, networkData.pos.y, networkData.pos.z)
+    
+    -- Update local player representation based on networkData
+    PlayerClientSystem.updatePlayerVisuals(networkData)
+    HUDController.updateHealthBar(networkData.health)
+end)
+```
+
+---
+
+## For Warzone-Style Games: Specialized Network Challenges
+
+### Movement Replication: Predictive Client, Authoritative Server
+Achieving responsive, fluid movement while maintaining server authority is paramount. We utilize a client-side prediction model with server reconciliation.
+
+```lua
+-- CLIENT: Continuously send player input state to the server.
+local UserInputService = game:GetService("UserInputService")
+local playerMovementInputEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("PlayerMovementInput")
+
+local lastSentInput: Vector3 = Vector3.zero
+game:GetService("RunService").RenderStepped:Connect(function()
+    local currentInputVector = UserInputService.GetInputVector(Enum.UserInputType.Move) -- Example
+    if currentInputVector ~= lastSentInput then
+        playerMovementInputEvent:FireServer(currentInputVector)
+        lastSentInput = currentInputVector
+    end
+end)
+
+-- SERVER: Process input, reconcile, and replicate to other clients.
+playerMovementInputEvent.OnServerEvent:Connect(function(player: Player, inputVector: Vector3)
+    -- 1. Validate Input: Is the input plausible? Speed hacks?
+    if not PlayerMovementService.isValidInput(player, inputVector) then return end
+
+    -- 2. Apply Movement: Authoritatively move the player's character.
+    local character = player.Character
+    if character and character:FindFirstChildOfClass("Humanoid") then
+        local humanoid = character.Humanoid
+        humanoid:WalkToPoint = character.HumanoidRootPart.Position + inputVector * 1000 -- Ex: large distance to move
+        humanoid.WalkSpeed = PlayerMovementService.getActualWalkSpeed(player)
+        
+        -- 3. Replicate Authoritative Position:
+        -- Send position to other clients, possibly using a separate throttled event.
+        PlayerMovementReplicationEvent:FireAllClients(
+            player.UserId, 
+            character.HumanoidRootPart.CFrame, 
+            humanoid.WalkSpeed
+        )
+    end
+end)
+```
+
+### Weapon Firing: Secure and Visceral Gunplay
+Precise and lag-compensated weapon firing is critical. This involves client-side prediction for visual feedback and server-side raycasting for authoritative hit detection.
+
+```lua
+-- CLIENT: Predict bullet path, send fire request to server.
+local fireWeaponRequestEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("FireWeaponRequest")
+local mouse = game.Players.LocalPlayer:GetMouse()
+
+mouse.Button1Down:Connect(function()
+    local camera = workspace.CurrentCamera
+    local rayOrigin = camera.CFrame.Position
+    local rayDirection = (mouse.Hit.Position - rayOrigin).Unit * 500 -- Client's predicted ray
+    
+    -- Client-side VFX (muzzle flash, bullet trail) for immediate feedback
+    WeaponVFXClient.playMuzzleFlash()
+    WeaponVFXClient.spawnBulletTrail(rayOrigin, rayOrigin + rayDirection)
+    
+    fireWeaponRequestEvent:FireServer(rayOrigin, rayDirection) -- Request server to fire
+end)
+
+-- SERVER: Authoritative validation, raycast, and damage application.
+fireWeaponRequestEvent.OnServerEvent:Connect(function(player, clientRayOrigin: Vector3, clientRayDirection: Vector3)
+    -- 1. Server-Side Validation: (As detailed in Error Handling & Safety)
+    --    - Player armed? Alive? Ammo? Valid fire rate?
+    if not CombatService.canServerFireWeapon(player) then return end
+
+    -- 2. Authoritative Raycast: Server performs its own raycast.
+    local serverRaycastParams = RaycastParams.new()
+    serverRaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    serverRaycastParams.FilterDescendantsInstances = {player.Character}
+    serverRaycastParams.IgnoreWater = true
+
+    local serverRaycastResult = workspace:Raycast(clientRayOrigin, clientRayDirection, serverRaycastParams)
+    
+    -- 3. Apply Damage and Replicate Hit:
+    if serverRaycastResult then
+        CombatService.handleHit(player, serverRaycastResult) -- Apply damage, manage hit registration
+        BulletReplicationEvent:FireAllClients(serverRaycastResult.Position, serverRaycastResult.Normal, serverRaycastResult.Material)
+    else
+        BulletReplicationEvent:FireAllClients(clientRayOrigin + clientRayDirection, Vector3.zero, Enum.Material.Air) -- Replicate miss
+    end
+end)
+```
+
+---
+
+## Performance Tips: Maximizing Network Efficiency
+
+1.  **Minimize Network Calls**: Only send data when necessary. Batch updates and use throttling for frequent but non-critical data.
+2.  **Prefer RemoteEvents for Fire-and-Forget**: Avoid blocking `RemoteFunction`s in performance-critical loops.
+3.  **Replicate Efficiently**: Only send changed data. Compress complex data types into simpler forms.
+4.  **Embrace Server Authority**: Trust server calculations for all important logic to prevent exploits and ensure consistency.
+5.  **Utilize Client-Side Prediction**: Provide immediate local feedback for player actions and reconcile with server authoritative states.
+6.  **Data Compression**: Use short names for keys in tables, combine related data, and avoid sending redundant information.
+7.  **Implement Cooldowns & Debouncing**: Prevent network spam from rapid client input, especially on the server.
+8.  **Leverage Roblox's Automatic Replication**: Use `Instance.new()` properties and `Attributes` for data that needs to be widely synchronized without explicit Remote calls.
+
+---
+
+## Further Reading & Integration: Extending Your Knowledge
+
+-   **[RobloxDocs/EngineReference.md](EngineReference.md)**: Explore the underlying API services and their network implications.
+-   **[RobloxDocs/Services_Reference.md](Services_Reference.md)**: Understand services like `DataStoreService` and `Players` in a networked context.
+-   **[RobloxDocs/Performance_Guide.md](Performance_Guide.md)**: Deep dive into network optimization techniques and profiling.
+-   **[RobloxDocs/errors.md](../errors.md)**: Learn about robust error handling strategies for networked systems.
+-   **[Features/Combat/WeaponFramework.md](../../Features/Combat/WeaponFramework.md)**: See how networking principles are applied to our weapon systems.
+-   **[Features/BattleRoyale/MatchLifecycle.md](../../Features/BattleRoyale/MatchLifecycle.md)**: Understand network considerations for game state transitions.
+
+---
+*Last Updated: 2026-01-21*

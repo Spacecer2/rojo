@@ -1,6 +1,16 @@
 # Drone Camera Tuning Guide
 
-This guide explains the most important parameters for controlling the drone's behavior. All parameters can be modified in real-time using player attributes.
+## Overview
+This guide provides an in-depth explanation of the critical parameters used to control the cinematic "Stalker Drone" camera behavior. These parameters offer granular control over the camera's responsiveness, movement dynamics, and overall aesthetic, enabling fine-tuning to achieve the precise desired "feel."
+
+## Design Philosophy
+
+The exposure of these tuning parameters is a deliberate architectural decision. Our philosophy is to empower developers and designers with direct control over the camera's kinematic behavior without requiring code modifications. This approach is founded on the following principles:
+
+-   **Empirical Tuning**: The "feel" of a cinematic camera is highly subjective and often discovered through iterative experimentation. Providing real-time adjustable parameters facilitates rapid prototyping and empirical validation of camera behaviors.
+-   **Decoupling of Logic and Values**: Separating the camera's underlying physics and control logic from its specific tuning values allows for independent iteration by different team members (e.g., engineers on physics, designers on feel).
+-   **Expressive Control**: These parameters are designed to translate high-level artistic intent (e.g., "lazy," "responsive," "cinematic") into measurable, adjustable values, providing a direct pipeline from vision to implementation.
+-   **Adaptability**: By exposing core behaviors, the camera system can be easily adapted for different scenarios (e.g., subtle menu idle, dynamic spectating, scripted sequences) by simply adjusting attributes, rather than reimplementing logic.
 
 ## Core Behavior Parameters
 

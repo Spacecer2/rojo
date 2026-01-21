@@ -1,6 +1,15 @@
 # System Design: Game Loop & Match Flow (Battle Royale)
 
-This document details the lifecycle of a single Battle Royale match, from the pre-game lobby to the final extraction.
+## System Design & Vision
+
+The game loop is the fundamental structure that defines the player's journey through a single match of our battle royale. It is designed to create a compelling narrative arc with a clear beginning, middle, and end, and to provide a constant sense of tension and release. The core principles are:
+
+- **A Three-Act Structure:** Each match is designed to have a distinct three-act structure, similar to a classic story.
+    - **Act I: The Infiltration & Scramble.** The match begins with a high-energy infiltration sequence, followed by a tense scramble for resources in the early game.
+    - **Act II: The Mid-Game Hunt.** As the circle closes and players become better equipped, the mid-game becomes a strategic game of cat and mouse, with squads vying for position and hunting each other down.
+    - **Act III: The Final Showdown.** The endgame is a climactic battle for survival as the last few squads are forced into a tiny, final circle.
+- **Pacing and Flow:** The game loop is carefully paced to provide a balance of high-intensity action and quieter moments of strategic planning. The gas circle, the Gulag, and the distribution of loot are all designed to work together to create a dynamic and unpredictable flow to each match.
+- **Player Agency and Choice:** While the overall structure of the game loop is linear, players have a high degree of agency within each phase. They can choose where to drop, which contracts to pursue, and how to approach the final circle. This ensures that no two matches play out the same way.
 
 ## 🔄 Match Lifecycle
 
