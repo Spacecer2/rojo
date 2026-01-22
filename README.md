@@ -174,6 +174,8 @@ src/
 | **2. Combat & Fluidity** | ✅ Complete | Movement, ADS, Camera, Matchmaking |
 | **3. Code Health** | ✅ Complete | Linting, Toolchain, Stability, Documentation |
 | **4. Platform Documentation** | ✅ Complete | Roblox Docs, API Reference, Best Practices |
+| **5. Gunsmith & Arsenal** | ✅ Complete | Weapon Framework, Gunsmith, Loadout UI, Recoil |
+| **6. Battle Royale Core** | 🔄 In Progress | Gas, Looting, Economy, Gulag (Partial), Match Lifecycle |
 | **5. Gunsmith & Arsenal** | 🔄 In Progress | Gunsmith Backend ✅, Gunsmith UI ✅, Weapon Framework (V3) pending |
 | **6. UI/UX & Meta-Progression** | 🔄 In Progress | Settings Menu ✅, HUD ✅, Barracks ✅, Battle Pass pending |
 

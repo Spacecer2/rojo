@@ -39,11 +39,19 @@ function Network.FireClient(player, name, ...)
 	end
 end
 
+function Network.FireAllClients(name, ...)
+	local remote = Network.GetRemote(name)
+	if remote then
+		remote:FireAllClients(...)
+	end
+end
+
 function Network.OnServerEvent(name, callback)
 	local remote = Network.GetRemote(name)
 	if remote then
 		return remote.OnServerEvent:Connect(callback)
 	end
+	return nil
 end
 
 function Network.OnClientEvent(name, callback)
@@ -51,6 +59,7 @@ function Network.OnClientEvent(name, callback)
 	if remote then
 		return remote.OnClientEvent:Connect(callback)
 	end
+	return nil
 end
 
 return Network

@@ -221,7 +221,7 @@ end
 local ProceduralAnimator = {}
 
 function ProceduralAnimator.Start()
-	local connection = RunService.PreRender:Connect(function(dt)
+	local _connection = RunService.PreRender:Connect(function(dt)
 		-- Time Accumulator
 		local time = tick()
 		

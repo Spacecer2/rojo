@@ -31,7 +31,7 @@ local parameters = {
 		 tooltip = "Minimum distance from player"},
 		{name = "DroneMaxDistance", label = "Max Distance", min = 30, max = 80, default = 30, step = 5,
 		 tooltip = "Maximum distance from player"},
-		{name = "DroneHeightOffset", label = "Height Offset", min = -10, max = 20, default = 0, step = 1,
+		{name = "DroneHeightOffset", label = "Height Offset", min = -10, max = 20, default = 8, step = 1,
 		 tooltip = "Vertical offset above player"},
 		{name = "DroneLookAheadFactor", label = "Look Ahead Factor", min = 0.0, max = 0.5, default = 0.2, step = 0.05,
 		 tooltip = "How far ahead the camera looks (velocity-based)"},
@@ -76,7 +76,7 @@ local parameters = {
 local function createSlider(parent, param, yOffset)
 	local container = Instance.new("Frame")
 	container.Size = UDim2.new(1, -20, 0, param.tooltip and 60 or 50)
-	container.Position = UDim2.new(0, 10, 0, yOffset)
+	container.Position = UDim2.fromOffset(10, yOffset)
 	container.BackgroundTransparency = 1
 	container.Parent = parent
 	
@@ -93,7 +93,7 @@ local function createSlider(parent, param, yOffset)
 	
 	local valueLabel = Instance.new("TextLabel")
 	valueLabel.Size = UDim2.new(0.5, 0, 0, 20)
-	valueLabel.Position = UDim2.new(0.5, 0, 0, 0)
+	valueLabel.Position = UDim2.fromScale(0.5, 0)
 	valueLabel.BackgroundTransparency = 1
 	valueLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
 	valueLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -105,7 +105,7 @@ local function createSlider(parent, param, yOffset)
 	if param.tooltip then
 		local tooltipLabel = Instance.new("TextLabel")
 		tooltipLabel.Size = UDim2.new(1, 0, 0, 15)
-		tooltipLabel.Position = UDim2.new(0, 0, 0, 20)
+		tooltipLabel.Position = UDim2.fromOffset(0, 20)
 		tooltipLabel.BackgroundTransparency = 1
 		tooltipLabel.Text = param.tooltip
 		tooltipLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
@@ -118,20 +118,20 @@ local function createSlider(parent, param, yOffset)
 	
 	local sliderBg = Instance.new("Frame")
 	sliderBg.Size = UDim2.new(1, 0, 0, 6)
-	sliderBg.Position = UDim2.new(0, 0, 0, param.tooltip and 40 or 30)
+	sliderBg.Position = UDim2.fromOffset(0, param.tooltip and 40 or 30)
 	sliderBg.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 	sliderBg.BorderSizePixel = 0
 	sliderBg.Parent = container
 	
 	local sliderFill = Instance.new("Frame")
-	sliderFill.Size = UDim2.new(0, 0, 1, 0)
+	sliderFill.Size = UDim2.fromScale(0, 1)
 	sliderFill.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
 	sliderFill.BorderSizePixel = 0
 	sliderFill.Parent = sliderBg
 	
 	local sliderButton = Instance.new("TextButton")
 	sliderButton.Size = UDim2.new(1, 0, 0, 30)
-	sliderButton.Position = UDim2.new(0, 0, 0, param.tooltip and 32 or 22)
+	sliderButton.Position = UDim2.fromOffset(0, param.tooltip and 32 or 22)
 	sliderButton.BackgroundTransparency = 1
 	sliderButton.Text = ""
 	sliderButton.Parent = container
@@ -170,7 +170,7 @@ local function createSlider(parent, param, yOffset)
 		end
 		
 		-- Update slider fill
-		sliderFill.Size = UDim2.new(fillRatio, 0, 1, 0)
+		sliderFill.Size = UDim2.fromScale(fillRatio, 1)
 	end
 	
 	-- Get current value
@@ -221,7 +221,7 @@ end
 local function createPresetButton(parent, name, values, xPos)
 	local button = Instance.new("TextButton")
 	button.Size = UDim2.new(0.3, -5, 0, 35)
-	button.Position = UDim2.new(xPos, 0, 0, 0)
+	button.Position = UDim2.fromScale(xPos, 0)
 	button.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
 	button.BorderSizePixel = 0
 	button.Text = name
@@ -247,7 +247,7 @@ function DroneSettingsUI.Init()
 	screenGui.Parent = playerGui
 	
 	settingsPanel = Instance.new("Frame")
-	settingsPanel.Size = UDim2.new(0, 500, 0, 600)
+	settingsPanel.Size = UDim2.fromOffset(500, 600)
 	settingsPanel.Position = UDim2.new(0.5, -250, 0.5, -300)
 	settingsPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 	settingsPanel.BorderSizePixel = 0
@@ -271,7 +271,7 @@ function DroneSettingsUI.Init()
 	-- Subtitle
 	local subtitle = Instance.new("TextLabel")
 	subtitle.Size = UDim2.new(1, -20, 0, 20)
-	subtitle.Position = UDim2.new(0, 10, 0, 50)
+	subtitle.Position = UDim2.fromOffset(10, 50)
 	subtitle.BackgroundTransparency = 1
 	subtitle.Text = "Three-Layer Architecture: Intent → Motion Plan → Physical"
 	subtitle.TextColor3 = Color3.fromRGB(150, 150, 150)
@@ -286,7 +286,7 @@ function DroneSettingsUI.Init()
 	
 	local scrollFrame = Instance.new("ScrollingFrame")
 	scrollFrame.Size = UDim2.new(1, -20, 1, -140)
-	scrollFrame.Position = UDim2.new(0, 10, 0, 75)
+	scrollFrame.Position = UDim2.fromOffset(10, 75)
 	scrollFrame.BackgroundTransparency = 1
 	scrollFrame.BorderSizePixel = 0
 	scrollFrame.ScrollBarThickness = 6
@@ -297,7 +297,7 @@ function DroneSettingsUI.Init()
 		-- Section header with background
 		local sectionContainer = Instance.new("Frame")
 		sectionContainer.Size = UDim2.new(1, -20, 0, 35)
-		sectionContainer.Position = UDim2.new(0, 10, 0, yOffset)
+		sectionContainer.Position = UDim2.fromOffset(10, yOffset)
 		sectionContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
 		sectionContainer.BorderSizePixel = 0
 		sectionContainer.Parent = scrollFrame
@@ -308,7 +308,7 @@ function DroneSettingsUI.Init()
 		
 		local sectionLabel = Instance.new("TextLabel")
 		sectionLabel.Size = UDim2.new(1, -20, 1, 0)
-		sectionLabel.Position = UDim2.new(0, 10, 0, 0)
+		sectionLabel.Position = UDim2.fromOffset(10, 0)
 		sectionLabel.BackgroundTransparency = 1
 		sectionLabel.Text = section.section
 		sectionLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
@@ -327,7 +327,7 @@ function DroneSettingsUI.Init()
 		yOffset = yOffset + 10
 	end
 	
-	scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
+	scrollFrame.CanvasSize = UDim2.fromOffset(0, yOffset)
 	
 	local presetContainer = Instance.new("Frame")
 	presetContainer.Size = UDim2.new(1, -20, 0, 40)
@@ -338,7 +338,7 @@ function DroneSettingsUI.Init()
 	-- Preset label
 	local presetLabel = Instance.new("TextLabel")
 	presetLabel.Size = UDim2.new(1, 0, 0, 20)
-	presetLabel.Position = UDim2.new(0, 0, 0, -25)
+	presetLabel.Position = UDim2.fromOffset(0, -25)
 	presetLabel.BackgroundTransparency = 1
 	presetLabel.Text = "Presets:"
 	presetLabel.TextColor3 = Color3.fromRGB(200, 200, 200)

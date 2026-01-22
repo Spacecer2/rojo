@@ -3,10 +3,6 @@
 	Features: Missions & Challenges, Identity (Operators/Calling Cards/Emblems), 
 	Rank Progression, Records, and Achievements
 ]]
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
-
 local Controllers = script.Parent.Parent.Parent.Controllers
 local PlayerDataController = nil
 local success_pdc, pdc = pcall(function() return require(Controllers:WaitForChild("PlayerDataController")) end)
@@ -301,8 +297,8 @@ function BarracksView.Create(parent)
 	progressText.Font = Enum.Font.Gotham
 	progressText.TextSize = 10
 	progressText.TextColor3 = COLORS.TextSecondary
-	progressText.Size = UDim2.new(0, 40, 0, 20)
-	progressText.Position = UDim2.new(0, 0, 1, 0)
+	progressText.Size = UDim2.fromOffset(40, 20)
+	progressText.Position = UDim2.fromScale(0, 1)
 	progressText.TextXAlignment = Enum.TextXAlignment.Left
 	progressText.BackgroundTransparency = 1
 	progressText.Parent = progressBg

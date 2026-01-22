@@ -1,6 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Network = require(ReplicatedStorage.Framework.Network)
+local SettingsData = require(ReplicatedStorage.Constants.SettingsData)
+
 local PlayerDataService = {}
 
 -- Store player data in memory for now
@@ -24,6 +27,16 @@ ChallengesUpdateEvent.Name = "ChallengesUpdate"
 ChallengesUpdateEvent.Parent = Remotes
 
 function PlayerDataService.Init()
+	-- Listen for settings updates
+	Network.OnServerEvent("UpdateSettings", function(player, key, value)
+		PlayerDataService.UpdateProfile(player, function(profile)
+			if not profile.Settings then profile.Settings = {} end
+			profile.Settings[key] = value
+			print(string.format("[PlayerDataService] Saved setting '%s' for %s", key, player.Name))
+			return profile
+		end)
+	end)
+
 	Players.PlayerAdded:Connect(function(player)
 		-- Load Mock Data
 		playerProfiles[player.UserId] = {
@@ -31,7 +44,8 @@ function PlayerDataService.Init()
 			XP = 15400,
 			MaxXP = 20000,
 			Currency = 2000,
-			Username = player.Name
+			Username = player.Name,
+			Settings = table.clone(SettingsData.Defaults)
 		}
 		
 		playerChallenges[player.UserId] = {
@@ -44,6 +58,15 @@ function PlayerDataService.Init()
 		task.wait(1) -- Wait for client to load
 		PlayerDataService.UpdateClient(player)
 	end)
+end
+
+function PlayerDataService.UpdateProfile(player, updateFunc)
+	local profile = playerProfiles[player.UserId]
+	if profile then
+		local newProfile = updateFunc(profile)
+		playerProfiles[player.UserId] = newProfile
+		PlayerDataService.UpdateClient(player)
+	end
 end
 
 function PlayerDataService.UpdateClient(player)

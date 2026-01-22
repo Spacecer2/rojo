@@ -25,6 +25,7 @@ MatchmakingService.Init()
 LoadoutService.Init()
 GunsmithService.Init() -- Initialize before WeaponService (WeaponService depends on it)
 WeaponService.Init()
+CombatService.Init()
 ChallengeService.Init()
 CheaterManagementService.Init() -- Initialize before MovementValidationService
 MovementValidationService.Init()

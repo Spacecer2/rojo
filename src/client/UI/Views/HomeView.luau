@@ -12,7 +12,7 @@ local Controllers = script.Parent.Parent.Parent.Controllers
 local MatchmakingController = nil
 local PlayerDataController = nil
 local Theme = nil
-local PlaylistData = nil
+local PlaylistData = {Modes = {}} -- Default fallback
 
 local constants = ReplicatedStorage:FindFirstChild("Constants") or ReplicatedStorage:WaitForChild("Constants", 5)
 
@@ -70,18 +70,6 @@ end)
 if not success3 then warn("Failed to load Theme:", theme) end
 if success3 and theme then Theme = theme end
 
-local PlaylistData = {Modes = {}}
-local success4, playlistDataModule = pcall(function()
-	if constants then
-		local module = constants:FindFirstChild("PlaylistData")
-		if module then
-			return require(module)
-		end
-	end
-	return nil
-end)
-if success4 and playlistDataModule then PlaylistData = playlistDataModule end
-
 local HomeView = {}
 
 -- Fallback colors if Theme fails to load
@@ -105,13 +93,13 @@ function HomeView.Create(parent)
 	local player = Players.LocalPlayer
 	
 	-- Get initial data with safe fallbacks
-	local lobbyState = {PlayerCount = 1, MaxPlayers = 100, Status = "Searching"}
+	local _lobbyState = {PlayerCount = 1, MaxPlayers = 100, Status = "Searching"}
 	if MatchmakingController and MatchmakingController.GetLobbyState then
 		local success, state = pcall(function() return MatchmakingController.GetLobbyState() end)
-		if success then lobbyState = state end
+		if success then _lobbyState = state end
 	end
 	
-	local profile = {
+	local _profile = {
 		Level = 1,
 		Currency = 0,
 		Username = player and player.Name or "Player",
@@ -120,7 +108,7 @@ function HomeView.Create(parent)
 	}
 	if PlayerDataController and PlayerDataController.GetProfile then
 		local success, prof = pcall(function() return PlayerDataController.GetProfile() end)
-		if success and prof then profile = prof end
+		if success and prof then _profile = prof end
 	end
 	
 	-- === LEFT SIDE: Game Mode List ===

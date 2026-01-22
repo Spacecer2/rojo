@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local Controllers = script.Parent.Parent.Controllers
@@ -33,6 +32,8 @@ local success_pdc, pdc = pcall(function() return require(Controllers:WaitForChil
 if success_pdc then PlayerDataController = pdc end
 
 local MenuController = {}
+
+local menuConnection = nil -- Track connection to clean up
 
 -- Theme Colors
 local COLORS = {
@@ -71,6 +72,15 @@ function MenuController.Start()
 	local success, err = pcall(function()
 		local player = Players.LocalPlayer
 		local playerGui = player:WaitForChild("PlayerGui")
+
+		-- Cleanup previous session
+		if menuConnection then
+			menuConnection:Disconnect()
+			menuConnection = nil
+		end
+		
+		local existing = playerGui:FindFirstChild("WarzoneMenu")
+		if existing then existing:Destroy() end
 
 		-- Global State
 		player:SetAttribute("InMenu", true)
@@ -162,7 +172,7 @@ function MenuController.Start()
 		end
 
 		if PlayerDataController and PlayerDataController.ProfileChanged then
-			PlayerDataController.ProfileChanged.Event:Connect(updateTopBar)
+			menuConnection = PlayerDataController.ProfileChanged.Event:Connect(updateTopBar)
 		end
 		updateTopBar()
 
@@ -287,6 +297,7 @@ function MenuController.Start()
 				createTab("SETTINGS", "Settings")
 				createTab("BATTLE PASS", "Home")
 				createTab("STORE", "Home")
+				createTab("OPTIONS", "Settings")
 
 				-- Default View
 				ViewManager.SwitchTo("Home")

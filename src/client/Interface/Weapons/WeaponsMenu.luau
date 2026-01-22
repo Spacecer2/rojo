@@ -33,7 +33,7 @@ function WeaponsMenu.Create(parent)
 	title.TextSize = 32
 	title.TextColor3 = COLORS.TextMain
 	title.Position = UDim2.fromOffset(40, 20)
-	title.Size = UDim2.new(0, 300, 0, 40)
+	title.Size = UDim2.fromOffset(300, 40)
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.BackgroundTransparency = 1
 	title.Parent = container
@@ -52,7 +52,7 @@ function WeaponsMenu.Create(parent)
 	
 	local centerPanel = Instance.new("Frame")
 	centerPanel.Name = "CenterPanel"
-	centerPanel.Position = UDim2.new(0, 360, 0, 80)
+	centerPanel.Position = UDim2.fromOffset(360, 80)
 	centerPanel.Size = UDim2.new(0, 450, 1, -120)
 	centerPanel.BackgroundTransparency = 1
 	centerPanel.Parent = container
@@ -197,7 +197,7 @@ function WeaponsMenu.Create(parent)
 		
 		for _, perk in ipairs(loadout.Perks) do
 			local p = Instance.new("Frame")
-			p.Size = UDim2.new(0.31, 0, 1, 0)
+			p.Size = UDim2.fromScale(0.31, 1)
 			p.BackgroundColor3 = COLORS.Panel
 			p.Parent = perksFrame
 			local uic = Instance.new("UICorner")
@@ -222,7 +222,7 @@ function WeaponsMenu.Create(parent)
 		
 		local function addEq(name, label)
 			local f = Instance.new("Frame")
-			f.Size = UDim2.new(0.48, 0, 1, 0)
+			f.Size = UDim2.fromScale(0.48, 1)
 			f.BackgroundColor3 = COLORS.Panel
 			f.Parent = eqFrame
 			local uic = Instance.new("UICorner")
@@ -282,8 +282,8 @@ function WeaponsMenu.Create(parent)
 			btn.TextColor3 = (loadout.Id == selectedId) and COLORS.AccentBlue or COLORS.TextSecondary
 			btn.TextXAlignment = Enum.TextXAlignment.Left
 			btn.Parent = item
-			local uic = Instance.new("UICorner")
-			uic.Parent = btn
+			local btnCorner = Instance.new("UICorner")
+			btnCorner.Parent = btn
 			local uip = Instance.new("UIPadding")
 			uip.PaddingLeft = UDim.new(0, 15)
 			uip.Parent = btn
@@ -306,9 +306,9 @@ function WeaponsMenu.Create(parent)
 			del.Font = Enum.Font.GothamBold
 			del.TextColor3 = COLORS.TextMain
 			del.Parent = item
-			local uic = Instance.new("UICorner")
-			uic.CornerRadius = UDim.new(1, 0)
-			uic.Parent = del
+			local delCorner = Instance.new("UICorner")
+			delCorner.CornerRadius = UDim.new(1, 0)
+			delCorner.Parent = del
 			
 			UI.ApplyFeedback(del, {HoverScale = 1.1, PressScale = 0.9})
 			
@@ -334,7 +334,7 @@ function WeaponsMenu.Create(parent)
 	addBtn.TextSize = 14
 	addBtn.TextColor3 = Color3.new(0,0,0)
 	addBtn.BackgroundColor3 = COLORS.AccentGold
-	addBtn.Size = UDim2.new(0, 300, 0, 40)
+	addBtn.Size = UDim2.fromOffset(300, 40)
 	addBtn.Position = UDim2.new(0, 40, 1, -80)
 	addBtn.Parent = container
 	local uic = Instance.new("UICorner")

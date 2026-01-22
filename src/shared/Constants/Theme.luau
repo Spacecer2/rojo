@@ -25,7 +25,7 @@ local Theme = {
 	},
 	
 	Sounds = {
-		Hover = "rbxassetid://6042048399",  -- Soft blip
+		Hover = "rbxassetid://6895079853",  -- Mechanical click (using for both temporarily)
 		Click = "rbxassetid://6895079853",  -- Mechanical click
 		Back = "rbxassetid://6895079667",   -- Thud/Back
 		Transition = "rbxassetid://6042047495" -- Swoosh
