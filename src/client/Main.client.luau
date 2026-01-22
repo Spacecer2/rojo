@@ -195,7 +195,7 @@ local function Start()
 			end
 		end)
 		
-		print("[Client] Developer Console initialized (Press F9 to open)")
+		print("[Client] Developer Console initialized (Keybind: I)")
 	end)
 	
 	print("[Client] All Controllers Initialized")

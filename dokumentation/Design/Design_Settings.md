@@ -93,15 +93,17 @@ export type SettingsProfile = {
 }
 ```
 
-### Client-Side Implementation (`SettingsController`)
-The controller acts as the central hub for applying changes. It does not run per-frame logic itself but **signals** other controllers to update.
+### Client-Side Implementation (`SettingsManager`)
+**Location:** `src/client/Settings/SettingsManager.luau`
 
-1.  **Initialization**: Loads data from `PlayerDataController`.
+The settings manager is the central hub for applying changes. It does not run per-frame logic itself but **signals** other systems to update.
+
+1.  **Initialization**: Loads data from player attributes (`ClientSettings`) or defaults via `SettingsData`.
 2.  **Application**:
     *   **FOV**: Updates `workspace.CurrentCamera.FieldOfView`.
     *   **Sensitivity**: Updates `CameraData` (or attributes) read by `CameraController`.
     *   **Input**: Updates configuration in `InputManager`.
-3.  **Persistence**: Changes are cached locally and synced to server via `SettingsService` periodically (auto-save) or on menu close.
+3.  **Persistence**: Changes are cached locally and saved via `SettingsManager.SaveSettings` (player attributes). The **Settings** tab uses `SettingsView` and `SettingsManager`; there is no separate `SettingsController`.
 
 ### Integration Points
 

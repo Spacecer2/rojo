@@ -16,18 +16,19 @@ The core purpose of this developer console is to act as a force multiplier for p
 ## Architecture
 
 ```
-DeveloperConsole/
-├── DeveloperConsole.luau          # Core console logic & command registry
-├── DeveloperConsoleUI.luau        # UI rendering & input handling
-├── CommandRegistry.luau           # Command definitions & validation
-└── init.luau                      # Integration point
+src/client/
+├── Controllers/
+│   ├── DeveloperConsole.luau      # Core console logic & command registry
+│   └── GameCommands.luau          # Game-related commands (ammo, weapon, playerdata, etc.)
+└── UI/
+    └── DeveloperConsoleUI.luau    # UI rendering & input handling
 ```
 
 ## Core Components
 
 ### 1. DeveloperConsole Module
 
-**Location:** `src/client/DeveloperConsole.luau`
+**Location:** `src/client/Controllers/DeveloperConsole.luau`
 
 **Responsibilities:**
 - Command execution
@@ -55,7 +56,7 @@ DeveloperConsole.CopyToClipboard(text)
 
 ### 2. DeveloperConsoleUI Module
 
-**Location:** `src/client/DeveloperConsole/DeveloperConsoleUI.luau`
+**Location:** `src/client/UI/DeveloperConsoleUI.luau`
 
 **Responsibilities:**
 - Render console window
@@ -73,35 +74,34 @@ DeveloperConsole.CopyToClipboard(text)
 - **Filter Tabs**: Switch between Info/Errors/All
 - **Search**: Search through output history
 
-### 3. CommandRegistry Module
+### 3. GameCommands Module
 
-**Location:** `src/client/DeveloperConsole/CommandRegistry.luau`
+**Location:** `src/client/Controllers/GameCommands.luau`
 
-**Built-in Commands:**
+Registers all game-related console commands. Built-in commands include:
 
 #### Navigation & Help
 - `help [command]` - Show available commands or specific help
 - `clear` - Clear console output
-- `history [num]` - Show last N commands
 
-#### Debugging
-- `vars [filter]` - Inspect game variables (player, character, etc.)
-- `perf` - Show performance statistics
-- `errors` - Show only error messages
-- `all` - Show all messages
-- `warn` - Show only warnings
+#### Game State
+- `gamestate [current|menu|game]` - Get or set game state
 
-#### Development
-- `find <name>` - Search for instances in workspace
-- `info <instance>` - Get detailed info about instance
-- `test <command>` - Run unit tests
-- `profile` - Start performance profiling
-- `memory` - Show memory usage
+#### Ammo & Weapons
+- `ammo [get|set|max|reload]` - Manage weapon ammo
+- `weapon [info|give|list]` - Manage weapons
 
-#### Network
-- `network` - Show network stats
-- `lag <ms>` - Add artificial lag for testing
-- `packet` - Show packet info
+#### Items
+- `drop <type> [name] [amount]` - Drop items (weapon, cash, ammo, armor)
+
+#### Player Data
+- `level`, `xp`, `cash`, `playerdata`, `health` - Manage player data
+
+#### Utility
+- `pos` - Get player position
+- `tp <x> <y> <z>` - Teleport player
+
+Keybind: **I** to toggle console. **Tab** for autocomplete, **Esc** to close.
 
 ## Implementation Steps
 
