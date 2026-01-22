@@ -39,10 +39,16 @@ This document outlines the complete development lifecycle for the project, aimed
     - Implementation of a sophisticated Hybrid Hitscan/Projectile system, accurately simulating bullet travel time, gravity drop, and terminal ballistics based on weapon type and attachment configuration.
     - Advanced Wall Penetration mechanics, with damage falloff and material-based deflection or absorption, adding tactical depth to cover usage.
     - Robust server-authoritative hit registration with client-side prediction and reconciliation for a fair, responsive shooting experience (refer to [RobloxDocs/Networking_Guide.md](RobloxDocs/Networking_Guide.md)).
-- [ ] **Gunsmith Backend**:
+- [x] **Gunsmith Backend**:
     - [x] Comprehensive data structure design and implementation for all attachment types (Muzzle, Barrel, Optic, Laser, Stock, Underbarrel, Magazine, Rear Grip, Perk).
-    - [ ] Development of real-time stat modification logic, dynamically impacting Mobility, Recoil Control, Range, ADS Speed, and Handling characteristics based on equipped attachments. This system ensures "Meaningful Trade-offs" for weapon customization (refer to [Features/Combat/GunsmithSystem.md](Features/Combat/GunsmithSystem.md)).
+    - [x] Development of real-time stat modification logic, dynamically impacting Mobility, Recoil Control, Range, ADS Speed, and Handling characteristics based on equipped attachments. This system ensures "Meaningful Trade-offs" for weapon customization (refer to [Features/Combat/GunsmithSystem.md](Features/Combat/GunsmithSystem.md)).
+    - [x] Server-side validation and stat calculation via `GunsmithService` with full integration into `WeaponService`.
     - [ ] Dynamic visual updates of weapon models in 3D space, reflecting equipped attachments and providing immediate feedback in UI and first-person views.
+- [x] **Gunsmith UI**:
+    - [x] Complete attachment selection interface with modal dialogs.
+    - [x] Real-time stat comparison with visual bar graphs showing before/after values.
+    - [x] Integration with WeaponsMenu via "CUSTOMIZE" button.
+    - [x] Attachment slot management and compatibility validation.
 - [x] **Loadout UI**:
     - Implementation of a visually compelling "WeaponsMenu" with intuitive slot selection, detailed stats visualization, and a 3D weapon preview.
     - Integration of a "Squad Preview" system in the 3D lobby, showcasing player loadouts and operator models with "Physicality" ([Vision.md](Vision.md)). (refer to [Guides/Armsdealer.md](Guides/Armsdealer.md)).
@@ -75,12 +81,30 @@ This document outlines the complete development lifecycle for the project, aimed
 - [ ] **Battle Pass System**: Multi-seasonal, 100-Tier "Sector Map" progression system, offering diverse rewards (Operators, Blueprints, XP Boosts, COD Points). Includes secure progression tracking, reward delivery, and anti-exploit measures for tier skipping (refer to [Features/Progression/BattlePass.md](Features/Progression/BattlePass.md)).
 - [ ] **Reward Systems**: Implementation of dynamic "Supply Drop" lottery mechanics with robust pity timers to ensure fair distribution of rare cosmetics. Secure backend for various cosmetic unlock paths (camos, emblems, calling cards) and anti-cheat for reward manipulation (refer to [Features/Progression/RewardSystems.md](Features/Progression/RewardSystems.md)).
 - [ ] **Global Progression**: Weapon XP tracks for attachment unlocks, Player Levels for overall rank, and challenging Camo unlocks (e.g., Gold, Platinum, Damascus) for dedicated players. Includes secure XP calculations and leaderboard integration (refer to [Assets/Assets_Ranks.md](Assets/Assets_Ranks.md)).
-- [x] **HUD Foundations**: Basic state indicators (Ammo, Health, Minimap, Scoreboard) with dynamic feedback and a modular architecture for easy expansion.
+- [x] **HUD Foundations**: Complete gameplay HUD implementation with:
+    - [x] Ammo counter (current/reserve) with low-ammo warnings.
+    - [x] Health and armor bars with color-coded status indicators.
+    - [x] Movement state display (sprint, crouch, ADS, etc.).
+    - [x] Reload progress bar with visual feedback.
+    - [x] Weapon name display.
+    - [x] Auto-hide when in menu.
+    - [x] Integration with `WeaponController` and movement state machine.
 - [x] **UI Polish & Feedback**:
     - [x] **Centralized UI Audio**: Implementation of `Theme.Sounds` for all UI interactions (Hover, Click, Navigation), providing consistent and distinct "mechanical" audio feedback ([Vision.md](Vision.md)).
     - [x] **Interaction Animations**: Spring-based scaling and `TweenService` animations for button presses/releases, adding "Physicality" to UI interactions (refer to [RobloxDocs/UI_Systems.md](RobloxDocs/UI_Systems.md)).
     - [x] **Global Utility**: Update `UI.luau` to automatically inject consistent visual and audio feedback into all framework-level buttons, promoting a unified UI/UX.
-- [ ] **Frontend Application**: Complete redesign and implementation of the entire game front-end (Main Menu, Barracks, Store, Loadout Editor) to reflect the minimalist, high-tech military interface vision. Focus on performance, responsive design, and intuitive navigation (refer to [Guides/Armsdealer.md](Guides/Armsdealer.md)).
+- [x] **Frontend Application**: Complete implementation of core front-end interfaces:
+    - [x] **Main Menu**: Tab navigation (PLAY, WEAPONS, OPERATORS, BARRACKS, SETTINGS, BATTLE PASS, STORE).
+    - [x] **Barracks Menu**: Full implementation with all tabs:
+        - [x] Missions & Challenges (mission tracking, daily challenges).
+        - [x] Identity (Operators, Calling Cards, Emblems).
+        - [x] Rank Progression (player level, XP tracking).
+        - [x] Records (wins, kills, K/D, match statistics).
+        - [x] Achievements (unlock tracking with visual indicators).
+    - [x] **Loadout Editor**: WeaponsMenu with weapon selection and Gunsmith integration.
+    - [x] **Settings Menu**: Complete tabbed interface (see above).
+    - [ ] **Store**: Purchase interface (pending).
+    - [ ] **Battle Pass**: Seasonal progression UI (pending).
 
 ---
 
@@ -132,4 +156,4 @@ This document outlines the complete development lifecycle for the project, aimed
 4.  **Roblox as an Engine**: Treat the Roblox platform as a powerful C++ engine, leveraging its capabilities for efficiency and scalability through state-driven logic, decoupled systems, and parallelism. We push the boundaries of what is thought possible on the platform.
 
 ---
-*Updated: 21.01.2026*
+*Updated: 21.01.2026 - Added Gunsmith Backend, Settings UI, Gameplay HUD, Weapon Controller, and complete Barracks Menu implementation*

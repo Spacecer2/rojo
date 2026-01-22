@@ -26,6 +26,7 @@ local HomeView = safeRequireView("HomeView")
 local LoadoutView = safeRequireView("LoadoutView")
 local OperatorsView = safeRequireView("OperatorsView")
 local BarracksView = safeRequireView("BarracksView")
+local SettingsView = safeRequireView("SettingsView")
 local PlayerDataController = nil
 
 local success_pdc, pdc = pcall(function() return require(Controllers:WaitForChild("PlayerDataController")) end)
@@ -255,6 +256,7 @@ function MenuController.Start()
 		if LoadoutView then ViewManager.RegisterView("Weapons", LoadoutView) end
 		if OperatorsView then ViewManager.RegisterView("Operators", OperatorsView) end
 		if BarracksView then ViewManager.RegisterView("Barracks", BarracksView) end
+		if SettingsView then ViewManager.RegisterView("Settings", SettingsView) end
 
 		-- 6. Create Tabs
 		local function createTab(tabName, viewName)
@@ -282,6 +284,7 @@ function MenuController.Start()
 				createTab("WEAPONS", "Weapons")
 				createTab("OPERATORS", "Operators")
 				createTab("BARRACKS", "Barracks")
+				createTab("SETTINGS", "Settings")
 				createTab("BATTLE PASS", "Home")
 				createTab("STORE", "Home")
 

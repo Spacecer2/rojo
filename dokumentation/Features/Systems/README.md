@@ -14,13 +14,18 @@ The settings menu is the primary interface for player customization. Our goal is
 ### Settings Categories
 The settings menu is divided into the following categories:
 
-| Category | Description |
-|---|---|
-| **Controls** | Allows players to customize keybindings, mouse sensitivity, and controller layouts. Includes options for inverting the Y-axis and other control preferences. |
-| **Audio** | Provides separate volume sliders for master, music, sound effects, and voice chat. Also includes options for audio output devices. |
-| **Graphics** | Contains settings for resolution, display mode, graphics quality presets, and advanced options like shadow quality and anti-aliasing. |
-| **Interface**| Allows players to customize the heads-up display (HUD), including the ability to show or hide elements like the minimap and player health. |
-| **Accessibility**| Includes options for colorblind filters, subtitles, and other features to assist players with disabilities. |
+| Category | Description | Status |
+|---|---|---|
+| **Input** | Allows players to customize keybindings, mouse sensitivity, and controller layouts. Includes options for raw input, mouse smoothing, and ADS sensitivity. | ✅ Implemented |
+| **Audio** | Provides separate volume sliders for master, music, sound effects, and voice chat. Also includes options for voice chat and push-to-talk. | ✅ Implemented |
+| **Graphics** | Contains settings for quality presets, draw distance, shadow quality, particle effects, VSync, and FPS/ping display. | ✅ Implemented |
+| **Accessibility** | Includes options for colorblind filters, brightness, contrast, HUD scale, font size, subtitles, mono audio, high contrast, and motion reduction. | ✅ Implemented |
+
+**Implementation Status:**
+- ✅ Complete UI with tabbed interface
+- ✅ Settings persistence via `SettingsManager`
+- ✅ All control types (sliders, checkboxes, dropdowns) implemented
+- 🔄 Settings application logic (pending integration with graphics/audio/input systems)
 
 For a complete breakdown of all settings, see [SettingsMenu.md](SettingsMenu.md).
 

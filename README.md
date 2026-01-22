@@ -104,6 +104,8 @@ For more help, see [Rojo documentation](https://rojo.space/docs).
 - ✅ Procedural weapon sway
 - ✅ ADS system with dynamic FOV
 - ✅ Advanced camera system
+- ✅ Weapon controller with ammo management
+- ✅ Reload system with progress tracking
 
 ### Game Systems
 - ✅ State machine-based character control
@@ -111,6 +113,16 @@ For more help, see [Rojo documentation](https://rojo.space/docs).
 - ✅ Networking framework with remote events
 - ✅ Data persistence & loadout system
 - ✅ Matchmaking & lobby system
+- ✅ Gunsmith service (attachment validation & stat calculation)
+- ✅ Weapon attachment system integration
+
+### UI & HUD
+- ✅ Gameplay HUD (Ammo, Health, Movement State, Reload Progress)
+- ✅ Settings Menu (Input, Audio, Graphics, Accessibility)
+- ✅ Gunsmith UI (Attachment selection & stat preview)
+- ✅ Barracks Menu (Missions, Identity, Rank, Records, Achievements)
+- ✅ Main Menu with tab navigation
+- ✅ Loadout Editor with weapon customization
 
 ### Code Quality
 - ✅ Selene linting standards
@@ -132,19 +144,25 @@ For more help, see [Rojo documentation](https://rojo.space/docs).
 src/
 ├── character/              # Movement & animation systems
 ├── client/
-│   ├── Controllers/        # Camera, Input, Interface logic
-│   ├── UI/                 # GUI components
-│   └── Components/         # React-style components
+│   ├── Controllers/        # Camera, Input, Interface, Weapon, Loot logic
+│   │   └── WeaponController.luau  # Weapon state & ammo management
+│   ├── UI/                 # GUI components & HUD
+│   │   ├── GameplayHUD.luau       # In-game HUD
+│   │   ├── GunsmithUI.luau        # Attachment selection
+│   │   └── Views/                 # Menu views (Home, Loadout, Barracks, Settings)
+│   ├── Settings/           # Settings management
+│   └── Interface/          # Menu controllers
 ├── server/
-│   ├── Services/           # Data, Player, Matchmaking
-│   ├── Managers/           # Game managers
-│   └── Modules/            # Server modules
+│   ├── Services/           # Data, Player, Matchmaking, Gunsmith, etc.
+│   │   └── GunsmithService.luau   # Attachment validation & stats
+│   └── ...
 ├── shared/
 │   ├── Framework/          # Network framework
 │   ├── Types/              # Type definitions
-│   ├── Constants/          # Game constants
-│   ├── Enums/              # Enumerations
-│   └── Utils/              # Utility functions
+│   ├── Constants/          # Game constants (Weapons, Attachments, Operators)
+│   ├── Settings/           # Settings data structures
+│   ├── Utils/              # Utility functions (WeaponUtils, etc.)
+│   └── UI/                 # Shared UI components (LootHUD)
 └── workspace/              # Map configurations
 ```
 
@@ -156,7 +174,8 @@ src/
 | **2. Combat & Fluidity** | ✅ Complete | Movement, ADS, Camera, Matchmaking |
 | **3. Code Health** | ✅ Complete | Linting, Toolchain, Stability, Documentation |
 | **4. Platform Documentation** | ✅ Complete | Roblox Docs, API Reference, Best Practices |
-| **5. Gunsmith & Arsenal** | 🔄 In Progress | Attachment System, Gunsmith UI, Weapon Leveling |
+| **5. Gunsmith & Arsenal** | 🔄 In Progress | Gunsmith Backend ✅, Gunsmith UI ✅, Weapon Framework (V3) pending |
+| **6. UI/UX & Meta-Progression** | 🔄 In Progress | Settings Menu ✅, HUD ✅, Barracks ✅, Battle Pass pending |
 
 ## 🛠️ Technical Highlights
 

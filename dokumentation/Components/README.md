@@ -16,16 +16,19 @@ Instead of creating monolithic game objects with complex inheritance chains, we 
 
 Below are the core components that drive the main gameplay systems.
 
-| Component | Purpose |
-|-----------|---------|
-| [CameraController](Component_CameraController.md) | Third-person camera system with hybrid drone architecture. Manages camera positioning, rotation, and effects. |
-| [StateMachine](Component_StateMachine.md) | The "brain" of an entity. Manages character states (e.g., sprinting, sliding, aiming) and transitions between them. |
-| [InputManager](Component_InputManager.md) | Normalizes player input from various sources and translates it into game-specific intents (e.g., "move forward," "fire weapon"). |
-| [MovementController](Component_MovementController.md) | Applies forces and physics to an entity based on the current state from the `StateMachine`. Handles locomotion. |
-| [ProceduralAnimator](Component_ProceduralAnimator.md) | Creates dynamic, procedural animations for weapon sway, camera bob, and other effects, adding a layer of realism. |
-| [MenuController](Component_MenuController.md) | Manages the UI and navigation logic for the main menu and other interfaces. |
-| [Gunsmith](Component_Gunsmith.md) | Handles the weapon customization system, allowing players to modify attachments and see real-time stat changes. |
-| [CameraController_Critique](Component_CameraController_Critique.md) | An analysis and critique of our camera implementation, a key component for the game's feel. |
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| [CameraController](Component_CameraController.md) | Third-person camera system with hybrid drone architecture. Manages camera positioning, rotation, and effects. | ✅ Implemented |
+| [StateMachine](Component_StateMachine.md) | The "brain" of an entity. Manages character states (e.g., sprinting, sliding, aiming) and transitions between them. | ✅ Implemented |
+| [InputManager](Component_InputManager.md) | Normalizes player input from various sources and translates it into game-specific intents (e.g., "move forward," "fire weapon"). | ✅ Implemented |
+| [MovementController](Component_MovementController.md) | Applies forces and physics to an entity based on the current state from the `StateMachine`. Handles locomotion. | ✅ Implemented |
+| [ProceduralAnimator](Component_ProceduralAnimator.md) | Creates dynamic, procedural animations for weapon sway, camera bob, and other effects, adding a layer of realism. | ✅ Implemented |
+| [MenuController](Component_MenuController.md) | Manages the UI and navigation logic for the main menu and other interfaces. | ✅ Implemented |
+| [Gunsmith](Component_Gunsmith.md) | Handles the weapon customization system, allowing players to modify attachments and see real-time stat changes. | ✅ Implemented |
+| **WeaponController** | Client-side weapon state management, ammo tracking, and reload system. Integrates with HUD for real-time updates. | ✅ Implemented |
+| **GameplayHUD** | In-game HUD displaying ammo, health, armor, movement state, and reload progress. Auto-hides in menu. | ✅ Implemented |
+| **GunsmithUI** | Complete attachment selection interface with stat comparison, modal dialogs, and real-time preview. | ✅ Implemented |
+| [CameraController_Critique](Component_CameraController_Critique.md) | An analysis and critique of our camera implementation, a key component for the game's feel. | 📝 Documentation |
 
 
 ---

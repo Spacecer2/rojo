@@ -74,9 +74,13 @@ We have implemented a **Three-Layer Hybrid Architecture** for the menu/spectator
 - [x] **Warzone-Specific Patterns**: Optimized networking, physics, UI, and performance guidance tailored to the project
 
 ### Phase 5: Gunsmith & Arsenal (IN PROGRESS)
-- [ ] **Attachment System**: Modular data structure for weapon modifications.
-- [ ] **Gunsmith UI**: Real-time stat visualization (Radar/Bar graphs).
-- [ ] **Weapon Leveling**: XP progression and unlock tracks.
+- [x] **Gunsmith Backend**: Server-side attachment validation and stat calculation system.
+- [x] **Gunsmith UI**: Complete attachment selection interface with real-time stat comparison.
+- [x] **Weapon Controller**: Client-side weapon handling (ammo, reloading, state management).
+- [x] **Attachment Integration**: Full integration with WeaponService for applying attachments.
+- [ ] **Weapon Framework (V3)**: Hybrid hitscan/projectile system with penetration (pending).
+- [ ] **Weapon Leveling**: XP progression and unlock tracks (pending).
+- [ ] **Visual Recoil**: Spring-driven camera kick and weapon feedback (pending).
 
 ---
 
@@ -157,13 +161,23 @@ Comprehensive Roblox development guides and API documentation:
 src/
 ├── character/        # Movement, FSM, and Procedural Animation
 ├── client/
-│   ├── Controllers/  # Camera, Interface, and Input logic
-│   ├── UI/           # Roact/Fusion-style View components
+│   ├── Controllers/  # Camera, Interface, Input, Weapon, and Loot logic
+│   │   ├── WeaponController.luau  # Weapon state, ammo, reloading
+│   │   └── ...
+│   ├── UI/           # View components and HUD systems
+│   │   ├── GameplayHUD.luau       # In-game HUD (ammo, health, reload)
+│   │   ├── GunsmithUI.luau        # Attachment selection interface
+│   │   └── Views/                 # Menu views (Home, Loadout, Barracks, Settings)
+│   ├── Settings/     # Settings management and persistence
 │   └── ...
 ├── server/
-│   ├── Services/     # Data, Player, Matchmaking, and Loadout services
+│   ├── Services/     # Data, Player, Matchmaking, Loadout, and Gunsmith services
+│   │   ├── GunsmithService.luau   # Attachment validation & stat calculation
+│   │   └── ...
 │   └── ...
-├── shared/           # Network framework, Types, Constants, and Utils (Spring, Signal)
+├── shared/           # Network framework, Types, Constants, and Utils
+│   ├── Settings/     # Settings data structures
+│   └── ...
 └── workspace/        # Map and environment configurations
 ```
 
