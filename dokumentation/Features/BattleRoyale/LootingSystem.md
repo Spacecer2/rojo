@@ -1,382 +1,98 @@
-# Looting System: Ground Loot, Supply Boxes, & Rarity Tiers
-
-## Overview
-The looting system is the foundation of the battle royale experience. It's designed to encourage exploration, create dynamic risk-reward scenarios, and provide a clear sense of progression within a single match.
-
-## System Design & Vision
-
-The looting system is built on a set of core principles that are essential to the Warzone experience:
-
-- **Exploration and Discovery:** The map is littered with loot of varying rarity, encouraging players to explore their surroundings and venture into new areas. The placement of high-tier loot in contested "hot zones" creates a natural flow to the match, as players are drawn to these high-risk, high-reward locations.
-- **Scarcity and Progression:** The early game is a frantic scramble for basic resources. As the match progresses, players will find better gear, creating a clear sense of progression and power. The rarity system, with its distinct color-coding, provides immediate and satisfying feedback on the value of a found item.
-- **Risk vs. Reward:** The best loot is often found in the most dangerous places. This creates a constant tension between the desire for better gear and the risk of encountering other players. Supply drops, in particular, are designed to be major points of conflict, as they offer the most valuable loot in the game.
-- **A Balanced and Fair Experience:** The loot distribution algorithm is designed to be random enough to make each match feel unique, but also balanced enough to prevent any one player from getting an insurmountable advantage in the early game. The system is designed to reward smart play and strategic decision-making, not just blind luck.
-
-## Loot Containers
-
-### 1. Ground Loot Spawns
-**Frequency**: Most common
-- Weapons, ammo, cash scattered randomly
-- Visual: Small item on ground with icon
-- Respawn: 30 seconds after pickup
-- Density: 200-300 spawn points per map
-
-**Pickup Mechanics**:
-```lua
-if DistanceTo(lootItem) < 3 then
-    if Input("Use") then
-        AddToInventory(lootItem)
-        lootItem.Visible = false
-        lootItem.RespawnTimer = 30
-    end
-end
-```
-
-### 2. Supply Boxes (Blue)
-**Frequency**: Common, respawning
-- Medium-sized wooden crate with lock
-- Requires interaction (1.5 second hold)
-- Contains: Armor plates, ammo, perks, cash
-- Quantity: 40-50 per map
-- Respawn: 60 seconds (empty state first)
-
-**Contents**:
-- Armor plates (50-70% chance)
-- Ammo bundles (20-30%)
-- Perks (10-15%)
-- Cash ($200-$500)
-
-### 3. Loot Crates (Orange)
-**Frequency**: Rare, static spawns
-- Large military-style crates
-- High-value items inside
-- Located at tactical/military POIs
-- Quantity: 15-20 per map
-- Respawn: 5 minutes
-
-**Contents**:
-- Rare weapons (blueprint M4, sniper)
-- Killstreak loadouts
-- Legendary armor
-- High cash ($500-$1000)
-
-### 4. Supply Drops (Airborne)
-**Frequency**: Periodic, mid-match
-- Plane drops random crate during match
-- Audio/visual warning (horn, marker)
-- Lands in contested areas (strategic)
-- Quantity: 5-10 drops per match
-- Timing: Drops every 3-5 minutes
-
-**Contents**:
-- Exotic weapons (limited edition)
-- Maximum armor stack
-- Rare attachments
-- Very high cash ($1000-$2000)
-- Killstreak tokens
-
-### 5. Corpse Loot
-**Frequency**: Per elimination
-- Eliminated player drops their inventory
-- Weapons they held, ammo, cash
-- Visible for 300 seconds (5 min)
-- Auto-collected if teammate picks up
-
-**Items Dropped**:
-- Primary weapon + mag
-- Secondary weapon + mag
-- All cash they had ($0-$500)
-- Armor remaining
-- Perks/consumables they held
-
-## Item Categories
-
-### Weapons
-**Rarity Tiers**:
-- Common: Stock AR, SMG, Pistol
-- Uncommon: Scoped rifle, shotgun
-- Rare: Experimental AR variant
-- Epic: Legendary blueprint
-- Exotic: Event-only weapons
-
-### Ammunition
-**Types**:
-- 5.56 NATO (AR/SMG)
-- .308 Magnum (sniper/LMG)
-- 9mm (pistol)
-- Shotgun shells
-- Grenades (lethal)
-- Tactical equipment (stun, smoke)
-
-**Quantities**:
-- Ground spawn: 30-60 rounds
-- Box: 120-180 rounds
-- Drop: 240+ rounds
-
-### Armor Plates
-**Tiers**:
-- Common: 25 durability
-- Uncommon: 50 durability
-- Rare: 75 durability
-- Epic: 100 durability (max stack = 3)
-
-### Perks (Killstreaks)
-**Types**:
-- UAV ($3000 from buy station)
-- Precision Airstrike ($2000)
-- VTOL Jet ($2500)
-- Sentry Gun ($1500)
-- Loadout Drop ($6000)
-
-### Cash
-**Denominations**:
-- Ground: $50-$200
-- Box: $200-$500
-- Drop: $500-$1000
-
-### Attachments
-**Availability**:
-- Rare drop loot only
-- Advanced grips, barrels, optics
-- Locked to player level (some)
-
-## Rarity System
-
-### Color Coding
-```
-Common      → White/Gray
-Uncommon    → Green
-Rare        → Blue
-Epic        → Purple
-Legendary   → Gold/Orange
-Exotic      → Rainbow/Animated
-```
-
-### Drop Rate Distribution
-```lua
-local LootDistribution = {
-    Common = 0.60,      -- 60%
-    Uncommon = 0.25,    -- 25%
-    Rare = 0.10,        -- 10%
-    Epic = 0.04,        -- 4%
-    Legendary = 0.01    -- 1%
-}
-```
-
-### Exotic Items
-- Appear only in final supply drops
-- Limited edition weapons
-- Cosmetic variations
-- Temporary (reset each season)
-
-## Location-Based Loot
-
-### Military/Industrial POIs (High-Tier)
-- Rare weapons
-- Epic armor
-- Attachments
-- High cash concentration
-- More dangerous (contested)
-
-### Civilian POIs (Low-Tier)
-- Common weapons
-- Basic armor
-- Standard cash
-- Safer to loot (less contested)
-
-### Landmark POIs (Medium-Tier)
-- Mixed rarity
-- Moderate cash
-- Balanced risk/reward
-
-## Inventory System
-
-### Inventory Slots
-- Primary Weapon: 1 slot (mandatory)
-- Secondary Weapon: 1 slot
-- Armor Plates: Stack (max 3)
-- Equipment: 3 slots (grenades, tactical, etc.)
-- Cash: Stack unlimited
-
-### Weight Limits
-- Players don't have weight, but UI shows capacity
-- Visual feedback if "overencumbered"
-- No movement speed penalty (arcade feel)
-
-### Pickup UI
-```
-┌─────────────────────────────┐
-│ [E] Pick up M4A1 Carbine    │
-│ [Hold for alternatives]     │
-│ • Secondary: Akimbo M19     │
-│ • Swap with Primary         │
-└─────────────────────────────┘
-```
-
-## Loot Distribution Algorithm
-
-### Map Coverage
-```lua
-function DistributeLoot(mapBounds)
-    local spawnPoints = {}
-    
-    -- Create grid overlay
-    for x = mapBounds.Min.X, mapBounds.Max.X, GRID_SIZE do
-        for z = mapBounds.Min.Z, mapBounds.Max.Z, GRID_SIZE do
-            local loot = GenerateRandomLoot()
-            table.insert(spawnPoints, {
-                Position = Vector3.new(x, HEIGHT, z),
-                Item = loot,
-                RespawnTime = 30
-            })
-        end
-    end
-    
-    return spawnPoints
-end
-```
-
-### Proximity Clustering
-- Nearby items are similar rarity
-- Incentivizes thorough area exploration
-- Prevents lone legendary items
-
-### Dynamic Spawning
-- Early match: All spawn locations active
-- Mid-match: Popular areas restock
-- Late match: Concentrated drops near circle
-
-## Corpse Loot Management
-
-### Dropdown System
-```lua
-function DropCorpseLoot(player)
-    local corpse = player.Character:Clone()
-    corpse.Parent = workspace
-    
-    local loot = {
-        PrimaryWeapon = player.Inventory.Primary,
-        SecondaryWeapon = player.Inventory.Secondary,
-        Cash = player.Cash,
-        Ammo = player.Ammo,
-        Armor = player.Armor
-    }
-    
-    CreateLootBag(corpse, loot)
-end
-```
-
-### Loot Bag UI
-- Shows items inside bag
-- Can preview stats before pickup
-- Highlighting for rarity
-- "Take All" button
-
-## Supply Drop Events
-
-### Drop Sequence
-1. **Warning** (60s before): Plane horn, announcer "Supply drop incoming"
-2. **Flight Path**: Animated drop pod descends with parachute
-3. **Landing**: Explosion effect, loot crate appears
-4. **Looting**: Open like supply box, first-come-first-served
-
-### Supply Drop Frequency
-- First drop: T=5:00 (1 crate)
-- Second drop: T=10:00 (1 crate)
-- Third drop: T=15:00 (2 crates)
-- Final circle: (1 crate per 2 minutes)
-
-### Strategic Placement
-- Drops in contested zones (creates firefights)
-- Uses intelligent pathfinding to avoid edges
-- Guaranteed never on top of buildings (lands safely)
-
-## Rarity Progression Strategy
-
-### Early Game (0-5 min)
-- Common loot dominates
-- Players gather basics
-- Lower risk fights
-
-### Mid Game (5-15 min)
-- Uncommon/Rare loot available
-- Armor plates, attachments appear
-- Supply drops increase rarity
-
-### Late Game (15+ min)
-- Epic/Legendary rarity
-- Final supply drops valuable
-- Every item matters
-
-## Network Considerations
-
-### Loot Sync
-- Server authoritative on loot spawning
-- Client predicts pickup locally (server validates)
-- Respawn handled server-side
-
-### Efficient Replication
-- Only replicate visible loot within 200 stud radius
-- LOD system for distant loot
-- Batch respawn notifications
-
-## UI Elements
-
-### Minimap Indicators
-- Red = Supply drop incoming (pings location)
-- Yellow = Corpse loot (timer shows expiration)
-- White = Ground loot (if in proximity)
-
-### HUD Display
-- On-screen prompt: "[E] Pick up M4 ($200)"
-- Item name, rarity color, value
-- Alternative actions if inventory full
-
-### Loot List Screen
-- Post-pickup: Shows what was acquired
-- Rarity highlight for notable items
-- Audio cue for rare drops
-
-## Balancing
-
-### Drop Rate Tweaks (Exposed Parameters)
-- Weapon spawn frequency
-- Rarity weighting
-- Cash per container
-- Respawn times
-
-### Seasonal Changes
-- Special cosmetic loot (seasonal)
-- Event-themed weapons
-- Limited-time exotic drops
-
-## Testing Checklist
-
-- [ ] All loot containers spawn correctly
-- [ ] Rarity distribution matches expected rates
-- [ ] Pickup mechanics work smoothly
-- [ ] Respawn timers accurate
-- [ ] Corpse loot drops on elimination
-- [ ] Supply drops spawn at valid locations
-- [ ] Network sync of loot instances
-- [ ] Duplicate items prevented
-- [ ] Inventory updates reflect picks
-- [ ] Minimap indicators show loot
-- [ ] Rarity color coding consistent
-- [ ] Edge cases (loot in water, air) handled
-
-## Performance Optimizations
-
-1. **Object Pooling**: Reuse loot object instances
-2. **Spatial Queries**: Frustum culling for distant loot
-3. **LOD System**: Low-detail models for far loot
-4. **Batch Updates**: Send all loot changes per frame
+# Looting System: Dynamic Acquisition for Warzone
+
+## Introduction & Philosophy
+
+The looting system in our Warzone recreation is designed to be fast-paced, tactical, and immediately rewarding, mirroring the fluid inventory management found in the original title. Our philosophy emphasizes quick decision-making under pressure, clear visual communication of item value, and seamless interaction with the game world. We aim to:
+
+-   **Promote Tactical Decision-Making**: Players should rapidly assess the value of ground loot based on rarity, attachments, and their current loadout.
+-   **Ensure Clear Visual Communication**: Instantly convey item quality (rarity), weapon state (attachments), and pickup prompts directly within the game world.
+-   **Provide Responsive Interaction**: A smooth, predictable, and visually/audibly satisfying experience when picking up or interacting with loot.
+-   **Balance Reward and Risk**: Encourage exploration and engagement with loot while maintaining a fair and secure server-authoritative system.
+
+This document outlines the core mechanics, technical implementation, and UI/UX considerations for our dynamic looting system.
+
+---
+
+## Core Mechanics
+
+### Ground Loot & Spawning
+-   **Dynamic Spawns**: Loot items (weapons, attachments, ammo, cash, armor plates, utility) are dynamically spawned across the map at designated loot points and within containers.
+-   **Rarity Tiers**: Items are categorized into rarity tiers (e.g., Common, Uncommon, Rare, Epic, Legendary, Mythic) influencing their stats, attachment count, and visual presentation.
+-   **Weapon Diversity**: A wide array of weapons, from pistols to launchers, with varying base stats and pre-attached modifiers based on rarity.
+-   **Attachments**: Individual weapon attachments (e.g., optics, muzzles, magazines) can be found as ground loot and automatically applied if compatible or added to inventory.
+-   **Cash**: In-game currency used at Buy Stations, found as ground loot in varying denominations.
+-   **Armor Plates**: Essential for survivability, found individually or in bundles.
+-   **Utility**: Grenades, tactical equipment, field upgrades.
+
+### Supply Boxes (Chests)
+-   **Tiered Rewards**: Supply boxes come in different tiers (e.g., standard, reinforced) offering increasingly valuable loot.
+-   **Visual & Audio Cues**: Distinctive visual models and opening/closing sounds to indicate presence and interaction.
+-   **Randomized Contents**: Contents are server-generated upon opening, ensuring fairness and replayability.
+
+### Pickup Interaction
+-   **Contextual Prompt**: A clear, contextual UI prompt appears when a player is in proximity to an interactable loot item.
+-   **Keybind Activation**: Items are picked up instantly via a designated keybind (e.g., `F` key), minimizing disruption to gameplay.
+-   **Automatic Attachment/Swap**: When picking up a weapon, if it's an upgrade, it automatically swaps with the current equipped weapon. Attachments are automatically equipped if the weapon slot is available.
+-   **Inventory Management (Simplified)**: While a full inventory system is beyond the scope of immediate ground loot, a simplified system for armor plates, utility, and cash is integrated.
+
+---
+
+## Technical Implementation
+
+### Server-Side Responsibilities
+-   **Loot Generation & Distribution**:
+    -   Secure server-side logic for generating loot items based on predefined spawn tables, rarity probabilities, and zone progression.
+    -   Ensuring fair distribution and preventing client-side manipulation of loot content.
+-   **Item State Management**:
+    -   Tracking the state of all loot items on the map (picked up, dropped, contents of opened boxes).
+    -   Serialization and deserialization of complex item data (e.g., weapon with specific attachments, rarity).
+-   **Pickup Validation**:
+    -   Authoritative validation of client pickup requests (player proximity, item availability, inventory space).
+    -   Handling weapon swaps, attachment application, and inventory updates securely.
+-   **Network Replication**:
+    -   Efficient replication of loot item presence, position, and critical properties (rarity, weapon type, attachment count) to relevant clients.
+    -   Minimizing bandwidth usage by only sending data for loot within player view distance.
+
+### Client-Side Responsibilities
+-   **Loot Item Visualization**:
+    -   Rendering 3D models of loot items in the world.
+    -   Applying visual indicators for rarity (e.g., glow, color tint).
+-   **Contextual UI Display**:
+    -   Detecting player proximity to loot items.
+    -   Rendering an interactive description box:
+        -   Item Name
+        -   Rarity Indicator (color, text)
+        -   Attachment Symbols (dynamic icons based on equipped attachments)
+        -   Pickup Keybind Prompt (e.g., `[F] Pick Up`)
+    -   Handling UI animation for display/hide transitions.
+-   **Input Handling**:
+    -   Listening for the designated pickup keybind (e.g., `F`).
+    -   Sending validated pickup requests to the server.
+-   **Visual & Audio Feedback**:
+    -   Playing pickup animations (e.g., quick raise of weapon model).
+    -   Triggering distinct audio cues for different item types (cash, weapon, armor).
+
+---
+
+## UI/UX Considerations
+
+### Interactive Description Box
+-   **Dynamic Positioning**: The description box will appear anchored to the loot item's screen position, slightly above it, and fade in/out smoothly.
+-   **Readability**: Clear, high-contrast text against a semi-transparent background to ensure readability in various environments.
+-   **Iconography**: Use intuitive icons for attachments (e.g., scope, muzzle, stock) rather than text abbreviations, for quick visual parsing.
+-   **Rarity Visuals**: Color-coding item names and/or adding a distinct glow effect to the box border to quickly communicate rarity.
+
+### Keybind Prompt
+-   **Standardization**: Utilize a universally recognized interaction keybind (e.g., `F` for interact).
+-   **Player Customization**: Allow players to rebind the interaction key in the settings menu.
+
+---
 
 ## Future Enhancements
+-   **Advanced Inventory**: A more comprehensive inventory management system for attachments and utility items.
+-   **Loot Bags**: Dropped upon player elimination, containing their equipped items and inventory.
+-   **Dynamic Loot Zones**: Areas with higher probabilities for rare loot.
+-   **Loot Ping System**: Allowing players to ping items for teammates.
 
-- Loot rarity "hotspots" (high-value zones)
-- Craftable loot (combine items to create better ones)
-- Loot trading between squadmates
-- Cosmetic loot (skins, finishers)
-- Quest-related loot drops
-- Time-limited exclusive loot seasons
+---
+*Last Updated: 2026-01-22*

@@ -37,7 +37,7 @@ The authoritative source for all gameplay features, each framed with its "System
 
 **Sub-Categories (Organized by Core Gameplay Pillars):**
 -   [Features/Combat/](Features/Combat/) - Detailed technical specifications for weapon systems, gunplay mechanics, and visual feedback (3 features).
--   [Features/BattleRoyale/](Features/BattleRoyale/) - Core Battle Royale mechanics, including match lifecycle, gas system, economy, and contracts (6 features).
+-   [Features/BattleRoyale/](Features/BattleRoyale/) - Core Battle Royale mechanics, including match lifecycle, gas system, economy, contracts, and a comprehensive looting system (6 features).
 -   [Features/Progression/](Features/Progression/) - Player retention systems: Battle Pass and sophisticated reward mechanisms (2 features).
 -   [Features/Systems/](Features/Systems/) - Technical documentation for critical game systems like UI and settings management (1 feature).
 

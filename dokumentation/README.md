@@ -95,7 +95,7 @@ Comprehensive design documentation for all 12 gameplay features:
 - **[BattleRoyale/](Features/BattleRoyale/)** - Core BR mechanics (MatchLifecycle, GasSystem, Gulag, Contracts, Economy, LootingSystem)
 - **[Progression/](Features/Progression/)** - Player retention (BattlePass, RewardSystems)
 - **[Systems/](Features/Systems/)** - UI & settings (SettingsMenu)
-- **[Features/README.md](Features/README.md)** - Start here for feature overview & navigation
+- **Features/README.md** - Overview of all game features, including Battle Royale and Combat systems.
 - **[Features/INDEX.md](Features/INDEX.md)** - Cross-references & dependency graph
 
 ### 🔧 **[Components/](Components/)** - Individual System Components
