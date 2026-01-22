@@ -149,25 +149,6 @@ local function Start()
 		updateProgress("Menu Failed")
 	end
 
-	-- Step 5: Initialize Developer Console
-	task.spawn(function()
-		local devConsoleModule = script.Parent:WaitForChild("DeveloperConsole")
-		local devConsoleUIModule = devConsoleModule:WaitForChild("DeveloperConsoleUI")
-		
-		local success_dc, DeveloperConsoleUI = pcall(require, devConsoleUIModule)
-		if success_dc then
-			local UserInputService = game:GetService("UserInputService")
-			UserInputService.InputBegan:Connect(function(input, gameProcessed)
-				if not gameProcessed and input.KeyCode == Enum.KeyCode.I then
-					DeveloperConsoleUI.Toggle()
-				end
-			end)
-			print("[Client] Developer Console initialized (Keybind: I)")
-		else
-			warn("[Client] Failed to load DeveloperConsoleUI: " .. tostring(DeveloperConsoleUI))
-		end
-	end)
-	
 	-- Complete (95-100%)
 	LoadingScreen.SetProgress(100, "Ready!")
 	task.wait(0.5) -- Brief pause to show 100%
@@ -182,12 +163,12 @@ local function Start()
 		-- Register all game commands
 		GameCommands.RegisterAll()
 		
-		-- Setup console toggle (F9 key)
+		-- Setup console toggle (I key)
 		local UserInputService = game:GetService("UserInputService")
 		UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			if gameProcessed then return end
 			
-			if input.KeyCode == Enum.KeyCode.F9 then
+			if input.KeyCode == Enum.KeyCode.I then
 				DeveloperConsoleUI.Toggle()
 			end
 		end)

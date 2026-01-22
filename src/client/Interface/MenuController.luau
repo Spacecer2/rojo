@@ -297,7 +297,6 @@ function MenuController.Start()
 				createTab("SETTINGS", "Settings")
 				createTab("BATTLE PASS", "Home")
 				createTab("STORE", "Home")
-				createTab("OPTIONS", "Settings")
 
 				-- Default View
 				ViewManager.SwitchTo("Home")
