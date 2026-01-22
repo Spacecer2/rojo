@@ -2,6 +2,19 @@
 
 Complete design documentation for all gameplay systems and features in the Warzone MW2019 Roblox recreation.
 
+## 🔥 The Warzone Experience
+
+A typical match of Warzone is a high-stakes battle for survival with a unique gameplay loop:
+
+1.  **Infiltration:** All squads start by dropping from a plane onto a large, detailed map. The initial moments are a scramble for weapons, armor, and resources.
+2.  **Loot & Contracts:** Squads explore the map, looting buildings for better gear and completing contracts to earn cash and other rewards.
+3.  **The Gas:** A deadly circle of gas slowly closes in, forcing squads into an ever-shrinking playable area.
+4.  **Buy Stations:** Squads can use the cash they've earned to buy valuable items like killstreaks, armor plates, and even bring back eliminated teammates.
+5.  **The Gulag:** Upon their first elimination, players are sent to the Gulag, a 1v1 arena where they can fight for a chance to redeploy.
+6.  **The Final Circle:** The last remaining squads fight it out in a small, final circle until only one team is left standing.
+
+This gameplay loop creates a dynamic and unpredictable experience that we aim to capture in this project.
+
 ## 📁 Structure
 
 Features are organized into 4 logical categories:
@@ -59,8 +72,8 @@ Everything needed for a complete battle royale match flow.
   - Difficulty scaling & risk-reward balance
 
 - **[Economy.md](BattleRoyale/Economy.md)** - In-game currency system
-  - **Cash**: Earned through gameplay (looting, kills, contracts)
-  - **Buy Stations**: Purchase tactical items, killstreaks, revives, loadout drops
+  - **Cash is King**: Earn cash through looting, kills, and contracts to gain a significant advantage.
+  - **Buy Stations**: These are shops where players can spend their cash on valuable items like killstreaks, armor plates, and teammate revives.
   - Squad cash pool (shared team budget)
   - Dynamic pricing (early game cheap, late game premium)
 
@@ -68,9 +81,8 @@ Everything needed for a complete battle royale match flow.
 Long-term engagement and cosmetic reward structures.
 
 - **[BattlePass.md](Progression/BattlePass.md)** - Seasonal 100-tier progression
-  - Free track (50 tiers) + Premium track (100 tiers)
-  - Sector Map visual representation
-  - Operator skins, weapon blueprints, executions
+  - Free and premium tracks with a variety of rewards.
+  - Examples: Operator skins (e.g., "Ghost," "Captain Price"), weapon blueprints with unique attachments and appearances, and cosmetic items like calling cards and emblems.
   - Weekly/daily challenges for accelerated progression
   - Pity system on COD Points purchases
 
@@ -258,6 +270,22 @@ GunsmithSystem (apply custom configuration)
 | **Testing Checklists** | 12 (all complete) |
 | **Cross-References** | 40+ internal links |
 | **Diagrams** | 10+ (ASCII and text-based) |
+
+## ✅ Implementation Status
+
+### Completed Systems
+- ✅ **Gunsmith Backend**: Server-side attachment validation and stat calculation (`GunsmithService`)
+- ✅ **Gunsmith UI**: Complete attachment selection interface with stat comparison
+- ✅ **Settings Menu**: Full UI implementation with Input, Audio, Graphics, and Accessibility tabs
+- ✅ **Gameplay HUD**: Ammo, health, movement state, and reload progress display
+- ✅ **Weapon Controller**: Client-side weapon state management and reload system
+- ✅ **Barracks Menu**: Complete implementation with all tabs (Missions, Identity, Rank, Records, Achievements)
+- ✅ **Loadout Editor**: WeaponsMenu with Gunsmith integration
+
+### In Progress
+- 🔄 **Weapon Framework (V3)**: Hybrid hitscan/projectile system (backend complete, ballistics pending)
+- 🔄 **Settings Application**: Graphics/audio/input application logic (UI complete, integration pending)
+- 🔄 **Visual Recoil**: Spring-driven camera kick system (pending)
 
 ---
 

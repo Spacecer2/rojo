@@ -1,7 +1,16 @@
 # Gunsmith System: Real-Time Stat Modification
 
 ## Overview
-A deep weapon customization system where attachments (barrel, muzzle, optic, grip, stock) dynamically modify weapon statistics in real-time. Players can craft unique loadouts with visible stat tradeoffs.
+The Gunsmith system is the heart of our combat experience. It's a deep and engaging weapon customization system where players can modify their weapons with a vast array of attachments, each with its own set of trade-offs. This system is designed to be the primary driver of player expression and strategic depth.
+
+## System Design & Vision
+
+The Gunsmith system is not just a collection of attachments; it's a carefully balanced system of meaningful choices. The design is guided by the following principles:
+
+- **Meaningful Trade-offs:** Every attachment offers a clear benefit, but also comes with a corresponding drawback. A long barrel might increase range and velocity, but it will also decrease mobility and aim-down-sights speed. This forces players to make thoughtful decisions about how they want to build their weapon, and it prevents the emergence of a single "meta" build.
+- **Player Expression:** With hundreds of attachments across dozens of weapons, the Gunsmith system allows for a near-infinite number of possible combinations. This gives players the freedom to create a weapon that is perfectly tailored to their individual playstyle, whether they prefer a fast-and-aggressive run-and-gun approach or a slow-and-methodical long-range playstyle.
+- **"Your Weapon, Your Way":** The ultimate vision for the Gunsmith is to empower players to create a weapon that feels truly their own. The combination of functional attachments and cosmetic customization options will allow players to craft a weapon that is not only effective in combat, but also a reflection of their personality and playstyle.
+- **A Living System:** The Gunsmith is designed to be a living system that will be constantly updated with new weapons, attachments, and balance changes. This will ensure that the meta is always evolving and that there are always new and interesting combinations to discover.
 
 ## Architecture
 

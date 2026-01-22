@@ -1,6 +1,14 @@
 # System Design: Battle Pass & Lottery (Supply Drops)
 
-This document outlines the design for the player retention and monetization systems: the Seasonal Battle Pass and the "Supply Drop" Lottery system.
+## System Design & Vision
+
+The Battle Pass and Supply Drop systems are the two pillars of our long-term player engagement and monetization strategy. They are designed to work together to create a compelling and rewarding experience that respects players' time and investment. The design is guided by the following principles:
+
+- **A Two-Pronged Approach to Rewards:** We offer two distinct paths for players to earn rewards, catering to different player motivations.
+    - **The Battle Pass (The Journey):** The Battle Pass is a deterministic and seasonal journey that provides a clear path to a wide variety of rewards. It's designed for players who want a sense of progression and a clear goal to work towards.
+    - **Supply Drops (The Surprise):** The Supply Drop system is a probabilistic system that offers a chance to get rare and exclusive items. It's designed for players who enjoy the thrill of the unknown and the excitement of a lucky drop.
+- **Fairness and Transparency:** We are committed to a "fairness first" approach. All gameplay-affecting content is available through free paths, and our monetization is focused on cosmetics. The probabilities for supply drops are clearly communicated, and a "pity system" ensures that players will always receive high-rarity items after a certain number of opens.
+- **A Player-Friendly Economy:** The in-game economy is designed to be player-friendly. The premium Battle Pass offers enough in-game currency to purchase the next season's pass, creating a "play to earn" loop for dedicated players. A duplicate protection system ensures that players always receive value from their supply drops, even if they get an item they already own.
 
 ## 🎯 Core Philosophy
 - **Fairness First**: No pay-to-win. All functional weapons are available via free paths or challenges.

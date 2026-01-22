@@ -1,6 +1,13 @@
 # System Design: Settings & Configuration
 
-This document outlines the architecture for the user configuration system. In a competitive FPS like this, granular control over input and feedback is not just a "feature"—it is a gameplay requirement.
+## System Design & Vision
+
+The settings system is a critical component of the player experience, providing a comprehensive suite of options for customizing controls, audio, and graphics. It is designed to be a pillar of player agency, accessibility, and performance optimization, empowering players to tailor the game to their specific hardware, preferences, and needs. The design is guided by the following core principles:
+
+- **Player Empowerment:** Our goal is to give players as much control as possible over their experience. The settings menu is not just a collection of options, but a powerful tool that allows players to fine-tune every aspect of the game, from the sensitivity of their mouse to the color of their crosshair.
+- **Accessibility for All:** We are committed to making our game accessible to as many players as possible. The settings menu includes a wide range of accessibility options, including colorblind modes, customizable subtitles, and remappable controls. We believe that everyone should be able to enjoy our game, regardless of their abilities.
+- **Performance and Scalability:** We understand that our players have a wide range of hardware, from high-end gaming PCs to older laptops. The graphics settings are designed to be highly scalable, allowing players to find the perfect balance of visual quality and performance for their system.
+- **A Clean and Intuitive UI:** A powerful settings menu is useless if it's difficult to navigate. The UI is designed to be clean, organized, and easily navigable, with all options logically grouped into categories. This ensures that players can quickly find the settings they're looking for without getting lost in a sea of options.
 
 ## 🎯 Design Philosophy
 - **Immediate Feedback**: Changes (like sensitivity or FOV) should apply instantly, not require a restart.

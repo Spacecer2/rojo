@@ -1,6 +1,15 @@
-# Roblox Creator Documentation Reference
+# Roblox Creator Documentation Reference: Core Engine Features
 
-This document provides a comprehensive summary of key Roblox API services and concepts, suitable for a developer reference.
+## System Design & Vision
+
+This document serves as a critical reference for core Roblox API services and concepts that form the backbone of our Warzone recreation project. Our philosophy is to treat the Roblox engine not just as a platform, but as a powerful, customizable C++ engine. By deeply understanding and strategically leveraging these fundamental APIs, we aim to:
+
+-   **Maximize Performance**: Optimize our Luau code to run efficiently, ensuring a smooth, high-fidelity experience even in complex scenarios.
+-   **Achieve AAA Responsiveness**: Utilize precise frame-rate synchronization and input handling to deliver the "snappy" and predictable control expected in a competitive FPS.
+-   **Enhance Visual Fidelity**: Employ advanced animation (TweenService), procedural effects (RunService), and accurate character representation (Humanoid) to achieve a visually immersive "Warzone Feel."
+-   **Build Robust Systems**: Construct resilient, data-driven architectures by understanding the replication behaviors (Attributes) and lifecycle management (RunService) of the engine.
+
+This reference is not merely a list of APIs; it is a guide to how we harness the engine's capabilities to meet our ambitious technical and design goals.
 
 ---
 
@@ -244,3 +253,5 @@ Attributes allow you to store custom data directly on Instances (like Parts, Mod
 *   **`Instance:GetAttributeChangedSignal(attributeName: string)`**: Returns a signal (RBXScriptSignal) that fires when the specified attribute changes.
 *   **`Instance.AttributeChanged`**: An event that fires when *any* attribute on the instance changes.
 
+---
+*Last Updated: 2026-01-21*

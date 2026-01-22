@@ -1,342 +1,453 @@
-# Roblox Physics & Constraints
+# Roblox Physics & Constraints: Engineering Realistic Interactions for Warzone
 
-Physics simulation and constraint systems for advanced mechanics.
+## Introduction & Philosophy
 
-## Physics Basics
+The fidelity of physics simulation is paramount to achieving the authentic "Warzone Feel" in our Roblox recreation. Realistic and predictable physics directly influence player movement (the "heavy but fast" paradox), weapon ballistics (bullet drop, wall penetration), and dynamic environmental interactions. Our philosophy is to:
 
-### Part Properties
+-   **Prioritize Realism**: Employ Roblox's advanced physics engine to simulate physically plausible movement and interactions, avoiding "floaty" or unrealistic behavior.
+-   **Enhance Player Skill**: Ensure physics systems contribute to a high skill ceiling, where mastery of movement and ballistic trajectories is rewarded.
+-   **Optimize for Performance**: Strategically utilize constraints, collision groups, and raycasting to deliver complex physical interactions without compromising frame rate or server stability.
+-   **Drive Immersion**: Create a tangible sense of weight and impact for characters, weapons, and environmental elements.
+
+This document serves as our technical guide to leveraging Roblox's physics capabilities to build an immersive and competitive experience.
+
+---
+
+## Physics Basics: Understanding the Core Elements
+
+### Part Properties: Defining Physical Characteristics
 
 ```lua
 local part = Instance.new("Part")
+part.BrickColor = BrickColor.new("Dark stone grey")
+part.Material = Enum.Material.Concrete
+part.Anchored = false -- Unanchored parts are subject to physics
 
--- Mass (determines momentum)
+-- Size directly influences mass (default density). Larger parts are heavier.
 part.Size = Vector3.new(2, 2, 2)
 
--- Friction & Bounce
-part.TopSurface = Enum.SurfaceType.Smooth
-part.BottomSurface = Enum.SurfaceType.Brick
+-- CustomPhysicalProperties allow granular control over how a part interacts physically.
+-- This is critical for achieving specific material behaviors (e.g., a "bouncy" tire, a "grippy" floor).
 part.CustomPhysicalProperties = PhysicalProperties.new(
-    0.7,    -- Density (kg/m³)
-    0.3,    -- Friction coefficient
-    0.5     -- Elasticity (bounciness)
+    0.7,    -- Density (kg/m³): How heavy the part is for its volume.
+    0.3,    -- Friction coefficient: Resistance to sliding (0 = no friction, 1 = high friction).
+    0.5,    -- Elasticity (bounciness): How much energy is retained on collision (0 = no bounce, 1 = full bounce).
+    0,      -- FrictionWeight (Optional): How friction is weighted across surfaces.
+    0       -- ElasticityWeight (Optional): How elasticity is weighted across surfaces.
 )
 
--- Gravity
+-- Example: Simulating a low-gravity or controlled upward force (generally deprecated, prefer BodyForce/LinearVelocity for modern physics)
 local bodyVelocity = Instance.new("BodyVelocity")
-bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Upward velocity
+bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0) -- Allow infinite force on Y-axis
+bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Applies an upward velocity
 bodyVelocity.Parent = part
 ```
 
-### Movement
+### Movement: Directly Manipulating Physical State
 
 ```lua
 local part = Instance.new("Part")
+part.Anchored = false
 
--- Velocity (change per second)
-part.Velocity = Vector3.new(0, 0, 20)  -- 20 studs/sec forward
+-- Direct velocity manipulation: Instantly changes speed and direction.
+-- Use with caution, as it can conflict with the physics engine if not managed carefully.
+part.AssemblyLinearVelocity = Vector3.new(0, 0, 20)  -- Moves at 20 studs/sec forward (along Z-axis)
 
--- Acceleration using BodyVelocity
-local bodyVelocity = Instance.new("BodyVelocity")
-bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-bodyVelocity.Velocity = Vector3.new(10, 20, 0)
-bodyVelocity.Parent = part
-
--- Apply force
+-- Applying continuous force (acceleration) using BodyForce.
+-- This is a more physically accurate way to exert influence on a part over time.
 local bodyForce = Instance.new("BodyForce")
-bodyForce.Force = Vector3.new(100, 0, 0)  -- 100 studs/sec² acceleration
+bodyForce.Force = Vector3.new(100, 0, 0)  -- Applies a constant force of 100 Newtons along the X-axis
 bodyForce.Parent = part
+
+-- Applying rotational force (torque) using BodyTorque (similar to BodyForce but for rotation).
+local bodyTorque = Instance.new("BodyTorque")
+bodyTorque.Torque = Vector3.new(0, 100, 0) -- Applies torque around the Y-axis
+bodyTorque.Parent = part
 ```
 
-## Constraints
+---
 
-Constraints are modern physics joints replacing old methods.
+## Constraints: Modern Joints for Complex Mechanical Systems
 
-### WeldConstraint (Rigid Connection)
+Constraints are the preferred, modern method for creating robust and performant physical connections and mechanical systems. They are significantly more stable and efficient than older methods like `Motor` objects or manual CFrame manipulation in tight loops.
+
+### WeldConstraint: Rigid, Immutable Connection
+Creates a rigid connection between two parts, making them behave as a single assembly. Ideal for static structures or connecting child parts to a main body.
 
 ```lua
 local part1 = Instance.new("Part")
 local part2 = Instance.new("Part")
 
--- Weld parts together
+-- Connect two parts rigidly at their current relative positions
 local weld = Instance.new("WeldConstraint")
 weld.Part0 = part1
 weld.Part1 = part2
-weld.Parent = part1
+weld.Parent = part1 -- Parent to one of the parts for cleanup
 
--- Result: part2 moves with part1 as a single unit
+-- Result: part2 will maintain its exact position and orientation relative to part1.
 ```
 
-### HingeConstraint (Rotating Joint)
+### HingeConstraint: Controlled Rotational Movement
+Allows rotational movement around a single axis, simulating a door, a wheel, or a rotating turret.
 
 ```lua
--- Door on hinges
-local doorFrame = workspace.DoorFrame
-local door = workspace.Door
+-- Simulate a door swinging on hinges
+local doorFrame = workspace.DoorFrame -- An anchored part
+local door = workspace.Door           -- An unanchored part
 
+-- Attachments define the pivot points and axes of the hinge.
+-- Attachment0 is usually the fixed point, Attachment1 is the moving point.
 local hinge = Instance.new("HingeConstraint")
 hinge.Attachment0 = doorFrame.Attachment0
 hinge.Attachment1 = door.Attachment0
 hinge.Parent = doorFrame
 
--- Control rotation
-hinge.AngularVelocity = math.rad(45)  -- Rotate 45°/sec
+-- Control the hinge: Set target angle, motor, or servo.
+hinge.AngularVelocity = math.rad(45)  -- Applies constant angular velocity (45 degrees/sec)
+hinge.MotorMaxTorque = 1000           -- Strength of the motor
 ```
 
-### BallSocketConstraint (Free Rotation)
+### BallSocketConstraint: Free Rotation, Fixed Connection Point
+Creates a connection that allows free rotation around a single point, like a shoulder joint, a swinging pendulum, or a loose chain link.
 
 ```lua
--- Swinging pendulum
-local anchor = workspace.Anchor
-local pendulum = workspace.Pendulum
+-- Simulate a swinging pendulum
+local anchor = workspace.Anchor     -- An anchored part
+local pendulum = workspace.Pendulum -- An unanchored part
 
+-- Attachments define the single point of connection.
 local socket = Instance.new("BallSocketConstraint")
 socket.Attachment0 = anchor.Attachment0
 socket.Attachment1 = pendulum.Attachment0
 socket.Parent = anchor
 
--- Pendulum swings freely but stays connected
+-- The pendulum will swing freely while remaining connected at the socket point.
 ```
 
-### RodConstraint (Fixed Distance)
+### RodConstraint: Fixed Distance, Flexible Orientation
+Maintains a fixed distance between two attachments, but allows them to rotate freely. Useful for suspension systems or keeping objects a set distance apart without rigid connection.
 
 ```lua
--- Spring-like connection that maintains distance
-local spring = Instance.new("RodConstraint")
-spring.Attachment0 = part1.Attachment0
-spring.Attachment1 = part2.Attachment0
-spring.Parent = part1
+-- Simulate a simple spring-like connection that maintains a fixed distance
+local partA = Instance.new("Part", workspace)
+local partB = Instance.new("Part", workspace)
 
--- Distance is determined by attachment positions
+local rod = Instance.new("RodConstraint")
+rod.Attachment0 = partA.Attachment0
+rod.Attachment1 = partB.Attachment0
+rod.Parent = partA
+
+-- The distance between partA and partB will be fixed by the distance between their attachments.
 ```
 
-### DistanceConstraint (Spring Joint)
+### DistanceConstraint: Spring-like Connection
+Creates a spring-like connection that oscillates around a target distance. Ideal for suspension, flexible cables, or absorbing impacts.
 
 ```lua
--- Springy connection
+-- Create a springy connection, good for suspension systems
+local partA = Instance.new("Part", workspace)
+local partB = Instance.new("Part", workspace)
+
 local spring = Instance.new("DistanceConstraint")
-spring.Attachment0 = part1.Attachment0
-spring.Attachment1 = part2.Attachment0
-spring.MaxForce = 1000  -- Spring strength
-spring.Parent = part1
+spring.Attachment0 = partA.Attachment0
+spring.Attachment1 = partB.Attachment0
+spring.MaxForce = 1000      -- The maximum force the spring can exert
+spring.Damping = 0.5        -- How quickly oscillations decay
+spring.Restitution = 0.2    -- Bounciness
+spring.Parent = partA
 
--- Parts oscillate around target distance
+-- Parts will oscillate around the target distance defined by their attachments, with damping.
 ```
 
-### CylindricalConstraint (Sliding + Rotating)
+### CylindricalConstraint: Sliding and Rotating Joint
+Combines linear movement along an axis with rotation around that same axis. Useful for pistons, sliding doors, or rotating shafts.
 
 ```lua
--- Piston or sliding door
+-- Simulate a piston or sliding door mechanism
+local base = workspace.BasePart     -- Anchored base
+local rod = workspace.PistonRod     -- Moving rod
+
 local piston = Instance.new("CylindricalConstraint")
 piston.Attachment0 = base.Attachment0
 piston.Attachment1 = rod.Attachment0
 piston.Parent = base
 
--- Rod slides along axis and rotates around it
+-- The rod will slide along and rotate around the axis defined by the attachments.
 ```
 
-### Rope Constraint (Max Distance)
+### RopeConstraint: Max Distance with Flexibility
+A non-rigid connection that prevents parts from exceeding a specified maximum distance, simulating a rope or chain that pulls but does not push.
 
 ```lua
--- Rope that pulls parts together but doesn't push
+-- Simulate a hanging rope or chain that pulls an object.
+local anchor = workspace.Anchor     -- Fixed anchor point
+local hanging = workspace.HangingPart -- Object to be hung
+
 local rope = Instance.new("RopeConstraint")
 rope.Attachment0 = anchor.Attachment0
 rope.Attachment1 = hanging.Attachment0
-rope.Length = 50  -- Max distance
-rope.Thickness = 1
+rope.Length = 50                    -- Maximum length of the rope
+rope.Thickness = 1                  -- Visual thickness of the rope (can be >0 to be visible)
 rope.Parent = anchor
+
+-- The hanging part will stay within 50 studs of the anchor, mimicking a rope.
 ```
 
-## Attachments
+---
 
-Attachments define where constraints connect.
+## Attachments: Defining Connection Points
+
+Attachments are crucial for precise constraint placement. They define a point and orientation on a part where a constraint connects.
 
 ```lua
 local part = Instance.new("Part")
+part.Size = Vector3.new(4, 1, 4)
+part.Parent = workspace
 
--- Create attachment at part center
-local attachment = Instance.new("Attachment")
-attachment.Parent = part
+-- Create an attachment at the center of the part (default position)
+local attachmentCenter = Instance.new("Attachment")
+attachmentCenter.Name = "CenterAttachment"
+attachmentCenter.Parent = part
 
--- Position relative to part
-attachment.Position = Vector3.new(0, 2, 0)  -- Top of part
-attachment.Orientation = Vector3.new(0, 0, 90)  -- Rotated 90°
+-- Create an attachment at the top of the part, rotated
+local attachmentTop = Instance.new("Attachment")
+attachmentTop.Name = "TopAttachment"
+attachmentTop.Position = Vector3.new(0, part.Size.Y / 2, 0)  -- Position at top surface
+attachmentTop.Orientation = Vector3.new(0, 0, 90)           -- Rotate 90 degrees around Z
+attachmentTop.Parent = part
 
--- Use in constraint
-local constraint = Instance.new("WeldConstraint")
-constraint.Attachment0 = part.Attachment
-constraint.Attachment1 = otherPart.Attachment
+-- Attachments are then used by constraints to define their connection points.
+local hinge = Instance.new("HingeConstraint")
+hinge.Attachment0 = attachmentTop -- Connect this attachment
+-- ... connect to another part's attachment ...
 ```
 
-## Motor Control
+---
 
-### Motor6D (Advanced Joints)
+## Motor Control: Precise Rotational Dynamics
+
+### Motor6D: The Backbone of Character Animation
+`Motor6D` instances are specialized joints used extensively in character rigging and animation. They allow precise control over rotational relationships between parts.
 
 ```lua
--- Used for character animation joints
+-- Typically found within character models, connecting limbs to the torso.
 local motor = Instance.new("Motor6D")
 motor.Part0 = character.Torso
 motor.Part1 = character["Right Arm"]
 motor.Parent = character.Torso
 
--- Rotate arm
-motor.Transform = CFrame.Angles(math.rad(45), 0, 0)
+-- Control the motor's target orientation using CFrame.
+-- This is how animations drive character movement.
+motor.C0 = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(45), 0, 0) -- Rotate arm 45 degrees
 ```
 
-### AngularVelocity (Spinning)
+### AngularVelocity: Applying Rotational Forces
+The `AngularVelocity` property (or `BodyAngularVelocity` for older methods) allows direct control over a part's rotational speed.
 
 ```lua
-local gyro = Instance.new("BodyGyro")
-gyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-gyro.Parent = part
+local part = Instance.new("Part", workspace)
+part.Anchored = false
+part.Size = Vector3.new(2,2,2)
 
--- Make part spin
-gyro.CFrame = CFrame.Angles(math.rad(45), math.rad(90), 0)
+-- Applying continuous angular velocity using BodyAngularVelocity (deprecated, prefer AngularVelocity property of Part).
+-- This forces the part to spin at a certain rate.
+local bodyGyro = Instance.new("BodyGyro") -- Often used with BodyAngularVelocity for stability
+bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+bodyGyro.Damping = 100
+bodyGyro.Parent = part
+
+part.RotationalVelocity = Vector3.new(0, 5, 0) -- Spin around Y-axis at 5 rad/s
 ```
 
-## Raycasting
+---
 
-Find what's in the world along a line.
+## Raycasting: Precise World Queries for Interaction and Combat
+
+Raycasting is an essential tool for accurate hit detection, line-of-sight checks, and intelligent environmental interactions in a complex 3D world.
 
 ```lua
-local workspace = game:GetService("Workspace")
+local Workspace = game:GetService("Workspace")
 
--- Setup raycast
+-- Raycast parameters define what the ray interacts with.
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-raycastParams.FilterDescendantsInstances = {character}
+raycastParams.FilterType = Enum.RaycastFilterType.Blacklist -- Ignore specific instances
+raycastParams.FilterDescendantsInstances = {character}       -- Ignore the player's own character
+raycastParams.IgnoreWater = true                             -- Don't hit water
 
--- Cast ray
+-- Define the ray: origin and direction/length.
 local rayOrigin = character.Head.Position
-local rayDirection = (targetPosition - rayOrigin).Unit
-local result = workspace:Raycast(rayOrigin, rayDirection * 1000)  -- 1000 studs range
+local rayDirection = (targetPosition - rayOrigin).Unit * 1000 -- Ray points from head towards target, 1000 studs long
+local result = Workspace:Raycast(rayOrigin, rayDirection, raycastParams)
 
 if result then
-    print("Hit:", result.Instance.Parent.Name)
-    print("Position:", result.Position)
-    print("Surface normal:", result.Normal)
+    print("Ray hit:", result.Instance.Name)
+    print("Hit position:", result.Position)
+    print("Surface normal:", result.Normal)      -- The orientation of the surface hit
+    print("Material:", result.Material.Name)     -- The physical material of the surface
 else
-    print("No hit")
+    print("Ray did not hit anything within range.")
 end
-
--- Region3 for area search (deprecated, use Terrain:FillBall instead)
 ```
 
-## Raycasting for Warzone
+### Raycasting for Warzone: Accurate Bullet Ballistics
+
+In a high-fidelity FPS like Warzone, raycasting is fundamental for server-authoritative bullet tracing, ensuring accurate hit registration and damage application.
 
 ```lua
--- Bullet firing
-local cannonPart = workspace.Cannon
-local bulletSpeed = 500
+-- SERVER (Module: CombatService): Authoritative bullet firing logic.
+local ServerWorkspace = game:GetService("Workspace")
 
-function fireWeapon(targetPosition)
-    local rayOrigin = cannonPart.Position
-    local rayDirection = (targetPosition - rayOrigin).Unit
-    
-    -- Server-side raycast for accuracy
+function CombatService.fireWeapon(player: Player, weaponConfig: any, rayOrigin: Vector3, rayDirection: Vector3)
+    -- Server-side validation (ammo, cooldown, etc.) would precede this.
+
     local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Whitelist
-    raycastParams.FilterDescendantsInstances = {workspace.Enemies}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.FilterDescendantsInstances = {player.Character} -- Don't hit self
+    raycastParams.IgnoreWater = true
     
-    local result = workspace:Raycast(rayOrigin, rayDirection * 1000, raycastParams)
+    local rayLength = weaponConfig.MaxRange or 1000
+    local result = ServerWorkspace:Raycast(rayOrigin, rayDirection * rayLength, raycastParams)
     
     if result then
-        local enemyCharacter = result.Instance.Parent
-        print("Hit enemy:", enemyCharacter.Name)
+        local hitInstance = result.Instance
+        local hitCharacter = hitInstance:FindFirstAncestorWhichIsA("Model") -- Check if hit a character
         
-        -- Calculate damage based on hit location
-        if result.Instance.Name == "Head" then
-            enemyCharacter.Humanoid:TakeDamage(100)  -- Headshot
+        if hitCharacter and hitCharacter:FindFirstChildOfClass("Humanoid") then
+            CombatService.applyDamage(player, hitCharacter.Humanoid, result) -- Custom damage application
+            CombatService.replicateHit(result.Position, hitCharacter) -- Notify clients of hit
         else
-            enemyCharacter.Humanoid:TakeDamage(50)
+            CombatService.replicateMiss(result.Position, result.Normal, result.Material) -- Notify clients of miss
         end
     end
-    
-    -- Create visual bullet for all clients
-    createBulletTrail(rayOrigin, rayDirection, 1000)
 end
 ```
 
-## Collision Groups
+---
 
-Control which parts collide with each other.
+## Collision Groups: Fine-Grained Physics Interaction Control
+
+Collision Groups allow precise control over which groups of parts collide with each other, significantly optimizing physics calculations and preventing unintended interactions (e.g., player's bullets not hitting teammates).
 
 ```lua
 local PhysicsService = game:GetService("PhysicsService")
 
--- Create collision group
-pcall(function()
-    PhysicsService:CreateCollisionGroup("Players")
-end)
+-- Define custom collision groups (do this once, e.g., on server startup)
+pcall(function() PhysicsService:CreateCollisionGroup("Players") end)
+pcall(function() PhysicsService:CreateCollisionGroup("PlayerBullets") end)
+pcall(function() PhysicsService:CreateCollisionGroup("Environment") end)
 
--- Add parts to group
-PhysicsService:CollisionGroupSetCollidable("Players", false)  -- Players don't collide with each other
+-- Set collision rules (e.g., Players don't collide with other Players)
+PhysicsService:SetCollisionGroupCollidable("Players", "Players", false)
+PhysicsService:SetCollisionGroupCollidable("PlayerBullets", "Players", false) -- Player bullets don't hit their own team
+PhysicsService:SetCollisionGroupCollidable("PlayerBullets", "PlayerBullets", false) -- Bullets don't collide with each other
+PhysicsService:SetCollisionGroupCollidable("PlayerBullets", "Environment", true) -- Bullets hit environment
 
--- Add player to group
-for _, part in pairs(character:GetDescendants()) do
-    if part:IsA("BasePart") then
-        PhysicsService:CollisionGroupAddMember("Players", part)
-    end
-end
-```
-
-## Advanced Physics Examples
-
-### Character Knockback
-```lua
-local function applyKnockback(character, direction, force)
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        humanoidRootPart.Velocity = humanoidRootPart.Velocity + (direction.Unit * force)
-    end
+-- Assign a part to a collision group
+local function assignToCollisionGroup(part: BasePart, groupName: string)
+    part.CollisionGroup = groupName
 end
 
-applyKnockback(character, (character.HumanoidRootPart.Position - shooterPosition), 50)
-```
-
-### Sliding Mechanics
-```lua
--- Smooth sliding on slopes
-local slidingVelocity = Vector3.new(0, 0, 0)
-local SLIDE_ACCELERATION = 50
-local SLIDE_FRICTION = 0.1
-
-game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
-    if isSliding then
-        local slopeDirection = calculateSlopeDirection()
-        slidingVelocity = slidingVelocity + (slopeDirection * SLIDE_ACCELERATION * deltaTime)
-        slidingVelocity = slidingVelocity * (1 - SLIDE_FRICTION)
-        
-        character.HumanoidRootPart.Velocity = slidingVelocity
-    end
-end)
-```
-
-### Gravity Control
-```lua
--- Zero-G environment
-local ZeroGParts = {}
-
-game:GetService("RunService").Heartbeat:Connect(function()
-    for _, part in pairs(ZeroGParts) do
-        if part.Parent then
-            part.AssemblyLinearVelocity = part.AssemblyLinearVelocity * Vector3.new(1, 0.98, 1)  -- Slight damping
+-- Example: Assigning character parts to "Players" group
+local function setupCharacterCollision(character: Model)
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            assignToCollisionGroup(part, "Players")
         end
     end
-end)
+end
 ```
-
-## Performance Tips
-
-1. **Use Constraints** - More efficient than BodyMover objects
-2. **Collision Groups** - Exclude non-colliding parts from physics
-3. **Network Optimization** - Only replicate important physics
-4. **Use Assembly Linear Velocity** - More efficient than Velocity
-5. **Disable Physics** - Set CanCollide = false for non-interactive objects
-6. **LOD Physics** - Reduce physics complexity for distant objects
 
 ---
 
-**For more information:**
-- [Constraints Documentation](https://create.roblox.com/docs/reference/engine/classes)
-- [Physics Best Practices](https://create.roblox.com/docs/tutorials)
-- [Raycasting Guide](https://create.roblox.com/docs/tutorials/scripting)
+## Advanced Physics Examples: Custom Mechanics
+
+### Character Knockback: Impactful Feedback
+Applying controlled forces to characters to simulate impacts from explosions or melee attacks.
+
+```lua
+local function applyKnockback(character: Model, sourcePosition: Vector3, forceMagnitude: number)
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local direction = (humanoidRootPart.Position - sourcePosition).Unit -- Direction away from source
+        local knockbackVector = direction * forceMagnitude + Vector3.new(0, forceMagnitude / 2, 0) -- Add some upward force
+        humanoidRootPart.AssemblyLinearVelocity = humanoidRootPart.AssemblyLinearVelocity + knockbackVector
+    end
+end
+
+-- Usage: applyKnockback(targetCharacter, explosionPosition, 75)
+```
+
+### Sliding Mechanics: Dynamic Player Movement
+Implementing momentum-based sliding, crucial for advanced movement.
+
+```lua
+-- CLIENT/SERVER (depending on authority for movement):
+local function updateSliding(character: Model, deltaTime: number)
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
+
+    local currentVelocity = humanoidRootPart.AssemblyLinearVelocity
+    local groundNormal = PlayerMovementService.getGroundNormal(character) -- Custom function to get terrain normal
+    local slideDirection = (currentVelocity - currentVelocity:Dot(groundNormal) * groundNormal).Unit -- Project velocity onto ground plane
+
+    local slideSpeed = currentVelocity.Magnitude
+    local desiredSlideSpeed = math.max(0, slideSpeed - SLIDE_DRAG * deltaTime) -- Apply drag
+
+    humanoidRootPart.AssemblyLinearVelocity = slideDirection * desiredSlideSpeed
+
+    -- Additional logic for slide cancellation, animations, etc.
+end
+```
+
+### Gravity Control: Environmental Dynamics
+Modifying gravity's effect for specific parts or regions, enabling unique gameplay mechanics.
+
+```lua
+-- For a specific part, you can manually apply anti-gravity force or override Workspace.Gravity.
+local function createZeroGField(zonePart: Part)
+    local connections = {}
+    connections.touched = zonePart.Touched:Connect(function(otherPart)
+        if otherPart.Parent and otherPart.Parent:FindFirstChildOfClass("Humanoid") then
+            local rootPart = otherPart.Parent.HumanoidRootPart
+            if rootPart then
+                -- Apply upward force to simulate zero-G (or set custom PhysicalProperties)
+                local bodyForce = Instance.new("BodyForce")
+                bodyForce.Force = Vector3.new(0, Workspace.Gravity * rootPart:GetMass(), 0) -- Counteract gravity
+                bodyForce.Parent = rootPart
+                table.insert(connections, rootPart.AncestryChanged:Connect(function()
+                    bodyForce:Destroy() -- Clean up force when part removed
+                end))
+            end
+        end
+    end)
+    -- Disconnect on zonePart.Destroying for cleanup
+end
+```
+
+---
+
+## Performance Tips: Optimizing Physics for Scale
+
+1.  **Prefer Constraints over BodyMovers**: Constraints are generally more stable and performant than legacy `BodyMover` objects.
+2.  **Utilize Collision Groups**: Define custom collision rules to prevent unnecessary collision checks between groups of parts that should not interact (e.g., character with own bullets).
+3.  **Optimize Network Replication of Physics**: Only replicate essential physics data and ensure server authority. Over-replicating physics can quickly saturate network bandwidth.
+4.  **Use `AssemblyLinearVelocity` / `AssemblyAngularVelocity`**: Directly setting these properties is often more efficient and predictable than applying continuous forces (like `BodyForce`) for simple movements.
+5.  **Anchor Static Objects**: Set `Part.Anchored = true` for any part that should not move or be affected by physics. This tells the engine to ignore them in physics calculations.
+6.  **LOD Physics (Level of Detail)**: Reduce physics complexity for distant objects. For instance, less critical physics objects far away might have their `CanCollide` set to `false` or be removed entirely.
+7.  **Minimize Part Count**: Reduce the total number of parts, especially unanchored ones. Combine multiple parts into single `MeshParts` where possible.
+8.  **Avoid High `Density`**: Extremely dense parts interacting with normal parts can lead to unstable physics. Keep `PhysicalProperties.Density` reasonable.
+9.  **Cache Raycast Results**: For repeated queries in a short timeframe, cache and reuse raycast data if the environment is static enough.
+
+---
+
+## Further Reading & Integration: Mastering Roblox Physics
+
+-   **[RobloxDocs/EngineReference.md](EngineReference.md)**: Details other core services that interact with physics (e.g., `RunService`).
+-   **[RobloxDocs/Performance_Guide.md](Performance_Guide.md)**: Dive deeper into general optimization strategies, many of which apply directly to physics.
+-   **[RobloxDocs/Networking_Guide.md](Networking_Guide.md)**: Essential for understanding how physics-driven interactions are replicated in a multiplayer environment.
+-   **[Components/Component_MovementController.md](../../Components/Component_MovementController.md)**: See practical application of physics principles for character movement.
+-   **[Features/Combat/WeaponFramework.md](../../Features/Combat/WeaponFramework.md)**: How raycasting and physics are used for weapon ballistics and hit detection.
+-   **[Vision.md](../../Vision.md)**: Understand how realistic physics contributes to the "Heavy but Fast" feel and overall immersion.
+
+---
+*Last Updated: 2026-01-21*

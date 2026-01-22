@@ -1,5 +1,9 @@
 # Component: MenuController
 
+## System Design & Vision
+
+The `MenuController` is the heart of our front-end experience. It's designed to be more than just a series of static screens; it's a seamless and immersive "front door" to the game. The vision is to create a menu that is as polished and engaging as the core gameplay itself, with a focus on a fast, responsive UI and a clean, modern aesthetic. We want players to feel like they are in the world of Warzone from the moment they launch the game.
+
 ## Responsibility
 The `MenuController` is the central hub for the main menu experience. It manages the UI lifecycle, view transitions, and global menu state.
 

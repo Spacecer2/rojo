@@ -14,7 +14,7 @@ This screen is where the player **views, edits, and manages a saved weapon loado
 
 ## 2. Left Sidebar – Loadout Preset List
 
-This is the **navigation column** for saved loadouts.
+This navigation column provides rapid access to pre-configured loadouts, optimizing for player efficiency and quick iteration.
 
 ### 📋 **Preset Loadout Names**
 
@@ -31,23 +31,17 @@ Examples shown:
 * Streak Denial
 * Main Multiplayer
 
-### 🧭 How this works:
+### 🧭 Functional Design:
 
-* Each entry represents a **fully saved loadout preset**
-* Clicking a name:
+*   Each entry represents a **fully saved loadout preset**, encapsulating all weapon, perk, and equipment configurations.
+*   **Rapid Context Switching**: Clicking a loadout name instantaneously loads its associated data, updating the central panel and visual showcase without perceptible delay. This minimizes friction and supports rapid experimentation.
+*   The **blue highlight + star icon** denotes the currently active or favorite preset. This visual cue provides immediate feedback on the player's current selection, a critical element in high-stakes environments.
 
-  * Loads its weapons, perks, and equipment
-  * Updates everything on the right side instantly
-* The **blue highlight + star icon** indicates:
+### 🎯 Design Rationale:
 
-  * The currently selected loadout
-  * Possibly a favorite or active preset
-
-### 🎯 Design intent:
-
-* Vertical list = fast switching
-* Names are player-defined or theme-based
-* Minimal icons to keep it readable
+*   **Efficiency**: A vertical list facilitates quick scanning and selection, critical for players who frequently switch between specialized loadouts.
+*   **Clarity**: The emphasis on concise, player-defined names and minimal iconography prioritizes readability, reducing cognitive load. This supports rapid decision-making, a core requirement in a competitive game.
+*   **Modularity**: This design implicitly supports an underlying system where loadout data is self-contained and atomic, allowing for seamless swapping and future expansion.
 
 ---
 

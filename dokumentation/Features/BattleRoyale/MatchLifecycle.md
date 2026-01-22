@@ -1,7 +1,19 @@
 # Match Lifecycle: Pre-Game → Infiltration → Victory
 
 ## Overview
-The complete flow of a Warzone match from lobby creation through player elimination, team wipes, final circles, and victory. Handles state transitions, player synchronization, and dynamic event sequencing.
+The match lifecycle is the backbone of the battle royale experience. It's a carefully orchestrated state machine that guides players through a distinct narrative arc, from the initial chaos of infiltration to the final, tense moments of a one-on-one showdown.
+
+## System Design & Vision
+
+The match lifecycle is designed to create a specific and compelling player experience that is distinct from a traditional deathmatch or other game modes. The core principles are:
+
+- **A Three-Act Structure:** Each match is designed to have a clear beginning, middle, and end.
+    - **Act I: The Scramble.** The infiltration and initial looting phase is all about survival and gearing up.
+    - **Act II: The Hunt.** The mid-game is a strategic game of cat and mouse, as squads hunt each other, complete contracts, and vie for positional advantage.
+    - **Act III: The Showdown.** The endgame is a climactic battle for survival as the final few squads are forced into a tiny, final circle.
+- **Player Agency and Choice:** While the overall structure is linear, players have a high degree of agency within each phase. They can choose where to drop, which contracts to pursue, and how to approach the final circle. This ensures that no two matches play out the same way.
+- **Escalating Stakes:** The stakes are constantly escalating throughout the match. The gas becomes more damaging, the circle shrinks faster, and the value of a single elimination increases exponentially. This creates a powerful sense of tension and excitement that builds to a crescendo in the final moments.
+- **A Sense of Place and Journey:** The large, detailed map is more than just a backdrop for the action. It's a character in itself, with its own landmarks and secrets. The journey from the initial drop zone to the final circle is a key part of the experience.
 
 ## Match States
 

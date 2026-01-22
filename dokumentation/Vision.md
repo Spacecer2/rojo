@@ -34,4 +34,6 @@ We treat Roblox as a powerful C++ engine and write our Luau code to be as effici
 - **Parallelism**: Using `task.spawn` and eventually Actor-based parallelism for heavy calculations like procedural IK.
 
 ---
-*Goal: To be the benchmark for FPS movement and feel on the Roblox platform.*
+**Vision Statement:** To be the benchmark for FPS movement and feel on the Roblox platform, delivering an unparalleled, authentic Warzone experience through meticulous engineering and visionary design.
+---
+*Last Updated: 2026-01-21*

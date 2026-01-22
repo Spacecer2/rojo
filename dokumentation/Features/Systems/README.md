@@ -1,30 +1,42 @@
 # ⚙️ System Features
 
-Core UI and settings systems affecting all gameplay.
+System-level features are the foundational elements that provide players with control over their experience. A well-designed systems menu is crucial for player satisfaction, accessibility, and overall usability.
 
-## 📄 Features
+## 🎛️ The Settings Menu
 
-| Feature | Description |
-|---------|-------------|
-| [SettingsMenu.md](SettingsMenu.md) | Player customization for input, audio, graphics, and accessibility |
+The settings menu is the primary interface for player customization. Our goal is to create a menu that is clear, intuitive, and comprehensive, following best practices for UI/UX design.
 
-## 🎛️ Overview
+### Key Design Principles
+- **Accessibility:** The menu is designed with accessibility in mind, featuring options for colorblind modes, scalable text, and other features to ensure all players can have a comfortable experience.
+- **Clarity:** Settings are organized into logical categories to prevent clutter and make options easy to find.
+- **Consistency:** The visual design and terminology are consistent with the rest of the game's UI, creating a seamless experience.
 
-System features provide essential player customization:
-- **Input Settings** - Sensitivity, control schemes, keybinding
-- **Audio Settings** - Master volume, device selection, voice chat
-- **Graphics Settings** - Resolution, FPS, quality presets
-- **Accessibility** - Motor, hearing, and visual adaptations
-- **Profile Management** - Cloud sync and settings persistence
+### Settings Categories
+The settings menu is divided into the following categories:
+
+| Category | Description | Status |
+|---|---|---|
+| **Input** | Allows players to customize keybindings, mouse sensitivity, and controller layouts. Includes options for raw input, mouse smoothing, and ADS sensitivity. | ✅ Implemented |
+| **Audio** | Provides separate volume sliders for master, music, sound effects, and voice chat. Also includes options for voice chat and push-to-talk. | ✅ Implemented |
+| **Graphics** | Contains settings for quality presets, draw distance, shadow quality, particle effects, VSync, and FPS/ping display. | ✅ Implemented |
+| **Accessibility** | Includes options for colorblind filters, brightness, contrast, HUD scale, font size, subtitles, mono audio, high contrast, and motion reduction. | ✅ Implemented |
+
+**Implementation Status:**
+- ✅ Complete UI with tabbed interface
+- ✅ Settings persistence via `SettingsManager`
+- ✅ All control types (sliders, checkboxes, dropdowns) implemented
+- 🔄 Settings application logic (pending integration with graphics/audio/input systems)
+
+For a complete breakdown of all settings, see [SettingsMenu.md](SettingsMenu.md).
 
 ## 🔗 Related Documentation
 
-- [Features/INDEX.md](../INDEX.md) - Cross-references and dependency graph
-- [Features/README.md](../README.md) - All features overview
-- [Combat/VisualRecoil.md](../Combat/VisualRecoil.md) - Haptic & visual settings
-- [Design/Design_Settings.md](../../Design/Design_Settings.md) - Design specifications
-- [Guides/](../../Guides/) - Tuning and configuration guides
+- [Features/INDEX.md](../INDEX.md) - Cross-references and dependency graph.
+- [Features/README.md](../README.md) - All features overview.
+- [Combat/VisualRecoil.md](../Combat/VisualRecoil.md) - Haptic & visual settings.
+- [Design/Design_Settings.md](../../Design/Design_Settings.md) - The high-level design specifications for the settings menu.
+- [Guides/](../../Guides/) - Tuning and configuration guides.
 
 ---
 
-**See [SettingsMenu.md](SettingsMenu.md) for the settings system documentation.**
+**See [SettingsMenu.md](SettingsMenu.md) for the detailed settings system documentation.**

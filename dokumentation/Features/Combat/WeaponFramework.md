@@ -1,9 +1,17 @@
 # Weapon Framework: Hybrid Hitscan/Projectile System
 
 ## Overview
-A unified ballistics system supporting both instant-hit (hitscan) and physics-based projectile weapons with realistic bullet travel, drop, wall penetration, and material-based damage falloff.
+The weapon framework is the foundation of our combat system. It's a unified ballistics system that supports both instant-hit (hitscan) and physics-based projectile weapons, with realistic bullet travel, drop, wall penetration, and material-based damage falloff.
 
-**Related Systems**: [GunsmithSystem](#gunsmith-integration) | [VisualRecoil](#integration-points) | [Economy](../BattleRoyale/Economy.md) (killstreaks)
+## System Design & Vision
+
+The weapon framework is designed to deliver a "AAA-feel" gunplay experience that is both authentic and responsive. The core principles are:
+
+- **Hybrid Ballistics for the Best of Both Worlds:** We use a hybrid hitscan/projectile system to achieve the perfect balance of realism and playability.
+    - **Hitscan for Close-Quarters:** For close-to-medium range combat, we use a hitscan system to ensure that shots feel instant and responsive. This is crucial for a fast-paced shooter.
+    - **Projectiles for Long-Range:** For long-range engagements, we switch to a projectile-based system that simulates bullet drop and travel time. This adds a layer of skill and realism to sniping and long-range gunfights.
+- **Data-Driven and Extensible:** The entire framework is data-driven, with all weapon properties defined in configuration files. This makes it easy to add new weapons, balance existing ones, and even create entirely new weapon archetypes without having to modify the core code.
+- **Seamless Integration:** The weapon framework is designed to be seamlessly integrated with other core systems like the Gunsmith and Visual Recoil. Attachments from the Gunsmith can directly modify weapon properties in the framework, and the framework provides the necessary data to the Visual Recoil system to generate realistic feedback.
 
 ## Architecture
 

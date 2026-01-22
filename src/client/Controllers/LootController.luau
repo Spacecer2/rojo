@@ -1,141 +1,119 @@
---[[
-	LootController - Client-side loot visualization and interaction
-]]
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--!strict
+-- src/client/Controllers/LootController.luau
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 
-local Network = require(ReplicatedStorage.Framework.Network)
-local LootData = require(ReplicatedStorage.Constants.LootData)
+local LootData = require(ReplicatedStorage.Shared.Constants.LootData)
+local LootHUD = require(ReplicatedStorage.Shared.UI.LootHUD) -- Will create this next
 
-local LootController = {
-	VisualLoot = {}, -- [LootId] = { Model, Prompt }
-	VisualBoxes = {}, -- [BoxId] = { Model, Prompt }
-}
+local ClientToServerEvents = ReplicatedStorage:WaitForChild("Events"):WaitForChild("ClientToServer")
+local ServerToClientEvents = ReplicatedStorage:WaitForChild("Events"):WaitForChild("ServerToClient")
 
-function LootController:Init()
-	-- Listen for loot spawns
-	Network.OnClientEvent("LootSpawned", function(data)
-		self:RenderLoot(data)
-	end)
-	
-	Network.OnClientEvent("LootCollected", function(lootId)
-		self:RemoveLoot(lootId)
-	end)
+local requestPickupRemote = ClientToServerEvents:WaitForChild("RequestPickup")
+local lootPickedUpEvent = ServerToClientEvents:WaitForChild("LootPickedUp")
 
-	Network.OnClientEvent("BoxSpawned", function(data)
-		self:RenderBox(data)
-	end)
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-	Network.OnClientEvent("BoxOpened", function(boxId)
-		self:HandleBoxOpening(boxId)
-	end)
+local LootController = {}
+
+local currentNearestLoot: Model? = nil
+local activeLootItems: {Model} = {} -- Stores loot models that are currently active in the world
+
+local function updateNearestLoot()
+    local nearestDistSq = math.huge
+    local nearestLootCandidate: Model? = nil
+
+    local charPos = humanoidRootPart.Position
+    local interactDistance = LootData.InteractionDistance
+
+    -- Remove any destroyed loot items from activeLootItems
+    for i = #activeLootItems, 1, -1 do
+        if not activeLootItems[i] or not activeLootItems[i].Parent then
+            LootHUD.RemoveLootUI(activeLootItems[i])
+            table.remove(activeLootItems, i)
+        end
+    end
+
+    -- Find all loot models in the workspace (this might need optimization for very large maps)
+    -- For now, iterate through a known folder. Later, use spatial partitioning.
+    local serverLootFolder = Workspace:FindFirstChild("ServerLoot")
+    if serverLootFolder then
+        for _, lootModel in ipairs(serverLootFolder:GetChildren()) do
+            if lootModel:IsA("Model") and lootModel.PrimaryPart then
+                local distSq = (lootModel.PrimaryPart.Position - charPos).Magnitude^2
+                if distSq <= (LootData.UIVisibleDistance + 5)^2 then -- Within UI visible range + some buffer
+                    if not table.find(activeLootItems, lootModel) then
+                        table.insert(activeLootItems, lootModel)
+                        LootHUD.AddLootUI(lootModel) -- Add UI for newly discovered loot
+                    end
+                end
+                
+                if distSq < nearestDistSq and distSq <= interactDistance^2 then
+                    nearestDistSq = distSq
+                    nearestLootCandidate = lootModel
+                end
+            end
+        end
+    end
+
+    if nearestLootCandidate ~= currentNearestLoot then
+        if currentNearestLoot then
+            LootHUD.HidePickupPrompt(currentNearestLoot)
+        end
+        currentNearestLoot = nearestLootCandidate
+        if currentNearestLoot then
+            LootHUD.ShowPickupPrompt(currentNearestLoot)
+        end
+    end
 end
 
-function LootController:RenderBox(data)
-	local config = LootData.Containers[data.Type]
-	if not config then return end
-
-	local boxId = data.BoxId
-
-	local model = Instance.new("Part")
-	model.Name = "SupplyBox_" .. data.Type
-	model.Size = Vector3.new(4, 2, 2)
-	model.Position = data.Position
-	model.Anchored = true
-	model.Color = data.Type == "SupplyBox" and Color3.fromRGB(0, 100, 255) or Color3.fromRGB(255, 100, 0)
-	model.Material = Enum.Material.Metal
-	model.Parent = workspace:FindFirstChild("Loot") or workspace
-
-	local prompt = Instance.new("ProximityPrompt")
-	prompt.ObjectText = data.Type == "SupplyBox" and "Supply Box" or "Loot Crate"
-	prompt.ActionText = "Open"
-	prompt.HoldDuration = config.HoldTime
-	prompt.Parent = model
-
-	prompt.Triggered:Connect(function()
-		Network.FireServer("BoxInteraction", boxId)
-	end)
-
-	self.VisualBoxes[boxId] = {
-		Model = model,
-		Prompt = prompt
-	}
+local function onPickupAction(actionName: string, inputState: Enum.UserInputState, inputObject: InputObject)
+    if inputState == Enum.UserInputState.Begin then
+        if currentNearestLoot then
+            -- Request server to pick up the item
+            requestPickupRemote:FireServer(currentNearestLoot)
+            LootHUD.HidePickupPrompt(currentNearestLoot) -- Hide immediately, server will confirm
+            currentNearestLoot = nil -- Clear nearest, as we've requested pickup
+            return Enum.ContextActionResult.Sink -- Consume input
+        end
+    end
+    return Enum.ContextActionResult.Pass
 end
 
-function LootController:HandleBoxOpening(boxId)
-	local info = self.VisualBoxes[boxId]
-	if info then
-		-- Animation: Move lid or just fade out for now
-		if info.Prompt then info.Prompt:Destroy() end
-		
-		task.spawn(function()
-			for i = 0, 1, 0.1 do
-				info.Model.Transparency = i
-				task.wait(0.05)
-			end
-			info.Model:Destroy()
-			self.VisualBoxes[boxId] = nil
-		end)
-	end
+local function onLootPickedUp(pickedUpLootModel: Model)
+    -- Server confirmed pickup, remove UI and stop tracking
+    LootHUD.RemoveLootUI(pickedUpLootModel)
+    local index = table.find(activeLootItems, pickedUpLootModel)
+    if index then
+        table.remove(activeLootItems, index)
+    end
+    if currentNearestLoot == pickedUpLootModel then
+        currentNearestLoot = nil
+    end
 end
 
-function LootController:RenderLoot(data)
-	local itemData = LootData.Items[data.ItemKey]
-	if not itemData then return end
-	
-	local lootId = data.LootId
-	
-	-- Create visual representation
-	local model = Instance.new("Part")
-	model.Name = "VisualLoot_" .. data.ItemKey
-	model.Size = Vector3.new(1, 1, 1)
-	model.Position = data.Position
-	model.Anchored = true
-	model.CanCollide = false
-	model.Material = Enum.Material.Neon
-	
-	-- Color based on rarity
-	local rarity = itemData.Rarity or "Common"
-	local rarityData = LootData.Rarities[rarity]
-	model.Color = rarityData.Color
-	model.Parent = workspace:FindFirstChild("Loot") or workspace
-	
-	-- Interaction Prompt
-	local prompt = Instance.new("ProximityPrompt")
-	prompt.ObjectText = itemData.Name
-	prompt.ActionText = itemData.Type == "Currency" and ("Take $" .. itemData.Value) or "Pick Up"
-	prompt.HoldDuration = 0
-	prompt.MaxActivationDistance = 8
-	prompt.Parent = model
-	
-	prompt.Triggered:Connect(function()
-		Network.FireServer("LootInteraction", lootId)
-	end)
-	
-	self.VisualLoot[lootId] = {
-		Model = model,
-		Prompt = prompt
-	}
-	
-	-- Floating animation (optional)
-	task.spawn(function()
-		local startY = model.Position.Y
-		while model.Parent do
-			local t = tick()
-			model.Position = Vector3.new(data.Position.X, startY + math.sin(t * 2) * 0.2, data.Position.Z)
-			model.CFrame = model.CFrame * CFrame.Angles(0, 0.05, 0)
-			task.wait()
-		end
-	end)
-end
+function LootController.Init()
+    -- Bind pickup key
+    ContextActionService:BindAction(
+        "PickupLoot",
+        onPickupAction,
+        false, -- Don't create touch button
+        LootData.PickupKeybind
+    )
+    
+    -- Connect to server event for loot picked up
+    lootPickedUpEvent.OnClientEvent:Connect(onLootPickedUp)
 
-function LootController:RemoveLoot(lootId)
-	local info = self.VisualLoot[lootId]
-	if info then
-		if info.Model then info.Model:Destroy() end
-		self.VisualLoot[lootId] = nil
-	end
+    -- Update nearest loot every frame
+    RunService.Heartbeat:Connect(updateNearestLoot)
+
+    print("LootController Initialized.")
 end
 
 return LootController

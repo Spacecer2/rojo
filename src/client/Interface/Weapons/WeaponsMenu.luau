@@ -1,5 +1,11 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local UI = require(script.Parent.Parent.Parent.UI)
 local LoadoutData = require(script.Parent.LoadoutData)
+local GunsmithUI = require(script.Parent.Parent.Parent.UI.GunsmithUI)
+local Network = require(ReplicatedStorage.Framework.Network)
 
 local WeaponsMenu = {}
 
@@ -108,6 +114,64 @@ function WeaponsMenu.Create(parent)
 		xpFill.BackgroundColor3 = COLORS.AccentGold
 		xpFill.BorderSizePixel = 0
 		xpFill.Parent = xpBg
+		
+		-- Customize button (Gunsmith)
+		local customizeBtn = Instance.new("TextButton")
+		customizeBtn.Size = UDim2.new(0, 120, 0, 30)
+		customizeBtn.Position = UDim2.new(1, -135, 0, 10)
+		customizeBtn.BackgroundColor3 = COLORS.AccentBlue
+		customizeBtn.BorderSizePixel = 0
+		customizeBtn.Text = "CUSTOMIZE"
+		customizeBtn.TextColor3 = COLORS.TextMain
+		customizeBtn.Font = Enum.Font.GothamBold
+		customizeBtn.TextSize = 11
+		customizeBtn.Parent = slot
+		local uic = Instance.new("UICorner")
+		uic.Parent = customizeBtn
+		
+		UI.ApplyFeedback(customizeBtn, {HoverScale = 1.05})
+		
+		customizeBtn.MouseButton1Click:Connect(function()
+			-- Open Gunsmith UI
+			local gunsmithContainer = Instance.new("Frame")
+			gunsmithContainer.Size = UDim2.fromScale(1, 1)
+			gunsmithContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			gunsmithContainer.BackgroundTransparency = 0.3
+			gunsmithContainer.Parent = container
+			
+			local gunsmithContent = GunsmithUI.Create(
+				gunsmithContainer,
+				weaponData.Name,
+				weaponData.Attachments or {},
+				function(newAttachments)
+					-- Update weapon attachments
+					weaponData.Attachments = newAttachments
+					-- Close gunsmith
+					gunsmithContainer:Destroy()
+					-- Refresh editor to show updated attachments
+					refreshEditor(LoadoutData.GetLoadout(selectedId))
+				end
+			)
+			
+			-- Close button
+			local closeBtn = Instance.new("TextButton")
+			closeBtn.Size = UDim2.new(0, 40, 0, 40)
+			closeBtn.Position = UDim2.new(1, -50, 0, 10)
+			closeBtn.BackgroundColor3 = COLORS.Panel
+			closeBtn.BorderSizePixel = 0
+			closeBtn.Text = "X"
+			closeBtn.TextColor3 = COLORS.TextMain
+			closeBtn.Font = Enum.Font.GothamBold
+			closeBtn.TextSize = 20
+			closeBtn.Parent = gunsmithContainer
+			local uic = Instance.new("UICorner")
+			uic.CornerRadius = UDim.new(1, 0)
+			uic.Parent = closeBtn
+			
+			closeBtn.MouseButton1Click:Connect(function()
+				gunsmithContainer:Destroy()
+			end)
+		end)
 	end
 
 	local function refreshEditor(loadout)

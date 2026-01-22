@@ -1,7 +1,16 @@
 # Battle Pass System: 100-Tier Sector Map Progression
 
 ## Overview
-A seasonal progression system featuring 100 tiers of rewards organized as a "Sector Map" visual metaphor. Players earn tiers through gameplay, complete challenges, and unlock cosmetics, XP boosters, and in-game currency. Both free and premium tiers available.
+The Battle Pass is a seasonal progression system that serves as a cornerstone of our long-term player engagement and monetization strategy. It's a 100-tier system of rewards, organized as a "Sector Map," that players can progress through by earning XP in the game.
+
+## System Design & Vision
+
+The Battle Pass is designed to be more than just a simple reward track. It's a carefully crafted journey that takes the player through the seasonal theme, providing a sense of progression and a reason to come back every day. The design is guided by the following principles:
+
+- **A Seasonal Journey:** Each Battle Pass is tied to a specific seasonal theme, with all the rewards—from operator skins to weapon blueprints—being thematically linked. This creates a cohesive and immersive experience that evolves with each new season.
+- **Engagement, Not Grinding:** While the Battle Pass is designed to be a long-term goal, it's not intended to be a grind. The progression is paced to be achievable for the average player, and a variety of daily and weekly challenges provide accelerated progression for more dedicated players.
+- **Fair and Rewarding Monetization:** The Battle Pass offers a compelling value proposition for players who choose to purchase the premium track, but it's also designed to be fair to free-to-play players. The free track offers a generous selection of rewards, and all gameplay-affecting content is available to everyone.
+- **A "Play to Earn" Philosophy:** The Battle Pass is designed to be a "play to earn" system. The premium track includes enough in-game currency to purchase the next season's Battle Pass, meaning that a dedicated player can essentially play for free after their initial purchase.
 
 ## Battle Pass Structure
 

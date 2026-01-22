@@ -1,5 +1,16 @@
 # CameraController Critique & Refactoring Roadmap
 
+## Executive Summary
+
+This document provides a critical analysis of the `CameraController`'s "Stalker Drone" implementation. While the three-layer architecture is conceptually sound, there are several key areas where the implementation falls short of its ambitious goals.
+
+The main issues are:
+- **Architectural Leaks:** The separation of concerns between the three layers is not strictly enforced, leading to a hidden feedback loop that makes the system difficult to tune and debug.
+- **Overloaded and Fragile Systems:** The "Framing Quality" and "Motion Plan" layers are overloaded with responsibilities, making them complex and prone to emergent, unpredictable behavior.
+- **Pseudo-Physics:** The physical layer uses a number of "hacks" that break physical correctness and introduce hidden energy damping.
+
+The proposed refactoring steps are designed to address these issues by formalizing the system's architecture, simplifying the core components, and fixing the most egregious "hacks" in the physics layer. The goal is to create a camera system that is more robust, stable, and maintainable, while still delivering the "wow" factor of the original vision.
+
 ## 1. Architectural Claims vs Reality
 
 ### ✔ What works
