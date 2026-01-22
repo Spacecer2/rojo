@@ -16,6 +16,7 @@ local consoleFrame = nil
 local outputScroll = nil
 local inputField = nil
 local historyIndex = 0
+local consoleConnections = {}
 
 -- Color mapping
 local function getColorForLevel(level)
@@ -24,8 +25,10 @@ end
 
 -- Create console UI
 function DeveloperConsoleUI.Create(parent)
-	if screenGui then screenGui:Destroy() end
-	
+	if screenGui then
+		DeveloperConsoleUI.Close()
+	end
+
 	screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "DeveloperConsole"
 	screenGui.ResetOnSpawn = false
@@ -134,7 +137,7 @@ function DeveloperConsoleUI.Create(parent)
 	-- Output entry creation
 	local function createOutputEntry(entry)
 		local entryFrame = Instance.new("Frame")
-		entryFrame.Size = UDim2.new(1, -10, 0, 0) -- Height will be auto-sized
+		entryFrame.Size = UDim2.new(1, -10, 0, 20)
 		entryFrame.BackgroundTransparency = 1
 		entryFrame.Parent = outputScroll
 		
@@ -150,7 +153,7 @@ function DeveloperConsoleUI.Create(parent)
 		timeLabel.Parent = entryFrame
 		
 		local messageLabel = Instance.new("TextLabel")
-		messageLabel.Size = UDim2.new(1, -70, 0, 0) -- Auto-size height
+		messageLabel.Size = UDim2.new(1, -70, 0, 20)
 		messageLabel.Position = UDim2.fromOffset(65, 0)
 		messageLabel.BackgroundTransparency = 1
 		messageLabel.Text = entry.Message
@@ -171,19 +174,19 @@ function DeveloperConsoleUI.Create(parent)
 	end
 	
 	-- Listen for new output
-	DeveloperConsole.OutputChanged.Event:Connect(function(entry)
+	table.insert(consoleConnections, DeveloperConsole.OutputChanged.Event:Connect(function(entry)
 		createOutputEntry(entry)
-	end)
+	end))
 	
-	-- Listen for output cleared
-	DeveloperConsole.OutputCleared.Event:Connect(function()
+	-- Listen for output cleared (destroy output Frames only; UIListLayout is not a Frame)
+	table.insert(consoleConnections, DeveloperConsole.OutputCleared.Event:Connect(function()
 		for _, child in ipairs(outputScroll:GetChildren()) do
 			if child:IsA("Frame") then
 				child:Destroy()
 			end
 		end
 		updateCanvasSize()
-	end)
+	end))
 	
 	-- Load existing output
 	for _, entry in ipairs(DeveloperConsole.Output) do
@@ -191,18 +194,27 @@ function DeveloperConsoleUI.Create(parent)
 	end
 	
 	-- Input handling
-	inputField.FocusLost:Connect(function(enterPressed)
+	table.insert(consoleConnections, inputField.FocusLost:Connect(function(enterPressed)
 		if enterPressed then
 			local input = inputField.Text
 			inputField.Text = ""
 			historyIndex = 0
 			DeveloperConsole.ExecuteCommand(input)
 		end
-	end)
+	end))
 	
-	-- History navigation
-	UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if not DeveloperConsole.IsOpen or gameProcessed then return end
+	-- History navigation, Tab autocomplete, Escape to close
+	table.insert(consoleConnections, UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not DeveloperConsole.IsOpen then return end
+		
+		if input.KeyCode == Enum.KeyCode.Escape then
+			DeveloperConsoleUI.Close()
+			return
+		end
+		
+		-- Only handle these when input has focus (console open)
+		local focused = UserInputService:GetFocusedTextBox()
+		if focused ~= inputField then return end
 		
 		if input.KeyCode == Enum.KeyCode.Up then
 			if #DeveloperConsole.History > 0 then
@@ -218,8 +230,18 @@ function DeveloperConsoleUI.Create(parent)
 					inputField.Text = ""
 				end
 			end
+		elseif input.KeyCode == Enum.KeyCode.Tab then
+			local text = inputField.Text
+			local firstToken = text:match("^%s*(%S+)") or ""
+			if firstToken ~= "" and not text:match("%s") then
+				local suggestions = DeveloperConsole.GetAutocompleteSuggestions(firstToken)
+				if #suggestions > 0 then
+					inputField.Text = suggestions[1]
+					inputField.CursorPosition = #suggestions[1] + 1
+				end
+			end
 		end
-	end)
+	end))
 	
 	-- Focus input when console opens
 	task.wait()
@@ -230,14 +252,18 @@ end
 
 -- Close console
 function DeveloperConsoleUI.Close()
+	for _, c in ipairs(consoleConnections) do
+		if c and c.Disconnect then c:Disconnect() end
+	end
+	table.clear(consoleConnections)
 	if screenGui then
 		screenGui:Destroy()
 		screenGui = nil
-		consoleFrame = nil
-		outputScroll = nil
-		inputField = nil
-		DeveloperConsole.IsOpen = false
 	end
+	consoleFrame = nil
+	outputScroll = nil
+	inputField = nil
+	DeveloperConsole.IsOpen = false
 end
 
 -- Toggle console

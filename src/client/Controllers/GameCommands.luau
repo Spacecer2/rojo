@@ -333,7 +333,12 @@ function GameCommands.RegisterAll()
 			DeveloperConsole.Log("INFO", "  playerdata [get|set|reset] [field] [value] - Manage player data")
 			DeveloperConsole.Log("INFO", "  health [get|set|heal] [value] - Manage health")
 			DeveloperConsole.Log("INFO", "")
-			DeveloperConsole.Log("INFO", "Type 'help <command>' for detailed help")
+			DeveloperConsole.Log("INFO", "UTILITY:")
+			DeveloperConsole.Log("INFO", "  clear - Clear console output")
+			DeveloperConsole.Log("INFO", "  pos - Get player position")
+			DeveloperConsole.Log("INFO", "  tp <x> <y> <z> - Teleport player")
+			DeveloperConsole.Log("INFO", "")
+			DeveloperConsole.Log("INFO", "Type 'help <command>' for detailed help. Tab: autocomplete, Esc: close.")
 		else
 			local help = DeveloperConsole.GetCommandHelp(commandName)
 			if help then
