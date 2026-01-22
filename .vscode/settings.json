@@ -1,5 +1,6 @@
 {
 	"files.associations": {
 		"*.luau": "luau"
-	}
+	},
+	"luau-lsp.plugin.enabled": true
 }

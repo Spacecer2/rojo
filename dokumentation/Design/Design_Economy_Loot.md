@@ -1,6 +1,13 @@
 # System Design: Economy & Loot
 
-This document outlines the in-match economy (Cash) and the item distribution system.
+## System Design & Vision
+
+The economy and loot system are the twin engines that drive the core gameplay loop of our battle royale. They are designed to work in tandem to create a dynamic and strategic experience that is both rewarding and challenging. The design is guided by the following principles:
+
+- **A Two-Tiered Progression System:** The loot system provides immediate, short-term progression within a match. Finding a better weapon or a higher-tier armor plate provides an instant power boost. The economy system, on the other hand, provides a long-term strategic layer. Cash can be saved and invested in powerful, game-changing items like loadout drops and squad buybacks.
+- **Player Choice and Agency:** The interplay between loot and cash creates a constant stream of meaningful choices for the player. Do you risk a hot drop to get the best loot, or do you play it safe and focus on earning cash? Do you spend your cash on a UAV to get a tactical advantage, or do you save it for a loadout drop to get your preferred weapons? These choices are at the heart of the strategic experience.
+- **A Dynamic and Unpredictable World:** The loot is randomized at the start of each match, ensuring that no two games play out the same way. The location of high-tier loot is also randomized, creating dynamic "hot spots" that draw players in and create conflict.
+- **Rewarding Skill and Strategy:** While there is an element of luck in the loot system, it is designed to reward skill and strategy. Players who are able to efficiently loot, complete contracts, and win gunfights will be able to accumulate more cash and better gear, giving them a significant advantage in the late game.
 
 ## 💰 Economy (Cash)
 

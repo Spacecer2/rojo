@@ -1,7 +1,16 @@
 # The Gulag: 1v1 Arena & Capture-The-Flag Overtime
 
 ## Overview
-An elimination mechanic inspired by Warzone's Gulag system. When a player is first eliminated, they enter a 1v1 duel arena instead of being permanently eliminated. Winners rejoin their team; losers are permanently out. This provides a second chance while maintaining tension and fairness.
+The Gulag is a high-stakes, second-chance mechanic that fundamentally alters the traditional battle royale formula. Instead of permanent elimination on first death, players are given a chance to fight their way back into the match through a 1v1 duel.
+
+## System Design & Vision
+
+The Gulag is a cornerstone of the Warzone experience, designed to solve several key problems with the battle royale genre:
+
+- **Mitigating Early-Game RNG:** In a typical BR, an unlucky early-game encounter can lead to a frustratingly short match. The Gulag gives players a second chance, making the early game more forgiving and encouraging more aggressive plays.
+- **Maintaining Squad Integrity:** The Gulag keeps squads in the game longer. Even if a player is eliminated, their squad can still play with the hope of their teammate winning their Gulag and returning. This reduces the "lame duck" phase where a squad is at a disadvantage for the rest of the match.
+- **A Test of Pure Skill:** The Gulag is a 1v1 duel on a symmetrical map with a limited weapon pool. This strips away the variables of the main battle royale and boils it down to a pure test of gun skill. This creates a compelling and fair "redemption arc" for the player.
+- **Narrative & Tension:** The Gulag is a moment of high drama. A player's entire squad is spectating, their hopes riding on the outcome of a single duel. This creates a powerful narrative moment that is unique to each match.
 
 ## Gulag Mechanics
 

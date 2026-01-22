@@ -1,7 +1,16 @@
 # Economy & Buy Stations: In-Game Currency & Purchasing
 
 ## Overview
-A dynamic in-game economy where players earn Cash by looting, eliminating enemies, and completing contracts. Buy Stations scattered across the map allow purchasing tactical items, killstreaks, revives, and loadout drops. Economy management is key to team success.
+The in-game economy is a core system designed to drive strategic decision-making, reward proactive gameplay, and create dynamic shifts in power throughout a match. It's not merely a currency system, but a tool for pacing and balancing the battle royale experience.
+
+## System Design & Vision
+
+The economic model is built on a few key principles:
+
+- **Cash as a Catalyst for Conflict:** The pursuit of cash, whether through looting or hunting other players, is a primary driver of engagement. The most valuable items are expensive, forcing squads to take risks to build their finances.
+- **Shared Squad Economy:** By pooling cash at the squad level, we encourage communication and team-based strategic planning. The decision to spend a large amount of cash on a loadout drop versus saving it for revives becomes a critical team decision. This moves the focus from individual performance to squad-based success.
+- **Buy Stations as Strategic Hotspots:** Buy Stations are intentionally placed in high-traffic areas to create focal points for conflict. Their limited number and public visibility make them high-risk, high-reward locations where squads are forced to expose themselves to gain a significant advantage.
+- **Dynamic Pricing as a Balancing Mechanism:** The economy is designed to be dynamic, with prices adjusting based on the state of the match. This allows us to control the pacing of the game, making powerful items more accessible in the early game to accelerate the action, and more expensive in the late game to increase the stakes.
 
 ## Currency System
 
@@ -36,6 +45,8 @@ A dynamic in-game economy where players earn Cash by looting, eliminating enemie
    - 1000 total damage: +$300
 
 ### Cash Management
+The shared squad pool is a fundamental aspect of the economic design. It elevates the gameplay from a collection of individual efforts to a coordinated squad-based strategy.
+
 ```lua
 -- Squad cash pool
 local Squad = {

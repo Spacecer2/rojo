@@ -1,224 +1,276 @@
 --[[
-	WeaponController - Client-side weapon management
-	Handles input, local fire logic, effects, and communication with CombatService.
+	WeaponController - Client-side weapon handling
+	Manages weapon state, ammo, shooting, and reloading
+	Integrates with HUD for ammo display and reload progress
 ]]
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Network = require(ReplicatedStorage.Framework.Network)
-local WeaponData = require(ReplicatedStorage.Constants.WeaponData)
-local SharedState = require(script.Parent.Parent.SharedState)
-local TracerManager = require(script.Parent.Parent.Modules.TracerManager)
+local player = Players.LocalPlayer
+local character = nil
+local backpack = nil
+
+-- Initialize character reference
+local function initializeCharacter()
+	character = player.Character
+	if character then
+		backpack = player:WaitForChild("Backpack", 5)
+	end
+end
+
+-- Wait for character
+if player.Character then
+	initializeCharacter()
+end
+player.CharacterAdded:Connect(initializeCharacter)
 
 local WeaponController = {}
 
-local player = Players.LocalPlayer
-local camera = Workspace.CurrentCamera
-
--- Local State
-local currentWeaponName = "M4" -- Default for now
+-- Weapon state
+local currentWeapon = nil
 local currentAmmo = 0
+local currentReserve = 0
+local maxAmmo = 30
+local maxReserve = 90
 local isReloading = false
-local lastFireTime = 0
-local inputController = nil
+local reloadStartTime = 0
+local reloadDuration = 2.0
 
-local currentRecoil = Vector3.zero
-local recoilVelocity = Vector3.zero
-local recoilStiffness = 15
-local recoilDamping = 5
+-- Events
+local WeaponStateChanged = Instance.new("BindableEvent")
+WeaponController.WeaponStateChanged = WeaponStateChanged.Event
 
-function WeaponController:Init()
-	-- Wait for character and input controller
-	player.CharacterAdded:Connect(function(char)
-		self:SetupCharacter(char)
-	end)
+-- Get current equipped weapon
+local function getEquippedWeapon()
+	if not character then return nil end
 	
-	if player.Character then
-		self:SetupCharacter(player.Character)
+	-- Check if weapon is equipped (in character)
+	for _, tool in ipairs(character:GetChildren()) do
+		if tool:IsA("Tool") then
+			return tool
+		end
 	end
 	
-	-- Listen for effects from server
-	Network.OnClientEvent("WeaponFireEffect", function(data)
-		self:PlayFireEffect(data)
-	end)
-
-	RunService.RenderStepped:Connect(function(dt)
-		self:UpdateRecoil(dt)
-	end)
-end
-
-function WeaponController:UpdateRecoil(dt)
-	local force = -recoilStiffness * currentRecoil - recoilDamping * recoilVelocity
-	recoilVelocity = recoilVelocity + force * dt
-	currentRecoil = currentRecoil + recoilVelocity * dt
-	
-	if not player:GetAttribute("InMenu") and camera.CameraType == Enum.CameraType.Custom then
-		camera.CFrame = camera.CFrame * CFrame.Angles(math.rad(currentRecoil.X), math.rad(currentRecoil.Y), 0)
+	-- Check backpack for first weapon
+	if backpack then
+		for _, tool in ipairs(backpack:GetChildren()) do
+			if tool:IsA("Tool") then
+				return tool
+			end
+		end
 	end
-end
-
-function WeaponController:Start()
-	-- Initial state setup
-	local config = WeaponData.Weapons[currentWeaponName]
-	if config then
-		currentAmmo = config.BaseStats.MagazineSize
-	end
-
-	-- Connect to InputController from SharedState
-	task.spawn(function()
-		local controller = SharedState.WaitFor("InputController")
-		if controller then
-			self:SetInputController(controller)
-		end
-	end)
-end
-
-function WeaponController:SetupCharacter(char)
-	-- Try to get InputManager from character (MovementController creates it)
-	task.spawn(function()
-		local inputManagerModule = char:WaitForChild("InputManager", 10)
-		if inputManagerModule then
-			-- In this architecture, InputManager is a module that is required by MovementController
-			-- We need to wait for MovementController to initialize it or get the instance
-			-- For now, let's assume we can access it via a signal or global
-			print("[WeaponController] InputManager module found")
-		end
-		
-		-- Alternative: WeaponController creates its own input listeners or we use a central InputController
-		-- Let's check MovementController again to see how it exposes InputManager
-	end)
-end
-
-function WeaponController:SetInputController(controller)
-	inputController = controller
 	
-	inputController.FireToggled.Event:Connect(function(isPressed)
-		if isPressed then
-			self:StartFiring()
-		else
-			self:StopFiring()
-		end
-	end)
-	
-	inputController.ReloadRequest.Event:Connect(function()
-		self:Reload()
-	end)
+	return nil
 end
 
-function WeaponController:StartFiring()
-	if isReloading then return end
-	
-	self.IsFiring = true
-	
-	-- Rapid fire loop
-	task.spawn(function()
-		while self.IsFiring do
-			self:Fire()
-			
-			local config = WeaponData.Weapons[currentWeaponName]
-			if not config then break end
-			
-			local fireDelay = 60 / config.BaseStats.FireRate
-			task.wait(fireDelay)
-			
-			-- Semi-auto check (if we implement it)
-		end
-	end)
-end
-
-function WeaponController:StopFiring()
-	self.IsFiring = false
-end
-
-function WeaponController:Fire()
-	if currentAmmo <= 0 then
-		self:Reload()
+-- Update weapon stats from tool attributes
+local function updateWeaponStats(tool)
+	if not tool then
+		currentWeapon = nil
+		currentAmmo = 0
+		currentReserve = 0
+		maxAmmo = 30
 		return
 	end
 	
-	local now = tick()
-	local config = WeaponData.Weapons[currentWeaponName]
-	local fireDelay = 60 / config.BaseStats.FireRate
+	currentWeapon = tool
+	local weaponName = tool:GetAttribute("WeaponName") or tool.Name
+	local magazineSize = tool:GetAttribute("MagazineSize") or 30
+	local reloadTime = tool:GetAttribute("ReloadTime") or 2.0
 	
-	if (now - lastFireTime) < fireDelay then return end
-	lastFireTime = now
-	currentAmmo -= 1
+	maxAmmo = magazineSize
+	reloadDuration = reloadTime
 	
-	-- Calculate origin and direction
-	local origin = camera.CFrame.Position
-	local direction = camera.CFrame.LookVector
+	-- Read ammo from attributes if set (for dev commands)
+	local attrAmmo = tool:GetAttribute("CurrentAmmo")
+	local attrReserve = tool:GetAttribute("ReserveAmmo")
 	
-	-- Send to server
-	Network.FireServer("FireWeapon", {
-		WeaponName = currentWeaponName,
-		Origin = origin,
-		Direction = direction
-	})
+	if attrAmmo ~= nil then
+		currentAmmo = attrAmmo
+		tool:SetAttribute("CurrentAmmo", nil) -- Clear after reading
+	end
+	if attrReserve ~= nil then
+		currentReserve = attrReserve
+		tool:SetAttribute("ReserveAmmo", nil) -- Clear after reading
+	end
 	
-	-- Local Effects (Recoil, Sound, Muzzle Flash, Tracers)
-	self:ApplyLocalRecoil(config)
-	self:PlayLocalFireSound(config)
+	-- Initialize ammo if not set
+	if currentAmmo == 0 and attrAmmo == nil then
+		currentAmmo = maxAmmo
+		currentReserve = maxReserve
+	end
 	
-	self:PlayFireEffect({
-		Player = player,
-		WeaponName = currentWeaponName,
-		Origin = origin,
-		Direction = direction,
-		IsProjectile = (config.BallisticType == "Projectile")
+	WeaponStateChanged:Fire({
+		Weapon = weaponName,
+		Ammo = currentAmmo,
+		Reserve = currentReserve,
+		MaxAmmo = maxAmmo,
+		MaxReserve = maxReserve,
+		IsReloading = isReloading
 	})
 end
 
-function WeaponController:Reload()
-	if isReloading then return end
-	local config = WeaponData.Weapons[currentWeaponName]
-	if not config or currentAmmo >= config.BaseStats.MagazineSize then return end
+-- Fire weapon
+function WeaponController.Fire()
+	if not currentWeapon or isReloading then return false end
+	if currentAmmo <= 0 then
+		-- Auto-reload if empty
+		WeaponController.Reload()
+		return false
+	end
+	
+	currentAmmo = currentAmmo - 1
+	
+	WeaponStateChanged:Fire({
+		Weapon = currentWeapon:GetAttribute("WeaponName") or currentWeapon.Name,
+		Ammo = currentAmmo,
+		Reserve = currentReserve,
+		MaxAmmo = maxAmmo,
+		MaxReserve = maxReserve,
+		IsReloading = isReloading
+	})
+	
+	return true
+end
+
+-- Reload weapon
+function WeaponController.Reload()
+	if not currentWeapon or isReloading then return false end
+	if currentReserve <= 0 or currentAmmo >= maxAmmo then return false end
 	
 	isReloading = true
-	print("Reloading...")
+	reloadStartTime = tick()
 	
-	task.wait(config.BaseStats.ReloadTime)
+	WeaponStateChanged:Fire({
+		Weapon = currentWeapon:GetAttribute("WeaponName") or currentWeapon.Name,
+		Ammo = currentAmmo,
+		Reserve = currentReserve,
+		MaxAmmo = maxAmmo,
+		MaxReserve = maxReserve,
+		IsReloading = isReloading,
+		ReloadProgress = 0
+	})
 	
-	currentAmmo = config.BaseStats.MagazineSize
-	isReloading = false
-	print("Reloaded!")
-end
-
-function WeaponController:ApplyLocalRecoil(config)
-	local recoilConfig = config.BaseStats.Recoil
-	local vRecoil = recoilConfig.Vertical
-	local hRecoil = (math.random() - 0.5) * 2 * recoilConfig.Horizontal
-	
-	recoilVelocity = recoilVelocity + Vector3.new(vRecoil, hRecoil, 0)
-end
-
-function WeaponController:PlayLocalFireSound(config)
-	-- TODO: Play sound
-end
-
-function WeaponController:PlayFireEffect(data)
-	-- data: { Player, WeaponName, Origin, Direction, Hits, IsProjectile }
-	local config = WeaponData.Weapons[data.WeaponName]
-	if not config then return end
-
-	if data.IsProjectile then
-		local projStats = config.ProjectileStats or { Velocity = 1000, GravityMultiplier = 1 }
-		local velocity = data.Direction.Unit * projStats.Velocity
-		local gravity = Vector3.new(0, -workspace.Gravity, 0) * (projStats.GravityMultiplier or 1)
+	-- Simulate reload
+	task.spawn(function()
+		task.wait(reloadDuration)
 		
-		TracerManager.CreateProjectileTracer(data.Origin, velocity, gravity, config)
-	else
-		-- For hitscan, if hits are provided, use the first hit position, otherwise use max range
-		local hitPos = data.Origin + (data.Direction.Unit * (config.BaseStats.Range.Max or 500))
-		if data.Hits and #data.Hits > 0 then
-			hitPos = data.Hits[1].Position
-			TracerManager.CreateImpact(hitPos, Vector3.new(0, 1, 0), data.Hits[1].Material)
+		if currentWeapon then
+			local ammoNeeded = maxAmmo - currentAmmo
+			local ammoToAdd = math.min(ammoNeeded, currentReserve)
+			
+			currentAmmo = currentAmmo + ammoToAdd
+			currentReserve = currentReserve - ammoToAdd
+			
+			isReloading = false
+			
+			WeaponStateChanged:Fire({
+				Weapon = currentWeapon:GetAttribute("WeaponName") or currentWeapon.Name,
+				Ammo = currentAmmo,
+				Reserve = currentReserve,
+				MaxAmmo = maxAmmo,
+				MaxReserve = maxReserve,
+				IsReloading = isReloading
+			})
+		end
+	end)
+	
+	return true
+end
+
+-- Get current weapon state
+function WeaponController.GetWeaponState()
+	return {
+		Weapon = currentWeapon and (currentWeapon:GetAttribute("WeaponName") or currentWeapon.Name) or nil,
+		Ammo = currentAmmo,
+		Reserve = currentReserve,
+		MaxAmmo = maxAmmo,
+		MaxReserve = maxReserve,
+		IsReloading = isReloading,
+		ReloadProgress = isReloading and math.min(1, (tick() - reloadStartTime) / reloadDuration) or 0
+	}
+end
+
+-- Initialize
+function WeaponController.Init()
+	-- Monitor weapon changes
+	local function setupWeaponMonitoring()
+		if not character then return end
+		
+		character.ChildAdded:Connect(function(child)
+			if child:IsA("Tool") then
+				updateWeaponStats(child)
+			end
+		end)
+		
+		character.ChildRemoved:Connect(function(child)
+			if child:IsA("Tool") and child == currentWeapon then
+				updateWeaponStats(nil)
+			end
+		end)
+		
+		if backpack then
+			backpack.ChildAdded:Connect(function(child)
+				if child:IsA("Tool") and not currentWeapon then
+					updateWeaponStats(child)
+				end
+			end)
 		end
 		
-		TracerManager.CreateHitscanTracer(data.Origin, hitPos)
+		-- Initial weapon check
+		task.spawn(function()
+			task.wait(1) -- Wait for character to fully load
+			local weapon = getEquippedWeapon()
+			if weapon then
+				updateWeaponStats(weapon)
+			end
+		end)
 	end
+	
+	-- Setup for existing character or wait for spawn
+	if character then
+		setupWeaponMonitoring()
+	end
+	player.CharacterAdded:Connect(function()
+		initializeCharacter()
+		setupWeaponMonitoring()
+	end)
+	
+	-- Update reload progress and check for attribute changes
+	RunService.Heartbeat:Connect(function()
+		-- Check for attribute changes (from dev commands)
+		if currentWeapon then
+			local attrAmmo = currentWeapon:GetAttribute("CurrentAmmo")
+			local attrReserve = currentWeapon:GetAttribute("ReserveAmmo")
+			
+			if attrAmmo ~= nil then
+				currentAmmo = attrAmmo
+				currentWeapon:SetAttribute("CurrentAmmo", nil)
+			end
+			if attrReserve ~= nil then
+				currentReserve = attrReserve
+				currentWeapon:SetAttribute("ReserveAmmo", nil)
+			end
+		end
+		
+		if isReloading and currentWeapon then
+			local progress = math.min(1, (tick() - reloadStartTime) / reloadDuration)
+			WeaponStateChanged:Fire({
+				Weapon = currentWeapon:GetAttribute("WeaponName") or currentWeapon.Name,
+				Ammo = currentAmmo,
+				Reserve = currentReserve,
+				MaxAmmo = maxAmmo,
+				MaxReserve = maxReserve,
+				IsReloading = isReloading,
+				ReloadProgress = progress
+			})
+		end
+	end)
+	
+	print("[WeaponController] Initialized")
 end
 
 return WeaponController

@@ -1,7 +1,16 @@
 # Contracts System: Bounty, Recon & Scavenger Missions
 
 ## Overview
-In-match contracts provide secondary objectives that reward cash, XP, and strategic advantages. Three contract types offer varying risk-reward profiles and playstyles: Bounty (aggressive hunting), Recon (tactical intelligence), and Scavenger (exploration).
+Contracts are a core gameplay mechanic designed to create dynamic, player-driven scenarios and objectives within a single match. They serve as a catalyst for conflict, a source of income, and a tool for strategic decision-making, breaking up the traditional battle royale loop of "loot, survive, repeat."
+
+## System Design & Vision
+
+The contract system is designed with the following principles in mind:
+
+- **Player-Driven Narrative:** Contracts generate micro-narratives within each match. A "Bounty" contract creates a tense hunter-hunted scenario, while a "Recon" contract tells a story of tactical positioning and foresight. This makes each match feel unique and less predictable.
+- **Risk vs. Reward:** Each contract type is designed with a clear risk-reward profile. Bounties are high-risk, high-reward, pushing squads into direct conflict. Recons are lower risk, offering a strategic advantage. Scavenger contracts are a balance of the two, offering valuable loot at the cost of exposing your squad. This allows squads to choose their level of engagement.
+- **Economic & Strategic Integration:** Contracts are deeply integrated with the in-game economy. They are a primary source of cash, which can then be used at Buy Stations to gain a significant advantage. This creates a feedback loop where completing contracts directly translates to increased power.
+- **Information Warfare:** Contracts are a key source of information. A Bounty reveals the general location of an enemy squad, while a Recon contract reveals future circle locations. This adds a layer of information warfare to the game, where knowledge is as valuable as firepower.
 
 ## Contract Mechanics
 

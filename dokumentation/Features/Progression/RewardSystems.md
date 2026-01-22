@@ -1,7 +1,16 @@
 # Reward Systems: Supply Drops, Loot Lottery & Pity Mechanics
 
 ## Overview
-A player retention system providing cosmetic and functional rewards through probabilistic "supply drops" (loot boxes) with guaranteed pity mechanics. Players earn supply drops through gameplay, with purchasable options for speed. All rewards cosmetic/convenience (no pay-to-win).
+The reward system is a critical component of our long-term player engagement and monetization strategy. It's a system for distributing cosmetic rewards through probabilistic "supply drops," with a strong emphasis on fairness, transparency, and player respect.
+
+## System Design & Vision
+
+Our reward system is designed to be a fair and engaging monetization strategy that avoids the "pay-to-win" pitfalls of many other free-to-play games. The core principles are:
+
+- **Cosmetic-Only Rewards:** All rewards obtainable through supply drops are purely cosmetic and have no impact on gameplay. This is a hard line that we will not cross. Our goal is to create a fun and competitive game, not a game where players can buy an advantage.
+- **Transparency and Fairness:** We are committed to being transparent with our players about the probabilities of our supply drops. All drop rates are clearly displayed, and a "pity mechanic" ensures that players will always receive a high-rarity item after a certain number of opens. This builds trust with our players and ensures that they feel like they are getting a fair value for their time and money.
+- **A "Feel-Good" Experience:** The opening of a supply drop is designed to be a moment of excitement and anticipation. The animation, sound design, and visual effects are all carefully crafted to create a "feel-good" experience, even if the player doesn't receive the exact item they were hoping for.
+- **A Multi-Faceted Approach:** We don't rely on a single monetization method. The reward system is just one part of a multi-faceted approach that also includes a Battle Pass, cosmetic bundles, and other direct-purchase options. This gives players a choice in how they want to support the game and acquire cosmetic items.
 
 ## Supply Drop System
 

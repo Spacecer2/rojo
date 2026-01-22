@@ -6,6 +6,21 @@
       "$path": "src/shared",
       "Remotes": {
         "$className": "Folder"
+      },
+      "Events": {
+        "$className": "Folder",
+        "ClientToServer": {
+          "$className": "Folder",
+          "RequestPickup": {
+            "$className": "RemoteEvent"
+          }
+        },
+        "ServerToClient": {
+          "$className": "Folder",
+          "LootPickedUp": {
+            "$className": "RemoteEvent"
+          }
+        }
       }
     },
     "ReplicatedFirst": {

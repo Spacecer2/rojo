@@ -1,7 +1,16 @@
 # The Gas System: Circular Hazard with Visual Distortion
 
 ## Overview
-A dynamic, constantly-contracting circular hazard that forces players together and creates tension. The gas deals escalating damage, displays visual distortion, and generates strategic decision points around circle prediction and rotations.
+The gas system is the primary mechanism for controlling the pace and flow of a battle royale match. It's a constantly-contracting circular hazard that forces players into an ever-shrinking playable area, creating tension, strategic decision points, and a climactic endgame.
+
+## System Design & Vision
+
+The gas system is designed to be more than just a simple hazard. It's a core element of the Warzone experience, and its design is guided by the following principles:
+
+- **Pacing and Tension:** The primary function of the gas is to control the pacing of the match. The early-game circles are slow and forgiving, allowing players time to loot and position themselves. As the game progresses, the circles become faster and more damaging, ratcheting up the tension and forcing squads into conflict.
+- **Forced Engagement:** By constantly reducing the playable area, the gas system ensures that players are always on the move and cannot simply camp in one location for the entire match. This forces squads to interact with each other, leading to more dynamic and exciting gameplay.
+- **Strategic Depth:** The shrinking circle creates a wealth of strategic options. Players must constantly make decisions about when and how to rotate to the next safe zone. Do you move early and risk encountering other rotating squads, or do you play the edge of the gas and pick off players who are forced to move?
+- **Narrative Arc:** The gas system gives each match a clear narrative arc. The beginning is a tense scramble for resources. The mid-game is a strategic game of cat and mouse as squads vie for position. The endgame is a chaotic and intense battle for survival in a tiny, final circle.
 
 ## Gas Circle Mechanics
 

@@ -1,7 +1,19 @@
 # Visual Recoil System: Camera Kick & Weapon Vibration
 
 ## Overview
-A multi-layered visual recoil system that combines camera kickback, weapon sway, and controller vibration to provide tactile feedback during sustained fire. Recoil is manageable through player skill (tracking/compensation) and attachment tuning.
+The visual recoil system is a critical component of our "AAA-feel" gunplay. It's a multi-layered system that provides visceral, tactile feedback to the player, making every shot feel impactful and rewarding. This is not just a cosmetic effect; it's a core part of the skill-based combat loop.
+
+## System Design & Vision
+
+The design of the visual recoil system is guided by a few key principles:
+
+- **Feedback, Not Just Recoil:** The primary goal of the system is to provide clear and consistent feedback to the player. The camera kick, weapon sway, and haptic feedback all work together to communicate information about the weapon's state, such as its rate of fire, stability, and current recoil level.
+- **Skill-Based and Predictable:** While the recoil is designed to be challenging, it is also designed to be predictable and controllable. Skilled players will be able to learn the recoil patterns of their favorite weapons and compensate for them, creating a high skill ceiling that rewards practice and mastery.
+- **A Multi-Layered Approach:** To achieve a truly visceral and immersive experience, we use a multi-layered approach to recoil:
+    - **Camera Kick:** The foundation of the system, providing the primary sense of impact and force.
+    - **Weapon Sway:** A procedural animation layer that adds a sense of weight and momentum to the weapon.
+    - **Haptic Feedback:** Controller vibration that provides a direct, tactile connection to the weapon's recoil.
+- **Deeply Integrated with Gunsmith:** The visual recoil system is deeply integrated with the Gunsmith system. Every attachment has a tangible effect on the weapon's recoil, allowing players to fine-tune the feel of their weapon to their personal preference.
 
 ## Architecture
 

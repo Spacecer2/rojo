@@ -1,273 +1,279 @@
 # 📚 Documentation Index
 
-Complete navigation guide for all project documentation.
+A comprehensive and visionary navigation guide for all project documentation, emphasizing system thinking and architectural intent.
 
 ---
 
-## 🎯 Quick Start
+## 🎯 Quick Start: Navigating the Warzone Project Documentation
 
-**New to the project?** Start here:
-1. Read [README.md](README.md) - Project overview & vision
-2. Review [Roadmap.md](Roadmap.md) - Project timeline
-3. Check [Features/README.md](Features/README.md) - Feature documentation
+**Embarking on the project?** Begin your journey here for a holistic understanding:
+1.  **Project Vision**: Dive into [Vision.md](Vision.md) to grasp the core philosophy, the "Warzone Feel," and the technical principles guiding our development.
+2.  **Strategic Roadmap**: Review [Roadmap.md](Roadmap.md) for a detailed, long-term timeline of our development phases and objectives.
+3.  **Feature Overview**: Explore [Features/README.md](Features/README.md) for a high-level overview and interaction flows of all implemented gameplay features.
 
-**Implementing a feature?** 
-1. Find your feature in [Features/](Features/)
-2. Check dependencies in [Features/INDEX.md](Features/INDEX.md)
-3. Review [Components/](Components/) for implementation details
+**For Developers & Engineers**:
+1.  **Feature Deep Dive**: Locate your specific feature in [Features/](Features/) for detailed architecture, implementation, and testing checklists.
+2.  **System Dependencies**: Consult [Features/INDEX.md](Features/INDEX.md) to understand cross-system dependencies and integration points.
+3.  **Component Architecture**: Reference [Components/](Components/) for the detailed design and implementation of individual game systems.
 
-**Looking for something specific?**
-- Use the folders below to navigate to the right category
+**For Project Managers & Stakeholders**:
+1.  **Completion Report**: Review [Features/COMPLETION_REPORT.md](Features/COMPLETION_REPORT.md) for a comprehensive status update on feature documentation.
+2.  **Roadmap & Vision**: Regularly check [Roadmap.md](Roadmap.md) and [Vision.md](Vision.md) to align with strategic goals and progress.
 
 ---
 
-## 📂 Documentation Folders
+## 📂 Documentation Categories: An Architectural Overview
+
+This section categorizes our documentation, providing a logical pathway through the project's various layers, from high-level design to granular implementation details.
 
 ### 🎮 **Features/** - Main Reference Documentation
+**Status:** ✅ Complete & Vision-Aligned
+
+The authoritative source for all gameplay features, each framed with its "System Design & Vision."
+**Entry Points:**
+-   [Features/README.md](Features/README.md) - Master index for all features, interaction flows, and usage guide.
+-   [Features/INDEX.md](Features/INDEX.md) - Comprehensive cross-references, dependency graph, and terminology standards.
+-   [Features/COMPLETION_REPORT.md](Features/COMPLETION_REPORT.md) - Detailed report on feature documentation completion and refactoring.
+
+**Sub-Categories (Organized by Core Gameplay Pillars):**
+-   [Features/Combat/](Features/Combat/) - Detailed technical specifications for weapon systems, gunplay mechanics, and visual feedback (3 features).
+-   [Features/BattleRoyale/](Features/BattleRoyale/) - Core Battle Royale mechanics, including match lifecycle, gas system, economy, contracts, and a comprehensive looting system (6 features).
+-   [Features/Progression/](Features/Progression/) - Player retention systems: Battle Pass and sophisticated reward mechanisms (2 features).
+-   [Features/Systems/](Features/Systems/) - Technical documentation for critical game systems like UI and settings management (1 feature).
+
+---
+
+### 🔧 **Components/** - Foundational System Implementations
 **Status:** ✅ Complete & Verified
 
-The authoritative source for all gameplay features. 12 features across 4 categories.
+Technical documentation for individual, reusable game components and low-level systems. Each component's design philosophy is detailed.
 
-**Entry Points:**
-- [Features/README.md](Features/README.md) - Feature directory & interaction flows
-- [Features/INDEX.md](Features/INDEX.md) - Cross-references & dependency graph
-- [Features/COMPLETION_REPORT.md](Features/COMPLETION_REPORT.md) - Project completion status
+**Core Component Files:**
+-   [Components/Component_CameraController.md](Components/Component_CameraController.md) - Architecture of the dynamic camera system.
+-   [Components/Component_CameraController_Critique.md](Components/Component_CameraController_Critique.md) - Critical analysis and lessons learned from camera development.
+-   [Components/Component_Gunsmith.md](Components/Component_Gunsmith.md) - Technical design of the modular weapon customization system.
+-   [Components/Component_InputManager.md](Components/Component_InputManager.md) - Design of the input normalization and handling system.
+-   [Components/Component_MenuController.md](Components/Component_MenuController.md) - Logic and architecture for dynamic menu navigation.
+-   [Components/Component_MovementController.md](Components/Component_MovementController.md) - Technical implementation of physics-driven character movement.
+-   [Components/Component_ProceduralAnimator.md](Components/Component_ProceduralAnimator.md) - Architecture for dynamic, physics-based character and weapon animation.
+-   [Components/Component_StateMachine.md](Components/Component_StateMachine.md) - Design of the character's central state management system.
 
-**Categories:**
-- [Features/Combat/](Features/Combat/) - Weapon systems (3 features)
-- [Features/BattleRoyale/](Features/BattleRoyale/) - Core BR mechanics (6 features)
-- [Features/Progression/](Features/Progression/) - Player retention (2 features)
-- [Features/Systems/](Features/Systems/) - UI & settings (1 feature)
-
----
-
-### 🔧 **Components/** - System Implementation
-**Status:** 📋 Reference Materials
-
-Technical documentation for individual game components and systems.
-
-**Files:**
-- CameraController.md - Drone camera architecture
-- StateMachine.md - Character state management
-- InputManager.md - Input normalization
-- MovementController.md - Physics-driven movement
-- ProceduralAnimator.md - Animation system
-- MenuController.md - Menu UI logic
-- Gunsmith.md - Weapon customization
-
-**See Also:** [Components/README.md](Components/README.md)
+**See Also:** [Components/README.md](Components/README.md) - Overview of the component-based architecture.
 
 ---
 
-### 📋 **Design/** - High-Level Specifications
-**Status:** 📋 Reference Materials
+### 📋 **Design/** - Strategic Game Design Documents
+**Status:** ✅ Complete & Verified
 
-System-level design documents and mechanics specifications.
+High-level design specifications, game design pillars, and visionary documents outlining the "why" behind key gameplay loops and systems.
 
-**Files:**
-- Design_Contracts.md - Mission objectives
-- Design_Economy_Loot.md - Economy & distribution
-- Design_GameLoop.md - Match flow
-- Design_Rewards_BattlePass.md - Progression systems
-- Design_Settings.md - Settings options
+**Key Design Files:**
+-   [Design/Design_Contracts.md](Design/Design_Contracts.md) - Vision and mechanics for in-game mission objectives.
+-   [Design/Design_Economy_Loot.md](Design/Design_Economy_Loot.md) - Economic principles and loot distribution strategy.
+-   [Design/Design_GameLoop.md](Design/Design_GameLoop.md) - The overarching player journey and core gameplay loop.
+-   [Design/Design_Rewards_BattlePass.md](Design/Design_Rewards_BattlePass.md) - Strategic design of progression and reward systems.
+-   [Design/Design_Settings.md](Design/Design_Settings.md) - Principles for user-configurable game settings.
 
-**See Also:** [Design/README.md](Design/README.md)
-
----
-
-### 🎨 **Assets/** - Game Content Inventory
-**Status:** 📋 Reference Materials
-
-Asset documentation including weapons, operators, and cosmetics.
-
-**Files:**
-- Assets_Weapons.md - Weapon catalog
-- Assets_Operators.md - Character cosmetics
-- Assets_Equipment.md - Equipment items
-- Assets_Killstreaks.md - Killstreak rewards
-- Assets_Ranks.md - Rank progression
-- Gamepasses.md - Cosmetic purchases
-
-**See Also:** [Assets/README.md](Assets/README.md)
+**See Also:** [Design/README.md](Design/README.md) - Game design pillars and overarching design philosophy.
 
 ---
 
-### 📖 **Guides/** - How-To & Troubleshooting
-**Status:** 📋 Reference Materials
+### 🎨 **Assets/** - Game Content Specifications
+**Status:** ✅ Complete & Verified
 
-Implementation guides, tuning documentation, and troubleshooting.
+Detailed specifications for all in-game assets, framed within their strategic purpose and impact on player experience and monetization.
 
-**Files:**
-- DRONE_TUNING_GUIDE.md - Camera tuning parameters
-- drone.md - Drone system overview
-- errors.md - Error handling & solutions
-- Armsdealer.md - Weapon dealer system
+**Asset Specification Files:**
+-   [Assets/Assets_Equipment.md](Assets/Assets_Equipment.md) - Tactical and lethal equipment specifications and their tactical roles.
+-   [Assets/Assets_Killstreaks.md](Assets/Assets_Killstreaks.md) - Design and impact of killstreak rewards on gameplay.
+-   [Assets/Assets_Operators.md](Assets/Assets_Operators.md) - Player character specifications, including skins and customization.
+-   [Assets/Assets_Ranks.md](Assets/Assets_Ranks.md) - Player progression, leveling, and prestige system details.
+-   [Assets/Assets_Weapons.md](Assets/Assets_Weapons.md) - Comprehensive weapon catalog and modular attachment system (Gunsmith).
+-   [Assets/Gamepasses.md](Assets/Gamepasses.md) - Monetization strategy and gamepass specifications.
 
-**See Also:** [Guides/README.md](Guides/README.md)
+**See Also:** [Assets/README.md](Assets/README.md) - Overview of asset management and content pipeline.
+
+---
+
+### 📖 **Guides/** - Technical Implementation & Troubleshooting
+**Status:** ✅ Complete & Verified
+
+Practical implementation guides, technical tuning documentation, and best practices for debugging and error resolution.
+
+**Technical Guides:**
+-   [Guides/Armsdealer.md](Guides/Armsdealer.md) - UI/UX design and implementation for the Loadout customization screen.
+-   [Guides/DRONE_TUNING_GUIDE.md](Guides/DRONE_TUNING_GUIDE.md) - Advanced tuning parameters for the cinematic drone camera.
+-   [Guides/DeveloperConsole_Implementation.md](Guides/DeveloperConsole_Implementation.md) - Guide to our in-game developer console, a force multiplier for productivity.
+-   [Guides/drone.md](Guides/drone.md) - Architectural overview of the intelligent drone camera system.
+-   [Guides/errors.md](Guides/errors.md) - Comprehensive error handling philosophy and troubleshooting guide.
+
+**See Also:** [Guides/README.md](Guides/README.md) - Purpose and scope of the technical guides.
 
 ---
 
 ### 📦 **Archive/** - Legacy Documentation
 **Status:** 🔄 Historical Reference Only
 
-Superseded files and legacy documentation for reference purposes.
+Superseded and legacy documentation, retained for historical context or deprecated system references.
+**Note:** For current and authoritative documentation, always refer to the actively maintained folders above.
 
-**What's Here:**
-- Old Feature_*.md files (replaced by [Features/](Features/))
-- Legacy system designs
-- Deprecated documentation
-
-**Note:** For current documentation, reference the organized folders above.
-
-**See Also:** [Archive/README.md](Archive/README.md)
+**See Also:** [Archive/README.md](Archive/README.md) - Explanation of the archive's purpose.
 
 ---
 
-### 📁 **RobloxDocs/** - Platform Reference
-**Status:** 📋 External Reference
+### 📁 **RobloxDocs/** - Platform Reference & Best Practices
+**Status:** 📋 External Reference & Internal Best Practices
 
-Roblox platform documentation and API references.
+Curated references to Roblox platform documentation and internally developed best practices for Luau, networking, and performance.
 
----
-
-## 🌟 Key Documents
-
-| Document | Purpose | Location |
-|----------|---------|----------|
-| **README.md** | Project vision & overview | Root |
-| **Roadmap.md** | Project timeline & phases | Root |
-| **Vision.md** | Design philosophy & goals | Root |
-| **FEATURES_READY.md** | Feature documentation completion | Root |
-| **Features/README.md** | Feature directory & navigation | Features/ |
-| **Features/INDEX.md** | Cross-references & dependencies | Features/ |
+**Key Files:**
+-   [RobloxDocs/EngineReference.md](RobloxDocs/EngineReference.md) - Key Roblox engine APIs and their optimal usage.
+-   [RobloxDocs/INDEX.md](RobloxDocs/INDEX.md) - Internal index for Roblox-specific documentation.
+-   [RobloxDocs/Luau_Language.md](RobloxDocs/Luau_Language.md) - Best practices and advanced patterns for Luau scripting.
+-   [RobloxDocs/Networking_Guide.md](RobloxDocs/Networking_Guide.md) - Deep dive into secure and efficient Roblox networking strategies.
+-   [RobloxDocs/Performance_Guide.md](RobloxDocs/Performance_Guide.md) - Comprehensive guide to optimizing game performance on Roblox.
+-   [RobloxDocs/Physics_Constraints.md](RobloxDocs/Physics_Constraints.md) - Advanced usage of Roblox physics constraints for realistic interactions.
+-   [RobloxDocs/README.md](RobloxDocs/README.md) - Overview of Roblox platform documentation and project-specific guidelines.
+-   [RobloxDocs/Services_Reference.md](RobloxDocs/Services_Reference.md) - Detailed reference for Roblox services and their applications.
+-   [RobloxDocs/UI_Systems.md](RobloxDocs/UI_Systems.md) - Principles and best practices for building robust UI systems in Roblox.
 
 ---
 
-## 🔍 How to Find Things
+## 🌟 Key Documents: Strategic & Foundational
 
-### By Topic
-- **Weapons** → [Features/Combat/WeaponFramework.md](Features/Combat/WeaponFramework.md) or [Assets/Assets_Weapons.md](Assets/Assets_Weapons.md)
-- **Movement** → [Components/Component_MovementController.md](Components/Component_MovementController.md)
-- **Economy** → [Features/BattleRoyale/Economy.md](Features/BattleRoyale/Economy.md) or [Design/Design_Economy_Loot.md](Design/Design_Economy_Loot.md)
-- **Cosmetics** → [Features/Progression/BattlePass.md](Features/Progression/BattlePass.md) or [Assets/Gamepasses.md](Assets/Gamepasses.md)
-- **Camera** → [Components/Component_CameraController.md](Components/Component_CameraController.md) or [Guides/DRONE_TUNING_GUIDE.md](Guides/DRONE_TUNING_GUIDE.md)
-
-### By Role
-- **Developers** → Start with [Features/](Features/) then drill into specific components
-- **Designers** → Check [Design/](Design/) for high-level specifications
-- **QA/Testers** → Use testing checklists in [Features/](Features/)
-- **Project Managers** → Review [Roadmap.md](Roadmap.md) and [Features/INDEX.md](Features/INDEX.md)
-- **Content Creators** → See [Assets/](Assets/) for cosmetics & items
-
-### By Phase
-- **Foundation** → [Components/](Components/)
-- **Combat & Fluidity** → [Features/Combat/](Features/Combat/)
-- **BR Mechanics** → [Features/BattleRoyale/](Features/BattleRoyale/)
-- **Progression** → [Features/Progression/](Features/Progression/)
-- **Polish** → [Guides/](Guides/)
+| Document | Purpose & Vision | Location |
+|----------|------------------|----------|
+| **Vision.md** | The overarching design philosophy, core "feel," and technical principles of the project. | Root |
+| **Roadmap.md** | Detailed long-term development timeline, phases, and strategic objectives. | Root |
+| **README.md** | Project overview, high-level architecture, and entry point for new contributors. | Root |
+| **Features/COMPLETION_REPORT.md** | Executive summary of documentation refactoring, verification, and readiness. | Features/ |
+| **Features/README.md** | Master index and navigation for all gameplay features. | Features/ |
+| **Features/INDEX.md** | In-depth cross-references, dependency graphs, and terminology standards for features. | Features/ |
 
 ---
 
-## 📊 Documentation Statistics
+## 🔍 How to Find Things: A Tactical Search Guide
 
-| Category | Files | Status |
-|----------|-------|--------|
-| Features | 13 | ✅ Complete |
-| Components | 8 | 📋 Reference |
-| Design | 5 | 📋 Reference |
-| Assets | 6 | 📋 Reference |
-| Guides | 4 | 📋 Reference |
-| Archive | 12+ | 🔄 Legacy |
+### By Topic / Architectural Layer
+-   **Weapons & Gunsmith** → [Features/Combat/WeaponFramework.md](Features/Combat/WeaponFramework.md) or [Assets/Assets_Weapons.md](Assets/Assets_Weapons.md)
+-   **Player Movement** → [Components/Component_MovementController.md](Components/Component_MovementController.md)
+-   **Game Economy** → [Features/BattleRoyale/Economy.md](Features/BattleRoyale/Economy.md) or [Design/Design_Economy_Loot.md](Design/Design_Economy_Loot.md)
+-   **Character Customization** → [Assets/Assets_Operators.md](Assets/Assets_Operators.md) or [Assets/Assets_Weapons.md](Assets/Assets_Weapons.md)
+-   **Camera Systems** → [Components/Component_CameraController.md](Components/Component_CameraController.md) or [Guides/DRONE_TUNING_GUIDE.md](Guides/DRONE_TUNING_GUIDE.md)
+-   **UI/UX Design** → [Components/Component_MenuController.md](Components/Component_MenuController.md) or [Guides/Armsdealer.md](Guides/Armsdealer.md)
+-   **State Management** → [Components/Component_StateMachine.md](Components/Component_StateMachine.Component_StateMachine.md)
+-   **Error Handling** → [Guides/errors.md](Guides/errors.md)
+-   **Monetization Strategy** → [Assets/Gamepasses.md](Assets/Gamepasses.md)
 
-**Total:** 50+ documentation files
+### By Role & Workflow
+-   **Engineers/Developers** → Start with [Features/](Features/) for high-level, then drill into [Components/](Components/) for implementation details. Consult [RobloxDocs/](RobloxDocs/) for platform-specific best practices.
+-   **Game Designers** → Consult [Design/](Design/) for strategic intent and mechanics. Review [Features/](Features/) for feature-specific design and impact.
+-   **QA/Testers** → Utilize the comprehensive testing checklists embedded within each document in [Features/](Features/).
+-   **Project Managers** → Review [Roadmap.md](Roadmap.md), [Vision.md](Vision.md), and [Features/COMPLETION_REPORT.md](Features/COMPLETION_REPORT.md) for project status and strategic alignment.
+-   **Content Creators** → See [Assets/](Assets/) for asset specifications and content guidelines.
+
+### By Development Phase
+-   **Foundation & Core Systems** → [Components/](Components/) & [RobloxDocs/](RobloxDocs/)
+-   **Combat & Gameplay Loop** → [Features/Combat/](Features/Combat/) & [Features/BattleRoyale/](Features/BattleRoyale/)
+-   **Player Progression & Retention** → [Features/Progression/](Features/Progression/)
+-   **UI/UX & Polish** → [Features/Systems/](Features/Systems/) & [Guides/](Guides/)
 
 ---
 
-## ✨ Folder Structure Overview
+## 📊 Documentation Statistics: A Quantitative Overview
+
+| Category | Files (Total) | Status |
+|----------|---------------|--------|
+| Features | 13            | ✅ Complete & Vision-Aligned |
+| Components | 8             | ✅ Complete & Verified |
+| Design | 5             | ✅ Complete & Verified |
+| Assets | 6             | ✅ Complete & Verified |
+| Guides | 5             | ✅ Complete & Verified |
+| RobloxDocs | 9             | 📋 External Reference & Best Practices |
+| Archive | 12+           | 🔄 Historical Reference Only |
+
+**Total Actively Maintained Files:** 46
+**Total Documents (including Archive):** ~58+ documentation files
+
+---
+
+## ✨ Folder Structure Overview: Project Hierarchy
 
 ```
 dokumentation/
-├── README.md (This file - project overview)
-├── Roadmap.md (Project timeline)
-├── Vision.md (Design philosophy)
-├── FEATURES_READY.md (Feature completion status)
+├── README.md (Project Overview)
+├── Roadmap.md (Development Timeline)
+├── Vision.md (Design Philosophy)
 │
-├── Features/ ⭐ (MAIN REFERENCE)
+├── Features/ ⭐ (MAIN REFERENCE: Gameplay Features)
 │   ├── README.md
 │   ├── INDEX.md
-│   ├── COMPLETION_REPORT.md
-│   ├── Combat/ (3 features)
-│   ├── BattleRoyale/ (6 features)
-│   ├── Progression/ (2 features)
-│   └── Systems/ (1 feature)
+│   ├── COMPLETION_REPORT.md (Feature Documentation Status)
+│   ├── Combat/
+│   ├── BattleRoyale/
+│   ├── Progression/
+│   └── Systems/
 │
-├── Components/ (8 system components)
+├── Components/ (Foundational Systems & Reusable Modules)
 │   └── README.md
 │
-├── Design/ (5 design documents)
+├── Design/ (Strategic Game Design Documents)
 │   └── README.md
 │
-├── Assets/ (6 asset documents)
+├── Assets/ (Game Content Specifications)
 │   └── README.md
 │
-├── Guides/ (4 guide documents)
+├── Guides/ (Technical Implementation & Troubleshooting)
 │   └── README.md
 │
-├── Archive/ (12+ legacy files)
+├── Archive/ (Legacy & Historical Reference)
 │   └── README.md
 │
-└── RobloxDocs/ (Platform reference)
+└── RobloxDocs/ (Platform Reference & Internal Best Practices)
 ```
 
 ---
 
-## 🎯 Getting the Most Out of This Documentation
+## 🎯 Getting the Most Out Of This Documentation: Strategic Engagement
 
-### For Implementation
-1. Open [Features/](Features/) for your specific feature
-2. Read the "Architecture" and "Code Examples" sections
-3. Check [Features/INDEX.md](Features/INDEX.md) for dependencies
-4. Reference [Components/](Components/) for implementation patterns
-5. Use the testing checklist for validation
-
-### For Understanding System Interactions
-1. Open [Features/INDEX.md](Features/INDEX.md)
-2. Review the "Dependency Graph" section
-3. Read the "Interaction Scenarios" for specific flows
-4. Cross-reference related features
+### For Implementation Teams
+1.  **Understand the Vision**: Start with [Vision.md](Vision.md) and your feature's "System Design & Vision" section.
+2.  **Detail & Code**: Dive into the specific feature and component documentation for architecture, code examples, and technical requirements.
+3.  **Validate**: Utilize testing checklists for thorough validation.
+4.  **Integrate**: Leverage [Features/INDEX.md](Features/INDEX.md) for understanding system-wide dependencies.
 
 ### For Design Review
-1. Start with [Features/README.md](Features/README.md) for overview
-2. Check [Design/](Design/) for high-level specifications
-3. Verify mechanics against [Features/](Features/) documentation
-4. Review asset lists in [Assets/](Assets/)
+1.  **High-Level Overview**: Begin with [Features/README.md](Features/README.md) and [Design/README.md](Design/README.md).
+2.  **Strategic Alignment**: Verify mechanics and intent against [Vision.md](Vision.md) and individual feature "System Design & Vision" sections.
+3.  **Asset Context**: Review asset lists in [Assets/](Assets/) for their impact on design.
 
-### For Troubleshooting
-1. Check [Guides/errors.md](Guides/errors.md) for common issues
-2. Review [Guides/DRONE_TUNING_GUIDE.md](Guides/DRONE_TUNING_GUIDE.md) for specific systems
-3. Search [Components/](Components/) for implementation details
-4. Check [Archive/](Archive/) for legacy context
+### For Troubleshooting & Debugging
+1.  **Consult Guides**: Reference [Guides/errors.md](Guides/errors.md) for general error handling and [Guides/DRONE_TUNING_GUIDE.md](Guides/DRONE_TUNING_GUIDE.md) for system-specific debugging.
+2.  **Deep Dive**: Explore [Components/](Components/) and [RobloxDocs/](RobloxDocs/) for detailed technical insights.
 
 ---
 
 ## 🔗 Navigation Quick Links
 
-- **[Features Home](Features/README.md)** - All gameplay features
-- **[Components Home](Components/README.md)** - System components
-- **[Design Home](Design/README.md)** - Design specifications
-- **[Assets Home](Assets/README.md)** - Game assets
-- **[Guides Home](Guides/README.md)** - How-to guides
-- **[Archive](Archive/README.md)** - Legacy docs
+-   **[Project Vision](Vision.md)** - The guiding principles of our game.
+-   **[Project Roadmap](Roadmap.md)** - Our long-term development strategy.
+-   **[Features Home](Features/README.md)** - All gameplay features.
+-   **[Components Home](Components/README.md)** - Foundational system components.
+-   **[Design Home](Design/README.md)** - Strategic game design documents.
+-   **[Assets Home](Assets/README.md)** - Game content specifications.
+-   **[Guides Home](Guides/README.md)** - Technical implementation & troubleshooting.
+-   **[Archive](Archive/README.md)** - Legacy documentation for historical reference.
+-   **[RobloxDocs Home](RobloxDocs/README.md)** - Roblox platform reference & best practices.
 
 ---
 
 ## 📝 Notes
 
-- ✅ Documentation last organized: 2026-01-19
-- ✅ All documentation cross-checked for consistency
-- ✅ 40+ internal links and cross-references active
-- 📌 Each folder has its own README for quick navigation
+-   ✅ Documentation last organized: 2026-01-21
+-   ✅ All documentation cross-checked for consistency and vision alignment.
+-   ✅ All internal links and cross-references verified and active.
+-   📌 Each category folder contains its own README for quick navigation and context.
 
 ---
 
-*Happy exploring! If you can't find what you're looking for, start with [Features/README.md](Features/README.md) or check the quick reference guides above.*
+*Happy exploring! This documentation is a living blueprint for our Warzone recreation. Your feedback is invaluable.*

@@ -1,17 +1,18 @@
 # Gamepasses & Monetization
 
-This document outlines the strategy and implementation for Gamepasses and other monetization features within the project.
+## System Design & Vision
 
-## Overview
-
-Gamepasses provide permanent benefits to players for a one-time Robux purchase. In this project, we aim to offer value-driven, non-"pay-to-win" perks that enhance the user experience.
+This document outlines the strategy and implementation for Gamepasses and other monetization features within the project. Our overarching vision is to create a sustainable revenue model that supports continuous development and content creation, while rigidly adhering to "non-pay-to-win" principles. We believe that monetization should enhance, not detract from, the player experience.
 
 ## Key Principles (2025-2026 Best Practices)
 
-- **Value-Based Pricing**: Price passes according to their perceived benefit.
-- **Variety**: Offer a range of price points (e.g., Starter Pack, VIP, Elite).
-- **Non-Intrusive Promotion**: Use in-game UI and subtle environmental cues rather than aggressive pop-ups.
-- **Fair Play**: Avoid locking core gameplay mechanics behind a paywall. Focus on convenience, cosmetics, and progression accelerators.
+Our monetization strategy is built on the following core principles:
+
+-   **Value-Driven & Fair Play**: All Gamepasses and purchasable items are designed to offer clear, tangible value without providing any direct gameplay advantages. We are committed to a strict "no pay-to-win" policy, ensuring that skill and strategy remain the sole determinants of success in the game.
+-   **Enhanced User Experience**: Monetization features should primarily focus on convenience, cosmetic personalization, and accelerated progression. This allows players to customize their experience or save time, while keeping core gameplay accessible to everyone.
+-   **Variety and Accessibility**: We aim to offer a range of price points and benefits (e.g., Starter Packs, VIP, XP Boosters) to cater to different player budgets and preferences. This ensures broad accessibility to our monetization offerings.
+-   **Non-Intrusive Promotion**: Monetization will be integrated thoughtfully into the game's UI and progression systems, utilizing subtle environmental cues and clear menu navigation rather than aggressive or disruptive pop-ups.
+-   **Sustainable Development**: The revenue generated from these monetization efforts directly funds the game's long-term development, including new content, features, and ongoing maintenance, ensuring a vibrant and evolving game environment.
 
 ## Implementation Guide
 
