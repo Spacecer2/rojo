@@ -31,7 +31,7 @@ local parameters = {
 		 tooltip = "Minimum distance from player"},
 		{name = "DroneMaxDistance", label = "Max Distance", min = 30, max = 80, default = 30, step = 5,
 		 tooltip = "Maximum distance from player"},
-		{name = "DroneHeightOffset", label = "Height Offset", min = -10, max = 20, default = 0, step = 1,
+		{name = "DroneHeightOffset", label = "Height Offset", min = -10, max = 20, default = 8, step = 1,
 		 tooltip = "Vertical offset above player"},
 		{name = "DroneLookAheadFactor", label = "Look Ahead Factor", min = 0.0, max = 0.5, default = 0.2, step = 0.05,
 		 tooltip = "How far ahead the camera looks (velocity-based)"},
